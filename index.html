@@ -63,7 +63,7 @@
         #exportBtn { background: #27ae60; color: white; }
         #exportBtn:hover { background: #1e8449; }
 
-        /* ตารางกระทัดรัด สวยงาม */
+        /* ตารางสวย + สีคอลัมน์เข้มขึ้น */
         table {
             width: 100%; border-collapse: collapse; font-size: 15px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.1); margin: 20px 0; border-radius: 14px; overflow: hidden;
@@ -76,9 +76,16 @@
         tr:nth-child(even) { background: #f8fbff; }
         tr:hover { background: #e8f4fd !important; }
 
-        th:nth-child(6), td:nth-child(6) { background: #e3f2fd !important; } /* มูลค่า */
-        th:nth-child(11), td:nth-child(11) { background: #fff8e1 !important; font-weight: bold; } /* แนะนำสั่งซื้อ */
-        th:nth-child(12), td:nth-child(12) { background: #e8f5e8 !important; font-weight: bold; } /* ABC */
+        /* สีคอลัมน์ใหม่ – เข้มขึ้น ชัดเจนขึ้น */
+        th:nth-child(6), td:nth-child(6) { 
+            background: #1565c0 !important; color: white !important; font-weight: bold; 
+        } /* มูลค่า – น้ำเงินเข้ม */
+        th:nth-child(11), td:nth-child(11) { 
+            background: #e65100 !important; color: white !important; font-weight: bold; 
+        } /* แนะนำสั่งซื้อ – ส้มเข้ม */
+        th:nth-child(12), td:nth-child(12) { 
+            background: #2e7d32 !important; color: white !important; font-weight: bold; 
+        } /* ABC – เขียวเข้ม */
 
         .td-left { text-align: left !important; padding-left: 16px; white-space: normal; }
         .highlight { background: #fff3cd !important; font-weight: bold; color: #d35400; }
@@ -157,15 +164,15 @@
         <p style="margin:20px 0 0;font-size:22px;">รวม: <strong id="totalAll">0</strong> บาท | จำนวนรายการ: <strong id="countAll">0</strong></p>
     </div>
 
-    <div class="info">ตารางกระทัดรัด อ่านง่าย • ใช้ปุ่มด้านล่างเลื่อนหน้า</div>
+    <div class="info">ตารางสีเข้มขึ้น – อ่านง่าย สบายตา</div>
 
     <table id="dataTable">
         <thead>
             <tr>
                 <th>Plant</th><th>Material</th><th>รายการอะไหล่</th><th>หน่วย</th><th>คงเหลือ</th>
                 <th>มูลค่า</th><th>ใช้ 4 เดือน</th><th>Safety</th><th>ROP</th><th>DOS</th>
-                <th style="background:#ff9800;color:white;">แนะนำสั่งซื้อ</th>
-                <th style="background:#4caf50;color:white;">ABC</th>
+                <th style="background:#e65100;color:white;">แนะนำสั่งซื้อ</th>
+                <th style="background:#2e7d32;color:white;">ABC</th>
                 <th>% สะสม</th>
             </tr>
         </thead>
@@ -306,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
         currentPage = 1;
         renderTable();
         renderPagination();
-        updateSummaryFromCurrentView(); // สรุปตามตาราง
+        updateSummaryFromCurrentView();
     }
 
     function renderTable() {
@@ -332,13 +339,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td class="td-left">${r.Description}</td>
                 <td>${r.Unit}</td>
                 <td>${formatNumber(r.Unrestricted)}</td>
-                <td>${formatCurrency(r.Value)}</td>
+                <td style="color:white;font-weight:bold;">${formatCurrency(r.Value)}</td>
                 <td>${formatNumber(r.Qty4Month)}</td>
                 <td>${formatNumber(Math.round(r.SafetyStock))}</td>
                 <td>${formatNumber(Math.round(r.ROP))}</td>
                 <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
-                <td style="font-weight:bold;color:#e65100;font-size:1.3em;">${formatNumber(Math.round(r.RecommendedOrder))}</td>
-                <td style="font-weight:bold;color:#2e7d32;">${r.ABCValue}</td>
+                <td style="color:white;font-weight:bold;font-size:1.3em;">${formatNumber(Math.round(r.RecommendedOrder))}</td>
+                <td style="color:white;font-weight:bold;">${r.ABCValue}</td>
                 <td>${r.CumPercent.toFixed(2)}%</td>`;
             tbody.appendChild(tr);
         });
