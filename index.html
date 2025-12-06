@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function calculateKeepQty(r) {
         const avg = r.AvgDailyUse;
         if (r.Moving === "Dead") return 1;
-        if (r.Moving === "Slow" && r.ABCValue === "C") return 1;
+        if (r.Moving === "Slow" && r.ABCValue === "C") return Math.max(1, Math.round(avg * 60));
         if (r.Moving === "Slow" && r.ABCValue === "B") return Math.max(1, Math.round(avg * 60));
         if (r.Moving === "Medium" && r.ABCValue === "C") return Math.max(2, Math.round(avg * 60));
         if (r.Moving === "Slow" && r.ABCValue === "A") return Math.max(3, Math.round(avg * 60));
