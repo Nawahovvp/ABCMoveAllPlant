@@ -69,6 +69,33 @@
         .page-btn { padding: 8px 14px; margin: 0 4px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
         .page-btn.active { background: #667eea; color: white; border: none; }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* จัดข้อความในคอลัมน์ตัวเลขให้อยู่กึ่งกลาง */
+.item-card > :nth-child(5),
+.item-card > :nth-child(6),
+.item-card > :nth-child(7),
+.item-card > :nth-child(8),
+.item-card > :nth-child(9),
+.item-card > :nth-child(10),
+.item-card > :nth-child(11),
+.item-card > :nth-child(12),
+.item-card > :nth-child(13),
+.item-card > :nth-child(14),
+.item-card > :nth-child(17),
+.item-card > :nth-child(18),
+.table-header > :nth-child(5),
+.table-header > :nth-child(6),
+.table-header > :nth-child(7),
+.table-header > :nth-child(8),
+.table-header > :nth-child(9),
+.table-header > :nth-child(10),
+.table-header > :nth-child(11),
+.table-header > :nth-child(12),
+.table-header > :nth-child(13),
+.table-header > :nth-child(14),
+.table-header > :nth-child(17),
+.table-header > :nth-child(18) {
+    text-align: center;
+}
     </style>
  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -115,7 +142,7 @@
         <div class="control-group"><label>Plant:</label><select id="plantFilter"><option value="">ทุก Plant</option></select></div>
         <div class="control-group"><label>Lead Time:</label><input type="number" id="leadTimeDays" value="5"> วัน</div>
         <div class="control-group"><label>Safety:</label><input type="number" id="safetyDays" value="20"> วัน</div>
-        <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="60"> วัน</div>
+        <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="45"> วัน</div>
         <button class="export-btn" id="exportBtn">Export Excel</button>
     </div>
 
@@ -137,7 +164,7 @@
             <div data-sort="ABCValue">ABC</div>
             <div data-sort="Moving">Moving</div>
             <div data-sort="ReturnQty">ส่งคืน</div>
-            <div data-sort="CumPercent">%สะสม</div>
+            <div data-sort="CumPercent">%สะสม <i class="fas fa-sort sort-icon"></i></div>
         </div>
         <div id="dataList"></div>
     </div>
@@ -153,7 +180,7 @@ function formatShortCurrency(n) {
     if (n >= 1e3) return (n / 1e3).toFixed(2) + " K";
     return n.toFixed(2);
 }
-let sortKey = "Value", sortDir = "desc";
+let sortKey = "CumPercent", sortDir = "asc";
 
 document.addEventListener("DOMContentLoaded", function () {
     const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
