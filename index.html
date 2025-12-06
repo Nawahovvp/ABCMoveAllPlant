@@ -3,213 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบวิเคราะห์ ABC อะไหล่ + แนะนำสั่งซื้อ</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ระบบวิเคราะห์ ABC อะไหล่ (เวอร์ชันสวยสุด)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { 
-            font-family: "Segoe UI", Tahoma, Arial, sans-serif; 
-            margin: 0; 
-            background: #f0f2f5; 
-            padding: 15px; 
-        }
-        .container {
-            max-width: 1900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            overflow: hidden;
-        }
-        h1 { 
-            text-align: center; color: white; margin: 0; padding: 28px 20px; 
-            background: linear-gradient(45deg, #2c3e50, #3498db);
-            font-size: 30px; font-weight: bold;
-        }
-        .subtitle { text-align: center; color: #ddd; font-size: 17px; margin-bottom: 8px; }
+        body { font-family: "Prompt", "Segoe UI", sans-serif; margin: 0; background: #f0f4f8; padding: 10px; }
+        .container { max-width: 1920px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        h1 { text-align: center; color: white; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 26px; }
+        .subtitle { text-align: center; color: #888; font-size: 15px; margin-bottom: 10px; }
 
-        .controls {
-            padding: 22px; background: #f8f9fa;
-            display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center;
-            border-bottom: 1px solid #eee;
-        }
-        .control-group {
-            display: flex; align-items: center; gap: 10px;
-            background: white; padding: 12px 18px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        label { font-weight: bold; color: #2c3e50; }
-        select, input[type="number"] {
-            padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 15px;
-        }
-        input[type="number"] { width: 90px; }
+        /* Card สรุปเงิน แบบสั้น ๆ */
+        .summary-row { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 20px; background: #f8fafc; }
+        .card { flex: 1 1 200px; min-width: 200px; padding: 18px; border-radius: 16px; text-align: center; color: white; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 12px 25px rgba(0,0,0,0.2); }
+        .card-title { font-size: 15px; opacity: 0.95; margin-bottom: 8px; }
+        .card-value { font-size: 28px; font-weight: 900; margin: 8px 0; }
+        .card-count { font-size: 13px; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 4px 10px; display: inline-block; }
 
-        .filter-btn, .summary-btn {
-            padding: 12px 22px; border: none; border-radius: 50px; font-weight: bold;
-            cursor: pointer; transition: all 0.3s; font-size: 15px; min-width: 160px;
-        }
-        .filter-btn.off, .summary-btn { background: #95a5a6; color: white; }
-        .filter-btn.on { background: #27ae60; color: white; box-shadow: 0 6px 18px rgba(39,174,96,0.4); transform: translateY(-2px); }
-        .summary-btn { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .after-return { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .abc-a { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .abc-b { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .abc-c { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+        .fast { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .medium { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .slow { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .dead { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
 
-        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
-        button {
-            padding: 12px 22px; font-size: 15px; font-weight: bold;
-            border: none; border-radius: 12px; cursor: pointer; transition: 0.3s;
-        }
-        #calcBtn   { background: #3498db; color: white; }
-        #calcBtn:hover { background: #2980b9; }
-        #graphBtn  { background: #9b59b6; color: white; }
-        #graphBtn:hover { background: #8e44ad; }
-        #exportBtn { background: #27ae60; color: white; }
-        #exportBtn:hover { background: #1e8449; }
+        .controls { padding: 20px; background: #fff; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; border-bottom: 1px solid #eee; }
+        .control-group { display: flex; align-items: center; gap: 10px; background: #f1f3f5; padding: 10px 18px; border-radius: 12px; font-size: 14px; }
+        label { font-weight: 600; color: #2c3e50; }
+        select, input[type=number] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; }
+        .export-btn { padding: 12px 24px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); }
+        .export-btn:hover { transform: translateY(-3px); }
 
-        /* ตารางสวย + สีคอลัมน์เข้มขึ้น */
-        table {
-            width: 100%; border-collapse: collapse; font-size: 15px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1); margin: 20px 0; border-radius: 14px; overflow: hidden;
+        /* ตารางแบบ Card List (สวยมาก) */
+        .list-container { max-height: 70vh; overflow-y: auto; padding: 10px 20px; }
+        .item-card {
+            display: grid; grid-template-columns: 60px 100px 1fr 80px 90px 110px 90px 90px 90px 80px 90px 80px 100px 60px 80px 90px 80px;
+            gap: 10px; align-items: center; padding: 14px 16px; margin: 8px 0; background: white; border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s; font-size: 13px; line-height: 1.4;
         }
-        th {
-            background: #2c3e50; color: white; padding: 16px 12px; text-align: center;
-            font-weight: bold; font-size: 15.5px; position: sticky; top: 0; z-index: 10;
-        }
-        td { padding: 14px 10px; text-align: center; border-bottom: 1px solid #eee; white-space: nowrap; }
-        tr:nth-child(even) { background: #f8fbff; }
-        tr:hover { background: #e8f4fd !important; }
+        .item-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); background: #f8fffe; }
+        .item-card:nth-child(even) { background: #f8f9fa; }
+        .item-header { grid-column: 1 / -1; background: #667eea; color: white; padding: 12px 16px; border-radius: 12px; font-weight: bold; font-size: 13px; }
 
-        /* สีคอลัมน์ใหม่ – เข้มขึ้น ชัดเจนขึ้น */
-        th:nth-child(6), td:nth-child(6) { 
-            background: #1565c0 !important; color: white !important; font-weight: bold; 
-        } /* มูลค่า – น้ำเงินเข้ม */
-        th:nth-child(11), td:nth-child(11) { 
-            background: #e65100 !important; color: white !important; font-weight: bold; 
-        } /* แนะนำสั่งซื้อ – ส้มเข้ม */
-        th:nth-child(12), td:nth-child(12) { 
-            background: #2e7d32 !important; color: white !important; font-weight: bold; 
-        } /* ABC – เขียวเข้ม */
+        .material { font-weight: bold; color: #2c3e50; }
+        .desc { font-size: 12.5px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; }
+        .order { font-weight: bold; }
+        .order-0 { color: #95a5a6; }
+        .order-1-10 { background: #d5f5e3; color: #1e8449; }
+        .order-11-50 { background: #fef9e7; color: #d35400; }
+        .order-51-200 { background: #fdecea; color: #c0392b; }
+        .order-200 { background: #fadbd8; color: #c0392b; font-weight: bold; }
 
-        .td-left { text-align: left !important; padding-left: 16px; white-space: normal; }
-        .highlight { background: #fff3cd !important; font-weight: bold; color: #d35400; }
-        .non-moving { background: #f5f5f5 !important; color: #95a5a6; font-style: italic; }
+        .moving-fast { background: #d5f5e3; color: #1e8449; padding: 2px 8px; border-radius: 6px; }
+        .moving-medium { background: #fef9e7; color: #d35400; padding: 2px 8px; border-radius: 6px; }
+        .moving-slow { background: #fdecea; color: #c0392b; padding: 2px 8px; border-radius: 6px; }
+        .moving-dead { background: #f0f0f0; color: #7f8c8d; padding: 2px 8px; border-radius: 6px; }
 
-        /* ปุ่มนำทาง */
-        .pagination {
-            display: flex; justify-content: center; align-items: center; gap: 10px; padding: 20px;
-            background: #f8f9fa; border-top: 1px solid #eee;
-        }
-        .page-btn {
-            padding: 10px 16px; border: 1px solid #ddd; background: white; border-radius: 10px;
-            cursor: pointer; font-size: 16px; min-width: 44px; text-align: center; transition: 0.3s;
-        }
-        .page-btn:hover { background: #3498db; color: white; border-color: #3498db; }
-        .page-btn.active { background: #27ae60; color: white; font-weight: bold; border-color: #27ae60; }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .summary-box {
-            background: linear-gradient(45deg, #2c3e50, #34495e);
-            color: white; padding: 28px; text-align: center;
-            margin: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: none;
-        }
-        .summary-row { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin: 20px 0; }
-        .abc-item {
-            flex: 1; min-width: 260px; padding: 25px; border-radius: 16px;
-            font-weight: bold; font-size: 22px; cursor: pointer; transition: 0.4s;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .abc-item:hover { transform: translateY(-8px); box-shadow: 0 18px 35px rgba(0,0,0,0.4); }
-        .abc-a { background: linear-gradient(45deg, #e74c3c, #c0392b); }
-        .abc-b { background: linear-gradient(45deg, #f39c12, #e67e22); }
-        .abc-c { background: linear-gradient(45deg, #95a5a6, #7f8c8d); }
-
-        .info { text-align: center; color: #2c3e50; margin: 18px 0; font-size: 16px; }
+        .pagination { padding: 15px; text-align: center; background: #f8f9fa; }
+        .info-box { margin: 15px 20px; padding: 16px; background: linear-gradient(135deg, #a8edea, #fed6e3); border-radius: 14px; color: #2c3e50; font-size: 14px; line-height: 1.7; }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
 <div class="container">
-    <h1>ระบบวิเคราะห์ ABC อะไหล่ + แนะนำสั่งซื้อ</h1>
-    <p class="subtitle">Plant 0366 • คลิก A / B / C เพื่อกรองทันที</p>
+    <h1>ระบบวิเคราะห์ ABC อะไหล่ + สั่งซื้ออัจฉริยะ</h1>
+    <p class="subtitle">Plant 0366 • คลิกการ์ดเพื่อกรองทันที</p>
+
+    <!-- Card เงินสั้น ๆ -->
+    <div class="summary-row">
+        <div class="card total-stock" id="cardTotalStock">
+            <div class="card-title">มูลค่าคลังรวม</div>
+            <div class="card-value" id="totalStockValue">0.00</div>
+            <div class="card-count" id="totalCount">0 รายการ</div>
+        </div>
+        <div class="card order-items" id="cardOrderItems">
+            <div class="card-title">ต้องสั่งซื้อ</div>
+            <div class="card-value" id="orderItemCount">0</div>
+            <div class="card-value" id="orderTotalValue">0.00</div>
+        </div>
+        <div class="card return-value" id="cardReturnValue">
+            <div class="card-title">ส่งคืนได้</div>
+            <div class="card-value" id="returnValue">0.00</div>
+            <div class="card-count" id="returnItemCount">0 รายการ</div>
+        </div>
+        <div class="card after-return" id="cardAfterReturn">
+            <div class="card-title">หลังส่งคืน</div>
+            <div class="card-value" id="afterReturnValue">0.00</div>
+        </div>
+    </div>
+
+    <!-- ABC + Moving -->
+    <div class="summary-row">
+        <div class="card abc-a" id="abcA"><div class="card-title">กลุ่ม A</div><div class="card-value" id="sumA">0.00</div><div class="card-count" id="countA">0 รายการ</div></div>
+        <div class="card abc-b" id="abcB"><div class="card-title">กลุ่ม B</div><div class="card-value" id="sumB">0.00</div><div class="card-count" id="countB">0 รายการ</div></div>
+        <div class="card abc-c" id="abcC"><div class="card-title">กลุ่ม C</div><div class="card-value" id="sumC">0.00</div><div class="card-count" id="countC">0 รายการ</div></div>
+        <div class="card fast" id="cardFast"><div class="card-title">Fast Moving</div><div class="card-value" id="valFast">0.00</div><div class="card-count" id="countFast">0 รายการ</div></div>
+        <div class="card medium" id="cardMedium"><div class="card-title">Medium</div><div class="card-value" id="valMedium">0.00</div><div class="card-count" id="countMedium">0 รายการ</div></div>
+        <div class="card slow" id="cardSlow"><div class="card-title">Slow Moving</div><div class="card-value" id="valSlow">0.00</div><div class="card-count" id="countSlow">0 รายการ</div></div>
+        <div class="card dead" id="cardDead"><div class="card-title">Dead Stock</div><div class="card-value" id="valDead">0.00</div><div class="card-count" id="countDead">0 รายการ</div></div>
+    </div>
 
     <div class="controls">
         <div class="control-group"><label>Plant:</label><select id="plantFilter"><option value="">ทุก Plant</option></select></div>
-        <div class="control-group"><label>ABC:</label>
-            <select id="abcValueFilter"><option value="">ทั้งหมด</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
-        </div>
-
-        <div class="control-group"><label>Lead Time:</label><input type="number" id="leadTimeDays" value="5" min="0"> วัน</div>
-        <div class="control-group"><label>Safety Stock:</label><input type="number" id="safetyDays" value="3" min="0"> วัน</div>
-        <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="40" min="1"> วัน</div>
-
-        <button class="filter-btn on" id="btnOnlyOrder">เฉพาะต้องสั่ง (≥1)</button>
-        <button class="filter-btn off" id="btnNonMoving">เฉพาะไม่เคลื่อนไหว</button>
-        <button class="filter-btn off" id="btnShowAll">แสดงทั้งหมด</button>
-
-        <button class="summary-btn" id="btnSummary">สรุป ABC</button>
-
-        <div class="btn-group">
-            <button id="calcBtn">คำนวณใหม่</button>
-            <button id="graphBtn">แสดงกราฟ Pareto</button>
-            <button id="exportBtn">ส่งออก CSV</button>
-        </div>
+        <div class="control-group"><label>Lead Time:</label><input type="number" id="leadTimeDays" value="5"> วัน</div>
+        <div class="control-group"><label>Safety:</label><input type="number" id="safetyDays" value="20"> วัน</div>
+        <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="60"> วัน</div>
+        <button class="export-btn" id="exportBtn">Export Excel</button>
     </div>
 
-    <!-- สรุป ABC แสดงตามตาราง -->
-    <div id="summaryBox" class="summary-box">
-        <h3 style="margin:0 0 20px;font-size:26px;">สรุปมูลค่าตามข้อมูลที่แสดง (คลิกเพื่อกรอง)</h3>
-        <div class="summary-row">
-            <div class="abc-item abc-a" id="abcA">A: <span id="sumA">0</span> บาท</div>
-            <div class="abc-item abc-b" id="abcB">B: <span id="sumB">0</span> บาท</div>
-            <div class="abc-item abc-c" id="abcC">C: <span id="sumC">0</span> บาท</div>
-        </div>
-        <p style="margin:20px 0 0;font-size:22px;">รวม: <strong id="totalAll">0</strong> บาท | จำนวนรายการ: <strong id="countAll">0</strong></p>
+    <div class="info-box">
+        <strong>จำนวนแนะนำสั่งซื้อ:</strong> สั่งเฉพาะเมื่อคงเหลือ < ROP • สั่งให้เพียงพอใช้อีกเต็ม <span id="coverInfo">60</span> วัน • ถ้ายังเหลือเยอะ → แสดง 0 (ไม่ต้องสั่ง)
     </div>
 
-    <div class="info">ตารางสีเข้มขึ้น – อ่านง่าย สบายตา</div>
+    <div class="list-container">
+        <div class="item-card item-header">
+            <div>Plant</div><div>Material</div><div>รายการอะไหล่</div><div>หน่วย</div><div>คงเหลือ</div>
+            <div>มูลค่า</div><div>ใช้ 6ด.</div><div>ใช้ 4ด.</div><div>เฉลี่ย/ด.</div><div>Safety</div><div>ROP</div><div>DOS</div>
+            <div>แนะนำสั่งซื้อ</div><div>ABC</div><div>Moving</div><div>ส่งคืนได้</div><div>%สะสม</div>
+        </div>
+        <div id="dataList"></div>
+    </div>
 
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>Plant</th><th>Material</th><th>รายการอะไหล่</th><th>หน่วย</th><th>คงเหลือ</th>
-                <th>มูลค่า</th><th>ใช้ 4 เดือน</th><th>Safety</th><th>ROP</th><th>DOS</th>
-                <th style="background:#e65100;color:white;">แนะนำสั่งซื้อ</th>
-                <th style="background:#2e7d32;color:white;">ABC</th>
-                <th>% สะสม</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <!-- ปุ่มนำทาง -->
     <div class="pagination" id="pagination"></div>
 </div>
 
 <script>
+// ฟังก์ชันแปลงตัวเลขเป็น K / M
+function formatShortCurrency(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + " พันล้าน";
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + " M";
+    if (n >= 1e3) return (n / 1e3).toFixed(2) + " K";
+    return n.toFixed(2);
+}
 document.addEventListener("DOMContentLoaded", function () {
     const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
     const inventoryUrl = 'https://opensheet.elk.sh/1OtcgbmQdrI3gKJCGiDge6xuOsrT0GPxdKeFPjpvK3Rg/Sheet1';
-
-    let allData = [], currentView = [], filteredData = [];
-    let mode = "onlyOrder";
+    let allData = [], filteredData = [];
+    let mode = "all", abcFilter = "", movingFilter = ""; // ใช้ตัวแปรแยก
     let currentPage = 1;
-    const rowsPerPage = 20;
+    const rowsPerPage = 25;
 
     function toNumber(v) { return parseFloat((v||"0").toString().replace(/,/g,'')) || 0; }
     function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
     function formatCurrency(n) { return Number(n).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+    function calculateKeepQty(r) {
+        const avg = r.AvgDailyUse;
+        if (r.Moving === "Dead") return 1;
+        if (r.Moving === "Slow" && r.ABCValue === "C") return 1;
+        if (r.Moving === "Slow" && r.ABCValue === "B") return Math.max(1, Math.round(avg * 14));
+        if (r.Moving === "Medium" && r.ABCValue === "C") return Math.max(2, Math.round(avg * 21));
+        if (r.Moving === "Slow" && r.ABCValue === "A") return Math.max(3, Math.round(avg * 30));
+        if (r.Moving === "Medium" && r.ABCValue === "B") return Math.max(4, Math.round(avg * 45));
+        if (r.Moving === "Fast" && r.ABCValue === "C") return Math.max(5, Math.round(avg * 60));
+        if (r.Moving === "Medium" && r.ABCValue === "A") return Math.max(6, Math.round(avg * 75));
+        if (r.Moving === "Fast" && r.ABCValue === "B") return Math.max(8, Math.round(avg * 90));
+        if (r.Moving === "Fast" && r.ABCValue === "A") return Math.max(10, Math.round(avg * 120));
+        return Math.max(1, Math.round(avg * 40));
+    }
 
     async function loadData() {
         try {
             const [uRes, iRes] = await Promise.all([fetch(usageUrl), fetch(inventoryUrl)]);
             const usage = await uRes.json();
             const inv = await iRes.json();
-
             const useMap = new Map();
             usage.forEach(r => useMap.set(`${r.Plant?.trim()}-${r.Material?.trim()}`, r));
 
             allData = inv.map(r => {
                 const key = `${r.Plant?.trim()}-${r.Material?.trim()}`;
-                const u = useMap.get(key) || {Qtyissu:0};
+                const u = useMap.get(key) || {Qtyissu:0, Qtyissu6m:0};
                 const qty4m = toNumber(u.Qtyissu);
+                const qty6m = toNumber(u.Qtyissu6m) || Math.round(qty4m * 1.5);
                 return {
                     Plant: (r.Plant||'').trim(),
                     Material: (r.Material||'').trim(),
@@ -217,21 +187,19 @@ document.addEventListener("DOMContentLoaded", function () {
                     Unit: r["Base Unit of Measure"] || '',
                     Unrestricted: toNumber(r.Unrestricted),
                     Value: toNumber(r["Value Unrestricted"]),
+                    Qty6Month: qty6m,
                     Qty4Month: qty4m,
+                    AvgMonthly: qty4m / 4,
                     AvgDailyUse: qty4m / 120,
                     SafetyStock:0, ROP:0, DOS:0, RecommendedOrder:0,
-                    ABCValue:"", CumPercent:0,
-                    IsNonMoving: qty4m === 0
+                    ABCValue:"", CumPercent:0, Moving:"", IsNonMoving: qty4m === 0,
+                    ReturnQty: 0, ReturnValue: 0
                 };
             });
-
             calcABCValue();
             fillPlantDropdown();
             setDefaultAndCalculate();
-        } catch(e) {
-            alert("โหลดข้อมูลไม่สำเร็จ");
-            console.error(e);
-        }
+        } catch(e) { alert("โหลดข้อมูลไม่สำเร็จ"); console.error(e); }
     }
 
     function calcABCValue() {
@@ -249,22 +217,57 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function recalculateStockFields(data, params) {
-        data.forEach(r => {
-            const d = r.AvgDailyUse;
-            const safety = d * params.safety;
-            const rop = d * params.leadTime + safety;
-            const dos = d > 0 ? r.Unrestricted / d : 9999;
-            let recommend = d * params.cover + safety - r.Unrestricted;
-            if(recommend < 0) recommend = 0;
+    // 1. แก้ recalculateStockFields ให้ return ค่ากลับมา
+// 1. แก้ recalculateStockFields ให้ return ค่ากลับมา
+function recalculateStockFields(data, params) {
+    let totalReturnValue = 0;
+    let totalAfterReturn = 0;
 
-            r.SafetyStock = safety;
-            r.ROP = rop;
-            r.DOS = dos;
-            r.RecommendedOrder = recommend;
-        });
-    }
+    data.forEach(r => {
+        const d = r.AvgDailyUse || 0;
+        const leadTime = params.leadTime || 5;
+        const safetyDays = params.safety || 3;
+        const coverDays = params.cover || 40;
 
+        const safetyStock = d * safetyDays;
+        const rop = (d * leadTime) + safetyStock;
+        const dos = d > 0 ? r.Unrestricted / d : 9999;
+
+        r.SafetyStock = Math.round(safetyStock);
+        r.ROP = Math.round(rop);
+        r.DOS = dos > 9999 ? 9999 : parseFloat(dos.toFixed(1));
+
+        // สูตรสั่งซื้อใหม่: เฉพาะเมื่อต่ำกว่า ROP
+        let recommend = 0;
+        if (r.Unrestricted < rop) {
+            const needed = d * coverDays;
+            recommend = needed - r.Unrestricted;
+            if (recommend < 0) recommend = 0;
+        }
+        r.RecommendedOrder = Math.round(recommend);
+
+        // Moving
+        if (r.IsNonMoving || dos >= 9999) r.Moving = "Dead";
+        else if (dos > 30) r.Moving = "Fast";
+        else if (dos > 12) r.Moving = "Medium";
+        else r.Moving = "Slow";
+
+        // ส่งคืน
+        const keepQty = calculateKeepQty(r);
+        const returnQty = Math.max(0, r.Unrestricted - keepQty);
+        const unitPrice = r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0;
+        const returnValue = returnQty * unitPrice;
+
+        r.ReturnQty = Math.round(returnQty);
+        r.ReturnValue = returnValue;
+
+        totalReturnValue += returnValue;
+        totalAfterReturn += (r.Value - returnValue);
+    });
+
+    // ส่งค่ากลับ
+    return { totalReturnValue, totalAfterReturn };
+}
     function fillPlantDropdown() {
         const sel = document.getElementById("plantFilter");
         const plants = [...new Set(allData.map(r=>r.Plant))].filter(Boolean).sort();
@@ -274,145 +277,205 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function setDefaultAndCalculate() {
         const sel = document.getElementById("plantFilter");
-        const opt0366 = Array.from(sel.options).find(o => o.value === "0366");
-        if(opt0366) sel.value = "0366";
-        mode = "onlyOrder";
-        updateFilterButtons();
+        if (sel.querySelector('[value="0366"]')) sel.value = "0366";
+        mode = "all"; abcFilter = ""; movingFilter = "";
         applyFiltersAndRender();
     }
 
-    function updateFilterButtons() {
-        document.getElementById("btnOnlyOrder").className = "filter-btn " + (mode === "onlyOrder" ? "on" : "off");
-        document.getElementById("btnNonMoving").className = "filter-btn " + (mode === "nonMoving" ? "on" : "off");
-        document.getElementById("btnShowAll").className = "filter-btn " + (mode === "all" ? "on" : "off");
-    }
+    // 2. แก้ applyFiltersAndRender ให้รับค่ากลับมา
+function applyFiltersAndRender() {
+    let data = [...allData];
+    const plant = document.getElementById("plantFilter").value;
+    if (plant) data = data.filter(r => r.Plant === plant);
 
-    function applyFiltersAndRender() {
-        let data = [...allData];
+    const params = {
+        leadTime: parseInt(document.getElementById("leadTimeDays").value) || 5,
+        safety: parseInt(document.getElementById("safetyDays").value) || 3,
+        cover: parseInt(document.getElementById("coverDays").value) || 40
+    };
 
-        const plant = document.getElementById("plantFilter").value;
-        const abcFilter = document.getElementById("abcValueFilter").value;
-        if(plant) data = data.filter(r => r.Plant === plant);
-        if(abcFilter) data = data.filter(r => r.ABCValue === abcFilter);
+    // รับค่ากลับมาจากฟังก์ชัน
+    const { totalReturnValue, totalAfterReturn } = recalculateStockFields(data, params);
 
-        const params = {
-            leadTime: parseInt(document.getElementById("leadTimeDays").value) || 5,
-            safety:   parseInt(document.getElementById("safetyDays").value)   || 3,
-            cover:    parseInt(document.getElementById("coverDays").value)    || 40
-        };
-        recalculateStockFields(data, params);
+    // กรอง mode
+    if (mode === "onlyOrder") data = data.filter(r => Math.round(r.RecommendedOrder) >= 1);
+    else if (mode === "returnable") data = data.filter(r => r.ReturnQty > 0);
+    else if (mode === "afterReturn") data = data.map(r => ({...r, Unrestricted: r.Unrestricted - r.ReturnQty}));
 
-        if (mode === "onlyOrder") {
-            data = data.filter(r => Math.round(r.RecommendedOrder) >= 1);
-        } else if (mode === "nonMoving") {
-            data = data.filter(r => r.IsNonMoving);
+    if (abcFilter) data = data.filter(r => r.ABCValue === abcFilter);
+    if (movingFilter) data = data.filter(r => r.Moving === movingFilter);
+
+    data.sort((a,b) => b.Value - a.Value);
+    filteredData = data;
+    currentPage = 1;
+
+    // อัปเดต Card ส่งคืน (ใช้ค่าที่รับมา)
+    document.getElementById("returnValue").textContent = formatShortCurrency(totalReturnValue);
+    document.getElementById("afterReturnValue").textContent = formatShortCurrency(totalAfterReturn);
+
+    renderTable();
+    renderPagination();
+    updateAllCards();
+}
+
+   // 3. แก้ updateAllCards ให้ไม่ใช้ totalReturnValue อีก (เพราะอัปเดตไปแล้ว)
+function updateAllCards() {
+    const data = filteredData;
+    const abc = {A:0,B:0,C:0}, cntABC = {A:0,B:0,C:0};
+    const mov = {Fast:0,Medium:0,Slow:0,Dead:0}, cntMov = {Fast:0,Medium:0,Slow:0,Dead:0};
+    let totalStock = 0, orderItems = 0, orderValue = 0, returnCount = 0;
+
+    data.forEach(r => {
+        totalStock += r.Value;
+        abc[r.ABCValue] += r.Value; cntABC[r.ABCValue]++;
+        mov[r.Moving] += r.Value; cntMov[r.Moving]++;
+
+        const qty = Math.round(r.RecommendedOrder);
+        if (qty > 0) { 
+            orderItems++; 
+            orderValue += qty * (r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0); 
         }
+        if (r.ReturnQty > 0) returnCount++;
+    });
 
-        data.sort((a,b) => b.Value - a.Value);
-        filteredData = data;
-        currentPage = 1;
-        renderTable();
-        renderPagination();
-        updateSummaryFromCurrentView();
-    }
+    // แสดงเป็น K/M
+    document.getElementById("totalStockValue").textContent = formatShortCurrency(totalStock);
+    document.getElementById("orderTotalValue").textContent = formatShortCurrency(orderValue);
 
+    document.getElementById("sumA").textContent = formatShortCurrency(abc.A);
+    document.getElementById("sumB").textContent = formatShortCurrency(abc.B);
+    document.getElementById("sumC").textContent = formatShortCurrency(abc.C);
+    document.getElementById("valFast").textContent = formatShortCurrency(mov.Fast);
+    document.getElementById("valMedium").textContent = formatShortCurrency(mov.Medium);
+    document.getElementById("valSlow").textContent = formatShortCurrency(mov.Slow);
+    document.getElementById("valDead").textContent = formatShortCurrency(mov.Dead);
+
+    document.getElementById("totalCount").textContent = data.length + " รายการ";
+    document.getElementById("orderItemCount").textContent = orderItems;
+    document.getElementById("returnItemCount").textContent = returnCount + " รายการ";
+    document.getElementById("countA").textContent = cntABC.A + " รายการ";
+    document.getElementById("countB").textContent = cntABC.B + " รายการ";
+    document.getElementById("countC").textContent = cntABC.C + " รายการ";
+    document.getElementById("countFast").textContent = cntMov.Fast + " รายการ";
+    document.getElementById("countMedium").textContent = cntMov.Medium + " รายการ";
+    document.getElementById("countSlow").textContent = cntMov.Slow + " รายการ";
+    document.getElementById("countDead").textContent = cntMov.Dead + " รายการ";
+}
     function renderTable() {
-        const tbody = document.querySelector("#dataTable tbody");
-        tbody.innerHTML = "";
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
+        const container = document.getElementById("dataList");
+        container.innerHTML = "";
+        const start = (currentPage-1)*25;
+        const end = start + 25;
         const pageData = filteredData.slice(start, end);
 
-        if(pageData.length === 0){
-            tbody.innerHTML = "<tr><td colspan='13' style='text-align:center;color:#95a5a6;padding:50px;font-size:18px;'>ไม่มีข้อมูลตามเงื่อนไขที่เลือก</td></tr>";
+        if (pageData.length === 0) {
+            container.innerHTML = `<div style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</div>`;
             return;
         }
 
         pageData.forEach(r => {
-            const tr = document.createElement("tr");
-            if(r.IsNonMoving) tr.classList.add("non-moving");
-            if(Math.round(r.RecommendedOrder) >= 1) tr.classList.add("highlight");
+            const orderQty = Math.round(r.RecommendedOrder);
+            const orderClass = orderQty === 0 ? "order-0" :
+                              orderQty <= 10 ? "order-1-10" :
+                              orderQty <= 50 ? "order-11-50" :
+                              orderQty <= 200 ? "order-51-200" : "order-200";
 
-            tr.innerHTML = `
-                <td>${r.Plant}</td>
-                <td>${r.Material}</td>
-                <td class="td-left">${r.Description}</td>
-                <td>${r.Unit}</td>
-                <td>${formatNumber(r.Unrestricted)}</td>
-                <td style="color:white;font-weight:bold;">${formatCurrency(r.Value)}</td>
-                <td>${formatNumber(r.Qty4Month)}</td>
-                <td>${formatNumber(Math.round(r.SafetyStock))}</td>
-                <td>${formatNumber(Math.round(r.ROP))}</td>
-                <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
-                <td style="color:white;font-weight:bold;font-size:1.3em;">${formatNumber(Math.round(r.RecommendedOrder))}</td>
-                <td style="color:white;font-weight:bold;">${r.ABCValue}</td>
-                <td>${r.CumPercent.toFixed(2)}%</td>`;
-            tbody.appendChild(tr);
+            const card = document.createElement("div");
+            card.className = "item-card";
+            card.innerHTML = `
+                <div>${r.Plant}</div>
+                <div class="material">${r.Material}</div>
+                <div class="desc">${r.Description}</div>
+                <div>${r.Unit}</div>
+                <div>${formatNumber(r.Unrestricted)}</div>
+                <div class="value">${formatCurrency(r.Value)}</div>
+                <div>${formatNumber(r.Qty6Month)}</div>
+                <div>${formatNumber(r.Qty4Month)}</div>
+                <div>${formatNumber(Math.round(r.AvgMonthly))}</div>
+                <div>${formatNumber(r.SafetyStock)}</div>
+                <div>${formatNumber(r.ROP)}</div>
+                <div>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</div>
+                <div class="${orderClass} order">${formatNumber(orderQty)}</div>
+                <div><strong>${r.ABCValue}</strong></div>
+                <div class="moving-${r.Moving.toLowerCase()}">${r.Moving}</div>
+                <div style="background:#e74c3c;color:white;padding:2px 8px;border-radius:6px;">${formatNumber(r.ReturnQty)}</div>
+                <div>${r.CumPercent.toFixed(1)}%</div>
+            `;
+            container.appendChild(card);
         });
     }
-
+    
     function renderPagination() {
         const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-        const pagination = document.getElementById("pagination");
-        pagination.innerHTML = "";
+        const p = document.getElementById("pagination");
+        p.innerHTML = "";
+        const startItem = (currentPage - 1) * rowsPerPage + 1;
+        const endItem = Math.min(currentPage * rowsPerPage, filteredData.length);
 
-        const createBtn = (text, page, disabled = false) => {
-            const btn = document.createElement("button");
-            btn.className = "page-btn" + (page === currentPage ? " active" : "") + (disabled ? " disabled" : "");
-            btn.innerHTML = text;
-            btn.disabled = disabled;
-            btn.onclick = () => { if(!disabled) { currentPage = page; renderTable(); renderPagination(); } };
-            return btn;
+        const info = document.createElement("span");
+        info.className = "page-info";
+        info.textContent = `แสดง ${startItem}–${endItem} จาก ${filteredData.length.toLocaleString()} รายการ`;
+        p.appendChild(info);
+
+        if (totalPages <= 1) return;
+
+        const btn = (icon, page, disabled = false) => {
+            const b = document.createElement("button");
+            b.className = "page-btn";
+            b.innerHTML = `<i class="fas ${icon}"></i>`;
+            b.disabled = disabled;
+            if (!disabled) b.onclick = () => { currentPage = page; renderTable(); renderPagination(); };
+            return b;
         };
 
-        pagination.appendChild(createBtn("<i class='fas fa-fast-backward'></i>", 1, currentPage === 1));
-        pagination.appendChild(createBtn("<i class='fas fa-backward'></i>", currentPage - 1, currentPage === 1));
-
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-
-        for(let i = startPage; i <= endPage; i++){
-            pagination.appendChild(createBtn(i, i));
-        }
-
-        if(endPage < totalPages){
-            if(endPage < totalPages - 1) pagination.appendChild(document.createTextNode(" ... "));
-            pagination.appendChild(createBtn(totalPages, totalPages));
-        }
-
-        pagination.appendChild(createBtn("<i class='fas fa-forward'></i>", currentPage + 1, currentPage === totalPages));
-        pagination.appendChild(createBtn("<i class='fas fa-fast-forward'></i>", totalPages, currentPage === totalPages));
+        p.appendChild(btn("fa-angle-left", currentPage - 1, currentPage === 1));
+        p.appendChild(btn("fa-angle-right", currentPage + 1, currentPage === totalPages));
     }
 
-    function updateSummaryFromCurrentView() {
-        const data = filteredData;
-        const sumA = data.filter(r => r.ABCValue === "A").reduce((s,r) => s + r.Value, 0);
-        const sumB = data.filter(r => r.ABCValue === "B").reduce((s,r) => s + r.Value, 0);
-        const sumC = data.filter(r => r.ABCValue === "C").reduce((s,r) => s + r.Value, 0);
-        const total = sumA + sumB + sumC;
+    function exportToCSV() {
+        const headers = ["Plant","Material","รายการอะไหล่","หน่วย","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน","เฉลี่ย/เดือน","Safety","ROP","DOS","แนะนำสั่งซื้อ","ABC","Moving","ส่งคืนได้ (ชิ้น)","% สะสม"];
+        let csv = "\uFEFF" + headers.join(",") + "\n";
 
-        document.getElementById("sumA").textContent = formatCurrency(sumA);
-        document.getElementById("sumB").textContent = formatCurrency(sumB);
-        document.getElementById("sumC").textContent = formatCurrency(sumC);
-        document.getElementById("totalAll").textContent = formatCurrency(total);
-        document.getElementById("countAll").textContent = filteredData.length.toLocaleString();
+        filteredData.forEach(r => {
+            const row = [
+                r.Plant, r.Material, r.Description.replace(/"/g, '""'), r.Unit,
+                r.Unrestricted, r.Value, r.Qty6Month, r.Qty4Month,
+                Math.round(r.AvgMonthly), Math.round(r.SafetyStock), Math.round(r.ROP),
+                r.DOS > 9999 ? "มาก" : r.DOS.toFixed(1), Math.round(r.RecommendedOrder),
+                r.ABCValue, r.Moving, r.ReturnQty, r.CumPercent.toFixed(2)
+            ];
+            csv += row.map(v => `"${v}"`).join(",") + "\n";
+        });
 
-        document.getElementById("summaryBox").style.display = "block";
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `ABC_Analysis_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
-    // ปุ่มต่าง ๆ
-    document.getElementById("btnOnlyOrder").onclick = () => { mode = "onlyOrder"; updateFilterButtons(); applyFiltersAndRender(); };
-    document.getElementById("btnNonMoving").onclick = () => { mode = "nonMoving"; updateFilterButtons(); applyFiltersAndRender(); };
-    document.getElementById("btnShowAll").onclick = () => { mode = "all"; updateFilterButtons(); applyFiltersAndRender(); };
-    document.getElementById("btnSummary").onclick = () => { document.getElementById("summaryBox").style.display = document.getElementById("summaryBox").style.display === "none" ? "block" : "none"; };
+    // คลิก Card หลัก - รีเซ็ต ABC/Moving filter
+    document.getElementById("cardTotalStock").onclick = () => { mode = "all"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardOrderItems").onclick = () => { mode = "onlyOrder"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardReturnValue").onclick = () => { mode = "returnable"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardAfterReturn").onclick = () => { mode = "afterReturn"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
 
-    document.getElementById("calcBtn").onclick = applyFiltersAndRender;
-    document.getElementById("plantFilter").onchange = () => { applyFiltersAndRender(); };
-    document.getElementById("abcValueFilter").onchange = applyFiltersAndRender;
+    // คลิก Card ABC / Moving - กรองต่อเนื่อง (คง Plant + mode เดิม)
+    document.getElementById("abcA").onclick = () => { abcFilter = "A"; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("abcB").onclick = () => { abcFilter = "B"; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("abcC").onclick = () => { abcFilter = "C"; movingFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardFast").onclick = () => { movingFilter = "Fast"; abcFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardMedium").onclick = () => { movingFilter = "Medium"; abcFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardSlow").onclick = () => { movingFilter = "Slow"; abcFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardDead").onclick = () => { movingFilter = "Dead"; abcFilter = ""; applyFiltersAndRender(); };
 
-    document.getElementById("abcA").onclick = () => { document.getElementById("abcValueFilter").value = "A"; applyFiltersAndRender(); };
-    document.getElementById("abcB").onclick = () => { document.getElementById("abcValueFilter").value = "B"; applyFiltersAndRender(); };
-    document.getElementById("abcC").onclick = () => { document.getElementById("abcValueFilter").value = "C"; applyFiltersAndRender(); };
+    ["plantFilter","leadTimeDays","safetyDays","coverDays"].forEach(id => {
+        document.getElementById(id).addEventListener("change", applyFiltersAndRender);
+    });
+
+    document.getElementById("exportBtn").onclick = exportToCSV;
 
     loadData();
 });
