@@ -5,8 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบวิเคราะห์ ABC อะไหล่ (เวอร์ชันสวยสุด)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+       body { font-family: "Prompt", "Segoe UI", sans-serif; margin: 0; background: #f5f7fa; padding: 10px; }
+        .container { max-width: 1920px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        h1 { text-align: center; color: white; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 26px; margin: 0; }
+        .subtitle { text-align: center; color: #888; font-size: 15px; padding: 10px 0; background: #f8f9fa; margin: 0; }
+
+        /* Card เล็กลง + สวย */
+        .summary-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 16px; background: #f8f9fa; }
+        .card { flex: 1 1 160px; min-width: 160px; padding: 14px; border-radius: 14px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .card:hover { transform: translateY(-6px); }
+        .card-title { font-size: 13px; opacity: 0.95; margin-bottom: 6px; }
+        .card-value { font-size: 24px; font-weight: 900; margin: 6px 0; }
+        .card-count { font-size: 12px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 3px 8px; }
+
+        .total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
+        .order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .after-return { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .abc-a, .abc-b, .abc-c, .fast, .medium, .slow, .dead { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+.controls { padding: 20px; background: #fff; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; border-bottom: 1px solid #eee; }
+        .control-group { display: flex; align-items: center; gap: 10px; background: #f1f3f5; padding: 10px 18px; border-radius: 12px; font-size: 14px; }
+        label { font-weight: 600; color: #2c3e50; }
+        select, input[type=number] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; }
+        .export-btn { padding: 12px 24px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); }
+        .export-btn:hover { transform: translateY(-3px); }
+
+        /* ตารางแบบ Card List + Sticky Header */
+        .table-container { max-height: 70vh; overflow: auto; position: relative; }
+        .table-header {
+            position: sticky; top: 0; z-index: 10; background: #667eea; color: white; font-weight: bold;
+            display: grid; grid-template-columns: 70px 110px 1fr 80px 100px 110px 90px 90px 90px 80px 90px 80px 110px 60px 90px 100px 80px;
+            gap: 10px; padding: 14px 16px; border-radius: 12px 12px 0 0; font-size: 13px;
+        }
+        .table-header div { cursor: pointer; user-select: none; }
+        .table-header div:hover { opacity: 0.8; }
+        .sort-icon { margin-left: 4px; font-size: 10px; }
+
+        .item-card {
+            display: grid; grid-template-columns: 70px 110px 1fr 80px 100px 110px 90px 90px 90px 80px 90px 80px 110px 60px 90px 100px 80px;
+            gap: 10px; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #eee; font-size: 13px;
+            transition: background 0.2s;
+        }
+        .item-card:hover { background: #f0f8ff; }
+        .item-card:nth-child(even) { background: #f8f9fa; }
+
+        .value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 12px; }
+        .order-0 { color: #95a5a6; }
+        .order-1-10 { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; }
+        .order-11-50 { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; }
+        .order-51-200 { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; }
+        .order-200 { background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+
+        .moving-fast, .moving-medium, .moving-slow, .moving-dead {
+            padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold;
+        }
+        .moving-fast { background: #d5f5e3; color: #1e8449; }
+        .moving-medium { background: #fef9e7; color: #d35400; }
+        .moving-slow { background: #fdecea; color: #c0392b; }
+        .moving-dead { background: #f0f0f0; color: #7f8c8d; }
+
+        .pagination { padding: 16px; text-align: center; background: #f8f9fa; font-size: 16px; font-weight: bold; color: #2c3e50; }
+        .page-btn { padding: 8px 14px; margin: 0 4px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+        .page-btn.active { background: #667eea; color: white; border: none; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* จัดข้อความในคอลัมน์ตัวเลขให้อยู่กึ่งกลาง */
+.item-card > :nth-child(5),
+.item-card > :nth-child(6),
+.item-card > :nth-child(7),
+.item-card > :nth-child(8),
+.item-card > :nth-child(9),
+.item-card > :nth-child(10),
+.item-card > :nth-child(11),
+.item-card > :nth-child(12),
+.item-card > :nth-child(13),
+.item-card > :nth-child(14),
+.item-card > :nth-child(17),
+.item-card > :nth-child(18),
+.table-header > :nth-child(5),
+.table-header > :nth-child(6),
+.table-header > :nth-child(7),
+.table-header > :nth-child(8),
+.table-header > :nth-child(9),
+.table-header > :nth-child(10),
+.table-header > :nth-child(11),
+.table-header > :nth-child(12),
+.table-header > :nth-child(13),
+.table-header > :nth-child(14),
+.table-header > :nth-child(17),
+.table-header > :nth-child(18) {
+    text-align: center;
+}
+    </style>
+ <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="container">
@@ -94,7 +185,7 @@ let sortKey = "CumPercent", sortDir = "asc";
 
 document.addEventListener("DOMContentLoaded", function () {
     const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
-const inventoryUrl = 'https://opensheet.elk.sh/1OtcgbmQdrI3gKJCGiDge6xuOsrT0GPxdKeFPjpvK3Rg/Sheet1';
+    const inventoryUrl = 'https://opensheet.elk.sh/1OtcgbmQdrI3gKJCGiDge6xuOsrT0GPxdKeFPjpvK3Rg/Sheet1';
     let allData = [], filteredData = [];
     let mode = "all", abcFilter = "", movingFilter = ""; // ใช้ตัวแปรแยก
     let currentPage = 1;
