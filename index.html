@@ -101,34 +101,36 @@
 </head>
 <body>
 <div class="container">
-    <h1>Advanced Spare Parts Analytics & Intelligent Procurement System</h1>
+    <h1>ระบบวิเคราะห์ ABC อะไหล่ + สั่งซื้ออัจฉริยะ</h1>
     <p class="subtitle">Plant 0366 • คลิกการ์ดเพื่อกรองทันที</p>
-
+<div id="loadingBarContainer" style="height: 4px; background: #f0f0f0; position: relative; margin-bottom: 10px; border-radius: 2px; overflow: hidden;">
+    <div id="loadingBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s;"></div>
+</div>
     <!-- Card เงินสั้น ๆ -->
-   <div class="summary-row">
-        <div class="card total-stock" id="cardTotalStock">
-            <div class="card-title">มูลค่ารวม</div>
-            <div class="card-value" id="totalStockValue">0.00</div>
-            <div class="card-count" id="totalCount">0 รายการ</div>
-        </div>
-        <div class="card order-items" id="cardOrderItems">
-            <div class="card-title">Order</div>
-            <div class="card-value" id="orderItemCount">0 </div>
-            <div class="card-value" id="orderTotalValue">0.00</div>
-        </div>
-        <div class="card return-value" id="cardReturnValue">
-            <div class="card-title">OverStock</div>
-            <div class="card-value" id="returnValue">0.00</div>
-            <div class="card-count" id="returnItemCount">0 รายการ</div>
-        </div>
-        <div class="card after-return" id="cardAfterReturn">
-            <div class="card-title">After Value</div>
-            <div class="card-value" id="afterReturnValue">0.00</div>
-        </div>
+   <div class="summary-row" id="mainCardsSection" style="display:none;">
+    <div class="card total-stock" id="cardTotalStock">
+        <div class="card-title">มูลค่ารวม</div>
+        <div class="card-value" id="totalStockValue">0.00</div>
+        <div class="card-count" id="totalCount">0 รายการ</div>
     </div>
+    <div class="card order-items" id="cardOrderItems">
+        <div class="card-title">Order</div>
+        <div class="card-value" id="orderItemCount">0 </div>
+        <div class="card-value" id="orderTotalValue">0.00</div>
+    </div>
+    <div class="card return-value" id="cardReturnValue">
+        <div class="card-title">OverStock</div>
+        <div class="card-value" id="returnValue">0.00</div>
+        <div class="card-count" id="returnItemCount">0 รายการ</div>
+    </div>
+    <div class="card after-return" id="cardAfterReturn">
+        <div class="card-title">After Value</div>
+        <div class="card-value" id="afterReturnValue">0.00</div>
+    </div>
+</div>
 
     <!-- ABC + Moving -->
-    <div class="summary-row">
+    <div class="summary-row" id="summarySection" style="display:none;">
         <div class="card abc-a" id="abcA"><div class="card-title">กลุ่ม A</div><div class="card-value" id="sumA">0.00</div><div class="card-count" id="countA">0 รายการ</div></div>
         <div class="card abc-b" id="abcB"><div class="card-title">กลุ่ม B</div><div class="card-value" id="sumB">0.00</div><div class="card-count" id="countB">0 รายการ</div></div>
         <div class="card abc-c" id="abcC"><div class="card-title">กลุ่ม C</div><div class="card-value" id="sumC">0.00</div><div class="card-count" id="countC">0 รายการ</div></div>
@@ -138,15 +140,15 @@
         <div class="card dead" id="cardDead"><div class="card-title">Dead Stock</div><div class="card-value" id="valDead">0.00</div><div class="card-count" id="countDead">0 รายการ</div></div>
     </div>
 
-    <div class="controls">
+    <div class="controls" id="controlsSection" style="display:none;">
         <div class="control-group"><label>Plant:</label><select id="plantFilter"><option value="">ทุก Plant</option></select></div>
         <div class="control-group"><label>Lead Time:</label><input type="number" id="leadTimeDays" value="5"> วัน</div>
         <div class="control-group"><label>Safety:</label><input type="number" id="safetyDays" value="20"> วัน</div>
         <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="45"> วัน</div>
         <button class="export-btn" id="exportBtn">Export Excel</button>
     </div>
-
-    <div class="table-container">
+ 
+    <div class="table-container" id="tableSection" style="display:none;">
         <div class="table-header" id="tableHeader">
             <div data-sort="Plant">Plant <i class="fas fa-sort sort-icon"></i></div>
             <div data-sort="Material">Material <i class="fas fa-sort sort-icon"></i></div>
@@ -169,7 +171,7 @@
         <div id="dataList"></div>
     </div>
 
-    <div class="pagination" id="pagination"></div>
+     <div class="pagination" id="pagination" style="display:none;"></div>
 </div>
 
 <script>
@@ -210,39 +212,86 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     async function loadData() {
-        try {
-            const [uRes, iRes] = await Promise.all([fetch(usageUrl), fetch(inventoryUrl)]);
-            const usage = await uRes.json();
-            const inv = await iRes.json();
-            const useMap = new Map();
-            usage.forEach(r => useMap.set(`${r.Plant?.trim()}-${r.Material?.trim()}`, r));
+   const loadingBar = document.getElementById("loadingBar");
+const summarySection = document.getElementById("summarySection");
+const controlsSection = document.getElementById("controlsSection");
+const tableSection = document.getElementById("tableSection");
+const paginationSection = document.getElementById("pagination"); // ✅ ถูกต้อง
 
-            allData = inv.map(r => {
-                const key = `${r.Plant?.trim()}-${r.Material?.trim()}`;
-                const u = useMap.get(key) || {Qtyissu:0, Qtyissu6m:0};
-                const qty4m = toNumber(u.Qtyissu);
-                const qty6m = toNumber(u.Qtyissu6m) || Math.round(qty4m * 1.5);
-                return {
-                    Plant: (r.Plant||'').trim(),
-                    Material: (r.Material||'').trim(),
-                    Description: r["Material description"] || '',
-                    Unit: r["Base Unit of Measure"] || '',
-                    Unrestricted: toNumber(r.Unrestricted),
-                    Value: toNumber(r["Value Unrestricted"]),
-                    Qty6Month: qty6m,
-                    Qty4Month: qty4m,
-                    AvgMonthly: qty4m / 4,
-                    AvgDailyUse: qty4m / 120,
-                    SafetyStock:0, ROP:0, DOS:0, RecommendedOrder:0,
-                    ABCValue:"", CumPercent:0, Moving:"", IsNonMoving: qty4m === 0,
-                    ReturnQty: 0, ReturnValue: 0
-                };
-            });
-            calcABCValue();
-            fillPlantDropdown();
-            setDefaultAndCalculate();
-        } catch(e) { alert("โหลดข้อมูลไม่สำเร็จ"); console.error(e); }
+    // เริ่มโหลด: แสดง loading bar, ซ่อนเนื้อหา
+    loadingBar.style.width = "0%";
+    summarySection.style.display = "none";
+    controlsSection.style.display = "none";
+    tableSection.style.display = "none";
+    paginationSection.style.display = "block";
+
+    // แอนิเมชัน progress bar (0% → 100%)
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 10; // เพิ่มแบบสุ่มให้ดูธรรมชาติ
+        if (progress >= 95) {
+            clearInterval(interval);
+            loadingBar.style.width = "95%";
+        } else {
+            loadingBar.style.width = progress + "%";
+        }
+    }, 200);
+
+    try {
+        const [uRes, iRes] = await Promise.all([fetch(usageUrl), fetch(inventoryUrl)]);
+        const usage = await uRes.json();
+        const inv = await iRes.json();
+        const useMap = new Map();
+        usage.forEach(r => useMap.set(`${r.Plant?.trim()}-${r.Material?.trim()}`, r));
+
+        allData = inv.map(r => {
+            const key = `${r.Plant?.trim()}-${r.Material?.trim()}`;
+            const u = useMap.get(key) || {Qtyissu:0, Qtyissu6m:0};
+            const qty4m = toNumber(u.Qtyissu);
+            const qty6m = toNumber(u.Qtyissu6m) || Math.round(qty4m * 1.5);
+            return {
+                Plant: (r.Plant||'').trim(),
+                Material: (r.Material||'').trim(),
+                Description: r["Material description"] || '',
+                Unit: r["Base Unit of Measure"] || '',
+                Unrestricted: toNumber(r.Unrestricted),
+                Value: toNumber(r["Value Unrestricted"]),
+                Qty6Month: qty6m,
+                Qty4Month: qty4m,
+                AvgMonthly: qty4m / 4, // ❗ ตรวจคำผิด: ควรเป็น qty4m
+                AvgDailyUse: qty4m / 120,
+                SafetyStock:0, ROP:0, DOS:0, RecommendedOrder:0,
+                ABCValue:"", CumPercent:0, Moving:"", IsNonMoving: qty4m === 0,
+                ReturnQty: 0, ReturnValue: 0
+            };
+        });
+
+        calcABCValue();
+        fillPlantDropdown();
+        setDefaultAndCalculate();
+
+        // โหลดเสร็จ → แสดงเนื้อหาทั้งหมด
+     clearInterval(interval);
+loadingBar.style.width = "100%";
+setTimeout(() => {
+    document.getElementById("loadingBarContainer").style.display = "none";
+    // เปิดทุกส่วนที่ซ่อนไว้
+    document.getElementById("mainCardsSection").style.display = "flex";
+    summarySection.style.display = "flex";
+    controlsSection.style.display = "flex";
+    tableSection.style.display = "block";
+    document.getElementById("pagination").style.display = "block";
+}, 300);
+
+    } catch(e) {
+        clearInterval(interval);
+        loadingBar.style.width = "0%";
+        document.getElementById("loadingBarContainer").style.display = "none";
+        summarySection.style.display = "flex"; // หรือแสดง error
+        alert("โหลดข้อมูลไม่สำเร็จ");
+        console.error(e);
     }
+}
 
     function calcABCValue() {
         const sorted = [...allData].sort((a,b)=>b.Value-a.Value);
