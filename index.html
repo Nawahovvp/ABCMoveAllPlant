@@ -5,129 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบวิเคราะห์ ABC อะไหล่ (เวอร์ชันสวยสุด)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-       body { font-family: "Prompt", "Segoe UI", sans-serif; margin: 0; background: #f5f7fa; padding: 10px; }
+        body { font-family: "Prompt", "Segoe UI", sans-serif; margin: 0; background: #f5f7fa; padding: 10px; }
         .container { max-width: 1920px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
         h1 { text-align: center; color: white; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 26px; margin: 0; }
         .subtitle { text-align: center; color: #888; font-size: 15px; padding: 10px 0; background: #f8f9fa; margin: 0; }
 
-        /* Card เล็กลง + สวย */
-        .summary-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 16px; background: #f8f9fa; }
-        .card { flex: 1 1 160px; min-width: 160px; padding: 14px; border-radius: 14px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        /* Summary Cards - Responsive Flex Layout */
+        .summary-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 16px; background: #f8f9fa; }
+        .card { flex: 1 1 140px; min-width: 140px; max-width: 180px; padding: 12px; border-radius: 14px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
         .card:hover { transform: translateY(-6px); }
-        .card-title { font-size: 13px; opacity: 0.95; margin-bottom: 6px; }
-        .card-value { font-size: 24px; font-weight: 900; margin: 6px 0; }
-        .card-count { font-size: 12px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 3px 8px; }
-
+        .card-title { font-size: 12px; opacity: 0.95; margin-bottom: 6px; }
+        .card-value { font-size: 20px; font-weight: 900; margin: 6px 0; }
+        .card-count { font-size: 11px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 3px 8px; }
         .total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
         .order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         .return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
         .after-return { background: linear-gradient(135deg, #27ae60, #1e8449); }
-        .abc-a, .abc-b, .abc-c, .fast, .medium, .slow, .dead { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
-.controls { padding: 20px; background: #fff; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; border-bottom: 1px solid #eee; }
-        .control-group { display: flex; align-items: center; gap: 10px; background: #f1f3f5; padding: 10px 18px; border-radius: 12px; font-size: 14px; }
-        label { font-weight: 600; color: #2c3e50; }
-        select, input[type=number] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; }
-        .export-btn { padding: 12px 24px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); }
-        .export-btn:hover { transform: translateY(-3px); }
+        .abc-a { background: linear-gradient(135deg, #ff7675, #ff4757); }
+        .abc-b { background: linear-gradient(135deg, #ffeaa7, #ffd32a); }
+        .abc-c { background: linear-gradient(135deg, #a3daff, #74b9ff); }
+        .fast { background: linear-gradient(135deg, #55efc4, #00b894); }
+        .medium { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
+        .slow { background: linear-gradient(135deg, #fab1a0, #e17055); }
+        .slowly { background: linear-gradient(135deg, #dfe6e9, #b2bec3); }
+        .dead { background: linear-gradient(135deg, #b2bec3, #636e72); }
 
-        /* ตารางแบบ Card List + Sticky Header */
-        .table-container { max-height: 70vh; overflow: auto; position: relative; }
-        .table-header {
-            position: sticky; top: 0; z-index: 10; background: #667eea; color: white; font-weight: bold;
-            display: grid; grid-template-columns: 70px 110px 1fr 80px 100px 110px 90px 90px 90px 80px 90px 80px 110px 60px 90px 100px 80px;
-            gap: 10px; padding: 14px 16px; border-radius: 12px 12px 0 0; font-size: 13px;
-        }
-        .table-header div { cursor: pointer; user-select: none; }
-        .table-header div:hover { opacity: 0.8; }
+        /* Controls - Canva-inspired Styling: Vibrant, Clean, Icons */
+        .controls { padding: 20px; background: #fff; display: flex; flex-direction: column; gap: 15px; justify-content: flex-start; border-bottom: 1px solid #eee; align-items: flex-start; }
+        .filter-row { display: flex; gap: 15px; align-items: center; }
+        .search-row { display: flex; gap: 15px; align-items: center; width: 100%; }
+        .control-group { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #f0f4ff, #e0eaff); padding: 12px 20px; border-radius: 16px; font-size: 14px; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1); transition: all 0.3s; }
+        .control-group:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2); }
+        .control-icon { font-size: 18px; color: #667eea; }
+        label { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 5px; }
+        select, input[type=number], input[type=text] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ccd1ff; font-size: 14px; background: white; transition: border 0.2s; width: 80px; }
+        select { width: 120px; }
+        input[type=text] { width: 250px; }
+        select:focus, input[type=number]:focus, input[type=text]:focus { border-color: #667eea; outline: none; }
+        .unit { font-size: 14px; color: #667eea; font-weight: 500; }
+        .export-btn { padding: 12px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); transition: all 0.3s; flex: 0 1 auto; margin-left: auto; }
+
+        /* ตารางใหม่: Responsive Table with Scroll on Small Screens, Canva-like Styling */
+        .table-container { overflow: auto; max-height: 70vh; position: relative; padding: 0 16px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1400px; /* Minimum width for large tables */ border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: white; }
+        thead { position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        th { padding: 14px 10px; text-align: left; font-size: 13px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        th:hover { background: rgba(255,255,255,0.1); }
         .sort-icon { margin-left: 4px; font-size: 10px; }
-
-        .item-card {
-            display: grid; grid-template-columns: 70px 110px 1fr 80px 100px 110px 90px 90px 90px 80px 90px 80px 110px 60px 90px 100px 80px;
-            gap: 10px; align-items: center; padding: 12px 16px; background: white; border-bottom: 1px solid #eee; font-size: 13px;
-            transition: background 0.2s;
-        }
-        .item-card:hover { background: #f0f8ff; }
-        .item-card:nth-child(even) { background: #f8f9fa; }
-
-        .value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 12px; }
+        tbody tr { transition: background 0.2s; border-bottom: 1px solid #eee; }
+        tbody tr:hover { background: #f0f8ff; }
+        tbody tr:nth-child(even) { background: #f8f9fa; }
+        td { padding: 12px 10px; font-size: 13px; text-align: left; }
+        .value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 12px; display: inline-block; }
         .order-0 { color: #95a5a6; }
-        .order-1-10 { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; }
-        .order-11-50 { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; }
-        .order-51-200 { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; }
-        .order-200 { background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
-
-        .moving-fast, .moving-medium, .moving-slow, .moving-dead {
-            padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold;
-        }
+        .order-1-10 { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .order-11-50 { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .order-51-200 { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; display: inline-block; }
+        .order-200 { background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; }
+        .moving-fast, .moving-medium, .moving-slow, .moving-slowly, .moving-dead { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; }
         .moving-fast { background: #d5f5e3; color: #1e8449; }
         .moving-medium { background: #fef9e7; color: #d35400; }
         .moving-slow { background: #fdecea; color: #c0392b; }
+        .moving-slowly { background: #f2f3f4; color: #616161; }
         .moving-dead { background: #f0f0f0; color: #7f8c8d; }
+        .return-qty { background: #e74c3c; color: white; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
 
-        .pagination { padding: 16px; text-align: center; background: #f8f9fa; font-size: 16px; font-weight: bold; color: #2c3e50; }
-        .page-btn { padding: 8px 14px; margin: 0 4px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; }
+        /* Center Numeric Columns */
+        th:nth-child(5), td:nth-child(5),
+        th:nth-child(6), td:nth-child(6),
+        th:nth-child(7), td:nth-child(7),
+        th:nth-child(8), td:nth-child(8),
+        th:nth-child(9), td:nth-child(9),
+        th:nth-child(10), td:nth-child(10),
+        th:nth-child(11), td:nth-child(11),
+        th:nth-child(12), td:nth-child(12),
+        th:nth-child(13), td:nth-child(13),
+        th:nth-child(14), td:nth-child(14),
+        th:nth-child(16), td:nth-child(16),
+        th:nth-child(20), td:nth-child(20),
+        th:nth-child(21), td:nth-child(21) { text-align: center; }
+
+        /* Pagination - Centered and Responsive */
+        .pagination { padding: 16px; text-align: center; background: #f8f9fa; font-size: 16px; font-weight: bold; color: #2c3e50; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+        .page-btn { padding: 8px 14px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .page-btn.active { background: #667eea; color: white; border: none; }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        /* จัดข้อความในคอลัมน์ตัวเลขให้อยู่กึ่งกลาง */
-.item-card > :nth-child(5),
-.item-card > :nth-child(6),
-.item-card > :nth-child(7),
-.item-card > :nth-child(8),
-.item-card > :nth-child(9),
-.item-card > :nth-child(10),
-.item-card > :nth-child(11),
-.item-card > :nth-child(12),
-.item-card > :nth-child(13),
-.item-card > :nth-child(14),
-.item-card > :nth-child(17),
-.item-card > :nth-child(18),
-.table-header > :nth-child(5),
-.table-header > :nth-child(6),
-.table-header > :nth-child(7),
-.table-header > :nth-child(8),
-.table-header > :nth-child(9),
-.table-header > :nth-child(10),
-.table-header > :nth-child(11),
-.table-header > :nth-child(12),
-.table-header > :nth-child(13),
-.table-header > :nth-child(14),
-.table-header > :nth-child(17),
-.table-header > :nth-child(18) {
-    text-align: center;
-}
+        .page-btn:hover:not(.active):not(:disabled) { background: #e9ecef; }
+
+        /* Media Query for Smaller Screens */
+        @media (max-width: 768px) {
+            .summary-row { gap: 8px; padding: 8px; }
+            .card { flex: 1 1 120px; min-width: 120px; padding: 10px; }
+            .card-value { font-size: 18px; }
+            .control-group { flex-basis: 100%; max-width: none; }
+            .controls { gap: 10px; }
+            table { min-width: 100%; }
+            th, td { padding: 8px 5px; font-size: 12px; }
+            .pagination { font-size: 14px; }
+        }
     </style>
- <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-    <h1>ระบบวิเคราะห์ ABC อะไหล่ + สั่งซื้ออัจฉริยะ</h1>
-<div id="loadingBarContainer" style="height: 4px; background: #f0f0f0; position: relative; margin-bottom: 10px; border-radius: 2px; overflow: hidden;">
-    <div id="loadingBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s;"></div>
-</div>
+    <h1>ABC Analysis & Smart Ordering System</h1>
+    <div id="loadingBarContainer" style="height: 4px; background: #f0f0f0; position: relative; margin-bottom: 10px; border-radius: 2px; overflow: hidden;">
+        <div id="loadingBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s;"></div>
+    </div>
     <!-- Card เงินสั้น ๆ -->
-   <div class="summary-row" id="mainCardsSection" style="display:none;">
-    <div class="card total-stock" id="cardTotalStock">
-        <div class="card-title">มูลค่ารวม</div>
-        <div class="card-value" id="totalStockValue">0.00</div>
-        <div class="card-count" id="totalCount">0 รายการ</div>
+    <div class="summary-row" id="mainCardsSection" style="display:none;">
+        <div class="card total-stock" id="cardTotalStock">
+            <div class="card-title">มูลค่ารวม</div>
+            <div class="card-value" id="totalStockValue">0.00</div>
+            <div class="card-count" id="totalCount">0 รายการ</div>
+        </div>
+        <div class="card order-items" id="cardOrderItems">
+            <div class="card-title">Order</div>
+            <div class="card-value" id="orderItemCount">0 </div>
+            <div class="card-value" id="orderTotalValue">0.00</div>
+        </div>
+        <div class="card return-value" id="cardReturnValue">
+            <div class="card-title">OverStock</div>
+            <div class="card-value" id="returnValue">0.00</div>
+            <div class="card-count" id="returnItemCount">0 รายการ</div>
+        </div>
+        <div class="card after-return" id="cardAfterReturn">
+            <div class="card-title">After Value</div>
+            <div class="card-value" id="afterReturnValue">0.00</div>
+        </div>
     </div>
-    <div class="card order-items" id="cardOrderItems">
-        <div class="card-title">Order</div>
-        <div class="card-value" id="orderItemCount">0 </div>
-        <div class="card-value" id="orderTotalValue">0.00</div>
-    </div>
-    <div class="card return-value" id="cardReturnValue">
-        <div class="card-title">OverStock</div>
-        <div class="card-value" id="returnValue">0.00</div>
-        <div class="card-count" id="returnItemCount">0 รายการ</div>
-    </div>
-    <div class="card after-return" id="cardAfterReturn">
-        <div class="card-title">After Value</div>
-        <div class="card-value" id="afterReturnValue">0.00</div>
-    </div>
-</div>
-
     <!-- ABC + Moving -->
     <div class="summary-row" id="summarySection" style="display:none;">
         <div class="card abc-a" id="abcA"><div class="card-title">กลุ่ม A</div><div class="card-value" id="sumA">0.00</div><div class="card-count" id="countA">0 รายการ</div></div>
@@ -136,43 +143,72 @@
         <div class="card fast" id="cardFast"><div class="card-title">Fast Moving</div><div class="card-value" id="valFast">0.00</div><div class="card-count" id="countFast">0 รายการ</div></div>
         <div class="card medium" id="cardMedium"><div class="card-title">Medium</div><div class="card-value" id="valMedium">0.00</div><div class="card-count" id="countMedium">0 รายการ</div></div>
         <div class="card slow" id="cardSlow"><div class="card-title">Slow Moving</div><div class="card-value" id="valSlow">0.00</div><div class="card-count" id="countSlow">0 รายการ</div></div>
+        <div class="card slowly" id="cardSlowly"><div class="card-title">Slowly Moving</div><div class="card-value" id="valSlowly">0.00</div><div class="card-count" id="countSlowly">0 รายการ</div></div>
         <div class="card dead" id="cardDead"><div class="card-title">Dead Stock</div><div class="card-value" id="valDead">0.00</div><div class="card-count" id="countDead">0 รายการ</div></div>
     </div>
-
     <div class="controls" id="controlsSection" style="display:none;">
-        <div class="control-group"><label>Plant:</label><select id="plantFilter"><option value="">ทุก Plant</option></select></div>
-        <div class="control-group"><label>Lead Time:</label><input type="number" id="leadTimeDays" value="5"> วัน</div>
-        <div class="control-group"><label>Safety:</label><input type="number" id="safetyDays" value="20"> วัน</div>
-        <div class="control-group"><label>ครอบคลุม:</label><input type="number" id="coverDays" value="45"> วัน</div>
-        <button class="export-btn" id="exportBtn">Export Excel</button>
-    </div>
- 
-    <div class="table-container" id="tableSection" style="display:none;">
-        <div class="table-header" id="tableHeader">
-            <div data-sort="Plant">Plant <i class="fas fa-sort sort-icon"></i></div>
-            <div data-sort="Material">Material <i class="fas fa-sort sort-icon"></i></div>
-            <div>รายการอะไหล่</div>
-            <div data-sort="Unit">หน่วย</div>
-            <div data-sort="Unrestricted">คงเหลือ <i class="fas fa-sort sort-icon"></i></div>
-            <div data-sort="Value">มูลค่า <i class="fas fa-sort sort-icon"></i></div>
-            <div data-sort="Qty6Month">เบิก 6ด.</div>
-            <div data-sort="Qty4Month">เบิก 4ด.</div>
-            <div data-sort="AvgMonthly">เฉลี่ย/ด.</div>
-            <div data-sort="SafetyStock">Safety</div>
-            <div data-sort="ROP">ROP <i class="fas fa-sort sort-icon"></i></div>
-            <div data-sort="DOS">DOS</div>
-            <div data-sort="RecommendedOrder">แนะนำสั่งซื้อ <i class="fas fa-sort sort-icon"></i></div>
-            <div data-sort="ABCValue">ABC</div>
-            <div data-sort="Moving">Moving</div>
-            <div data-sort="ReturnQty">ส่งคืน</div>
-            <div data-sort="CumPercent">%สะสม <i class="fas fa-sort sort-icon"></i></div>
+        <div class="filter-row">
+            <div class="control-group">
+                <label><i class="fas fa-industry control-icon"></i> Plant:</label>
+                <select id="plantFilter"><option value="">ทุก Plant</option></select>
+            </div>
+            <div class="control-group">
+                <label><i class="fas fa-clock control-icon"></i> Lead Time:</label>
+                <input type="number" id="leadTimeDays" value="15">
+                <span class="unit">วัน</span>
+            </div>
+            <div class="control-group">
+                <label><i class="fas fa-shield-alt control-icon"></i> Safety:</label>
+                <input type="number" id="safetyDays" value="5">
+                <span class="unit">วัน</span>
+            </div>
+            <div class="control-group">
+                <label><i class="fas fa-calendar-check control-icon"></i> ครอบคลุม:</label>
+                <input type="number" id="coverDays" value="35">
+                <span class="unit">วัน</span>
+            </div>
         </div>
-        <div id="dataList"></div>
+        <div class="search-row">
+            <div class="control-group">
+                <label><i class="fas fa-search control-icon"></i> ค้นหา:</label>
+                <input type="text" id="searchInput" placeholder="Material หรือ Description">
+            </div>
+            <button class="export-btn" id="exportBtn"><i class="fas fa-file-export"></i></button>
+        </div>
     </div>
-
-     <div class="pagination" id="pagination" style="display:none;"></div>
+    <div class="table-container" id="tableSection" style="display:none;">
+        <table id="dataTable">
+            <thead>
+                <tr id="tableHeader">
+                    <th data-sort="Plant">Plant <i class="fas fa-sort sort-icon"></i></th>
+                    <th data-sort="Material">Material <i class="fas fa-sort sort-icon"></i></th>
+                    <th>รายการอะไหล่</th>
+                    <th data-sort="Unit">หน่วย</th>
+                    <th data-sort="Unrestricted" title="จำนวนอะไหล่คงเหลือในคลัง">คงเหลือ <i class="fas fa-sort sort-icon"></i></th>
+                    <th data-sort="Value" title="มูลค่าคงเหลือ = คงเหลือ * ราคาต่อหน่วย">มูลค่า <i class="fas fa-sort sort-icon"></i></th>
+                    <th data-sort="Qty6Month" title="จำนวนเบิกออกใน 6 เดือนที่ผ่านมา">เบิก 6ด.</th>
+                    <th data-sort="Qty4Month" title="จำนวนเบิกออกใน 4 เดือนที่ผ่านมา">เบิก 4ด.</th>
+                    <th data-sort="AvgMonthly" title="เฉลี่ยต่อวัน = เบิก 4ด. / 120">เฉลี่ย/ด.</th>
+                    <th data-sort="ThirtyDay" title="จำนวนเบิกใน 30 วันล่าสุด">30Day</th>
+                    <th data-sort="Mean" title="ค่ามากสุดระหว่างเฉลี่ย/เดือน เดิม และ 30Day ">Mean</th>
+                    <th data-sort="SafetyStock" title="Safety Stock = เฉลี่ยต่อวัน * จำนวนวัน Safety (เฉลี่ยต่อวัน = เฉลี่ยต่อเดือน / 30)">Safety</th>
+                    <th data-sort="ROP" title="Reorder Point = (เฉลี่ยต่อวัน * Lead Time) + Safety Stock">ROP <i class="fas fa-sort sort-icon"></i></th>
+                    <th data-sort="DOS" title="Days of Supply = คงเหลือ / เฉลี่ยต่อวัน (มากกว่า 9999 แสดง 'มาก')">DOS</th>
+                    <th data-sort="RecommendedOrder" title="ถ้าคงเหลือ < ROP, แนะนำสั่ง = (เฉลี่ยต่อวัน * ครอบคลุมวัน) - คงเหลือ แล้วปรับตาม Package Size">แนะนำสั่ง <i class="fas fa-sort sort-icon"></i></th>
+                    <th>หมายเหตุ</th>
+                    <th data-sort="MultiplyUnit" title="ขนาดแพ็คเกจสำหรับการสั่งซื้อ (ใช้ในการปัดเศษแนะนำสั่ง)">Package</th>
+                    <th data-sort="Product">Product</th>
+                    <th data-sort="ABCValue" title="A: มูลค่าสะสม <= 70%, B: <= 90%, C: ที่เหลือ (เรียงจากมูลค่าสูงไปต่ำ)">ABC</th>
+                    <th data-sort="Moving" title="Fast: >=30/เดือน, Medium: >=12, Slow: >=0.7, Slowly: <0.7, Dead: =0">Moving</th>
+                    <th data-sort="ReturnQty" title="จำนวนส่งคืน = max(0, คงเหลือ - Keep Qty), Keep Qty ขึ้นกับ Moving และ ABC">จำนวนส่งคืน</th>
+                    <th data-sort="CumPercent" title="% มูลค่าสะสมจากมูลค่ารวม (เรียงจากสูงไปต่ำ)">%สะสม <i class="fas fa-sort sort-icon"></i></th>
+                </tr>
+            </thead>
+            <tbody id="dataList"></tbody>
+        </table>
+    </div>
+    <div class="pagination" id="pagination" style="display:none;"></div>
 </div>
-
 <script>
 // ฟังก์ชันแปลงตัวเลขเป็น K / M
 function formatShortCurrency(n) {
@@ -182,22 +218,20 @@ function formatShortCurrency(n) {
     return n.toFixed(2);
 }
 let sortKey = "CumPercent", sortDir = "asc";
-
 document.addEventListener("DOMContentLoaded", function () {
     const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
     const inventoryUrl = 'https://opensheet.elk.sh/1OtcgbmQdrI3gKJCGiDge6xuOsrT0GPxdKeFPjpvK3Rg/Sheet1';
+    const mainsapUrl = 'https://opensheet.elk.sh/1CkfOIe2nDYBLs5aPGkPyZhOeqJkyS7UQ6tuMzxy-mfk/mainsap';
     let allData = [], filteredData = [];
     let mode = "all", abcFilter = "", movingFilter = ""; // ใช้ตัวแปรแยก
     let currentPage = 1;
     const rowsPerPage = 25;
-
     function toNumber(v) { return parseFloat((v||"0").toString().replace(/,/g,'')) || 0; }
     function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
     function formatCurrency(n) { return Number(n).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
-
     function calculateKeepQty(r) {
-        const avg = r.AvgDailyUse;
-        if (r.Moving === "Dead") return 1;
+        const avg = r.AvgMonthly;
+        if (r.Moving === "Dead" || r.Moving === "Slowly") return 1;
         if (r.Moving === "Slow" && r.ABCValue === "C") return Math.max(1, Math.round(avg * 60));
         if (r.Moving === "Slow" && r.ABCValue === "B") return Math.max(1, Math.round(avg * 60));
         if (r.Moving === "Medium" && r.ABCValue === "C") return Math.max(2, Math.round(avg * 60));
@@ -209,21 +243,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (r.Moving === "Fast" && r.ABCValue === "A") return Math.max(10, Math.round(avg * 120));
         return Math.max(1, Math.round(avg * 40));
     }
-
     async function loadData() {
    const loadingBar = document.getElementById("loadingBar");
 const summarySection = document.getElementById("summarySection");
 const controlsSection = document.getElementById("controlsSection");
 const tableSection = document.getElementById("tableSection");
 const paginationSection = document.getElementById("pagination"); // ✅ ถูกต้อง
-
     // เริ่มโหลด: แสดง loading bar, ซ่อนเนื้อหา
     loadingBar.style.width = "0%";
     summarySection.style.display = "none";
     controlsSection.style.display = "none";
     tableSection.style.display = "none";
     paginationSection.style.display = "block";
-
     // แอนิเมชัน progress bar (0% → 100%)
     let progress = 0;
     const interval = setInterval(() => {
@@ -235,40 +266,78 @@ const paginationSection = document.getElementById("pagination"); // ✅ ถู�
             loadingBar.style.width = progress + "%";
         }
     }, 200);
-
     try {
-        const [uRes, iRes] = await Promise.all([fetch(usageUrl), fetch(inventoryUrl)]);
+        const [uRes, iRes, mRes] = await Promise.all([fetch(usageUrl), fetch(inventoryUrl), fetch(mainsapUrl)]);
         const usage = await uRes.json();
         const inv = await iRes.json();
+        const mainsap = await mRes.json();
         const useMap = new Map();
-        usage.forEach(r => useMap.set(`${r.Plant?.trim()}-${r.Material?.trim()}`, r));
-
-        allData = inv.map(r => {
-            const key = `${r.Plant?.trim()}-${r.Material?.trim()}`;
-            const u = useMap.get(key) || {Qtyissu:0, Qtyissu6m:0};
+        const invMap = new Map();
+        const mainsapMap = new Map();
+        usage.forEach(r => {
+            const plant = (r.Plant || '').trim();
+            const material = (r.Material || '').trim();
+            const key = `${plant}-${material}`;
+            useMap.set(key, r);
+        });
+        inv.forEach(r => {
+            const plant = (r.Plant || '').trim();
+            const material = (r.Material || '').trim();
+            const key = `${plant}-${material}`;
+            invMap.set(key, r);
+        });
+        mainsap.forEach(r => {
+            const material = (r.Material || '').trim();
+            mainsapMap.set(material, {
+                Note: r['หมายเหตุ'] || '',
+                MultiplyUnit: toNumber(r['คูณหน่วย']),
+                Product: r.Product || ''
+            });
+        });
+        const allKeys = new Set([...useMap.keys(), ...invMap.keys()]);
+        allData = Array.from(allKeys).map(key => {
+            const [plant, material] = key.split('-');
+            const u = useMap.get(key) || {Qtyissu: 0, Qtyissu6m: 0, '30Day': 0};
+            const i = invMap.get(key) || {Unrestricted: 0, "Value Unrestricted": 0, "Material description": '', "Base Unit of Measure": ''};
+            const main = mainsapMap.get(material) || {Note: '', MultiplyUnit: 1, Product: ''};
             const qty4m = toNumber(u.Qtyissu);
             const qty6m = toNumber(u.Qtyissu6m) || Math.round(qty4m * 1.5);
+            const thirtyDay = toNumber(u['30Day']);
             return {
-                Plant: (r.Plant||'').trim(),
-                Material: (r.Material||'').trim(),
-                Description: r["Material description"] || '',
-                Unit: r["Base Unit of Measure"] || '',
-                Unrestricted: toNumber(r.Unrestricted),
-                Value: toNumber(r["Value Unrestricted"]),
+                Plant: plant,
+                Material: material,
+                Description: i["Material description"] || '',
+                Unit: i["Base Unit of Measure"] || '',
+                Unrestricted: toNumber(i.Unrestricted),
+                Value: toNumber(i["Value Unrestricted"]),
                 Qty6Month: qty6m,
                 Qty4Month: qty4m,
-                AvgMonthly: qty4m / 4, // ❗ ตรวจคำผิด: ควรเป็น qty4m
-                AvgDailyUse: qty4m / 120,
-                SafetyStock:0, ROP:0, DOS:0, RecommendedOrder:0,
+                ThirtyDay: thirtyDay,
+                AvgDailyUse: qty4m / 120 ,
+                AvgMonthly: qty4m / 4,
+                SafetyStock:0, ROP:0, DOS:0, RecommendedOrder:0, Mean:0,
                 ABCValue:"", CumPercent:0, Moving:"", IsNonMoving: qty4m === 0,
-                ReturnQty: 0, ReturnValue: 0
+                ReturnQty: 0, ReturnValue: 0,
+                Note: main.Note,
+                MultiplyUnit: main.MultiplyUnit,
+                Product: main.Product
             };
         });
-
+        // Fill missing Descriptions
+        const descMap = new Map();
+        allData.forEach(r => {
+            if (r.Description) {
+                descMap.set(r.Material, r.Description);
+            }
+        });
+        allData.forEach(r => {
+            if (!r.Description && descMap.has(r.Material)) {
+                r.Description = descMap.get(r.Material);
+            }
+        });
         calcABCValue();
         fillPlantDropdown();
         setDefaultAndCalculate();
-
         // โหลดเสร็จ → แสดงเนื้อหาทั้งหมด
      clearInterval(interval);
 loadingBar.style.width = "100%";
@@ -281,7 +350,6 @@ setTimeout(() => {
     tableSection.style.display = "block";
     document.getElementById("pagination").style.display = "block";
 }, 300);
-
     } catch(e) {
         clearInterval(interval);
         loadingBar.style.width = "0%";
@@ -291,7 +359,6 @@ setTimeout(() => {
         console.error(e);
     }
 }
-
     function calcABCValue() {
         const sorted = [...allData].sort((a,b)=>b.Value-a.Value);
         const total = sorted.reduce((s,r)=>s+r.Value,0);
@@ -306,60 +373,83 @@ setTimeout(() => {
             }
         });
     }
-
     // 1. แก้ recalculateStockFields ให้ return ค่ากลับมา
-// 1. แก้ recalculateStockFields ให้ return ค่ากลับมา
 function recalculateStockFields(data, params) {
     let totalReturnValue = 0;
     let totalAfterReturn = 0;
-
     data.forEach(r => {
         const d = r.AvgDailyUse || 0;
         const leadTime = params.leadTime || 5;
         const safetyDays = params.safety || 3;
         const coverDays = params.cover || 40;
-
         const safetyStock = d * safetyDays;
         const rop = (d * leadTime) + safetyStock;
         const dos = d > 0 ? r.Unrestricted / d : 9999;
-
         r.SafetyStock = Math.round(safetyStock);
         r.ROP = Math.round(rop);
         r.DOS = dos > 9999 ? 9999 : parseFloat(dos.toFixed(1));
-
-        // สูตรสั่งซื้อใหม่: เฉพาะเมื่อต่ำกว่า ROP
+        
+        // สูตรคำนวณแนะนำสั่งซื้อ (พื้นฐาน)
         let recommend = 0;
         if (r.Unrestricted < rop) {
             const needed = d * coverDays;
             recommend = needed - r.Unrestricted;
             if (recommend < 0) recommend = 0;
         }
+        const multiply = r.MultiplyUnit || 1;
+        if (multiply > 0) {
+            recommend = Math.ceil(recommend / multiply) * multiply;
+        }
         r.RecommendedOrder = Math.round(recommend);
-
-       // กำหนด Moving จาก AvgMonthly (เฉลี่ย/เดือน)
-if (r.IsNonMoving || r.AvgMonthly <= 0) {
-    r.Moving = "Dead";
-} else if (r.AvgMonthly >= 100) {
-    r.Moving = "Fast";
-} else if (r.AvgMonthly >= 10) {
-    r.Moving = "Medium";
-} else {
-    r.Moving = "Slow";
-}
+        
+        // กำหนด Moving จาก AvgMonthly (เฉลี่ย/เดือน)
+        const avgMonthly = r.Qty4Month / 4;
+        if (avgMonthly === 0) {
+            r.Moving = "Dead";
+        } else if (avgMonthly < 0.7) {
+            r.Moving = "Slowly";
+        } else if (avgMonthly < 12) {
+            r.Moving = "Slow";
+        } else if (avgMonthly < 30) {
+            r.Moving = "Medium";
+        } else {
+            r.Moving = "Fast";
+        }
+        
+        // กำหนด Mean: ค่าสูงสุดระหว่าง ThirtyDay และ AvgMonthly
+        if (r.ThirtyDay > r.AvgMonthly) {
+            r.Mean = r.ThirtyDay;
+        } else {
+            r.Mean = r.AvgMonthly;
+        }
+        
+        // ตรวจสอบเงื่อนไขที่ทำให้ไม่สั่งซื้อ
+        
+        // เงื่อนไข 1: Mean = 0 AND (Moving = Slow OR Moving = Slowly) → ไม่สั่ง
+        if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) {
+            r.RecommendedOrder = 0;
+        }
+        
+        // เงื่อนไข 2: ThirtyDay = 0 AND (Moving = Slow OR Moving = Slowly) → ไม่สั่ง
+        if (r.ThirtyDay === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) {
+            r.RecommendedOrder = 0;
+        }
+        
+        // เงื่อนไข 3: ThirtyDay >= Qty4Month AND Moving = Slowly → ไม่สั่ง
+        if (r.ThirtyDay >= r.Qty4Month && r.Moving === "Slowly") {
+            r.RecommendedOrder = 0;
+        }
+        
         // ส่งคืน
         const keepQty = calculateKeepQty(r);
         const returnQty = Math.max(0, r.Unrestricted - keepQty);
         const unitPrice = r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0;
         const returnValue = returnQty * unitPrice;
-
         r.ReturnQty = Math.round(returnQty);
         r.ReturnValue = returnValue;
-
         totalReturnValue += returnValue;
         totalAfterReturn += (r.Value - returnValue);
     });
-
-    // ส่งค่ากลับ
     return { totalReturnValue, totalAfterReturn };
 }
     function fillPlantDropdown() {
@@ -368,15 +458,14 @@ if (r.IsNonMoving || r.AvgMonthly <= 0) {
         sel.innerHTML = '<option value="">ทุก Plant</option>';
         plants.forEach(p => sel.add(new Option(p,p)));
     }
-
     function setDefaultAndCalculate() {
         const sel = document.getElementById("plantFilter");
-        if (sel.querySelector('[value="0366"]')) sel.value = "0366";
+        sel.value = "";
         mode = "all"; abcFilter = ""; movingFilter = "";
         applyFiltersAndRender();
     }
 document.getElementById("tableHeader").addEventListener("click", function(e) {
-        const col = e.target.closest("[data-sort]");
+        const col = e.target.closest("th[data-sort]");
         if (!col) return;
         const key = col.getAttribute("data-sort");
         if (sortKey === key) {
@@ -392,28 +481,24 @@ function applyFiltersAndRender() {
     let data = [...allData];
     const plant = document.getElementById("plantFilter").value;
     if (plant) data = data.filter(r => r.Plant === plant);
-
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    if (search) data = data.filter(r => r.Material.toLowerCase().includes(search) || r.Description.toLowerCase().includes(search));
     const params = {
         leadTime: parseInt(document.getElementById("leadTimeDays").value) || 5,
         safety: parseInt(document.getElementById("safetyDays").value) || 3,
         cover: parseInt(document.getElementById("coverDays").value) || 40
     };
-
     // รับค่ากลับมาจากฟังก์ชัน
     const { totalReturnValue, totalAfterReturn } = recalculateStockFields(data, params);
-
     // กรอง mode
     if (mode === "onlyOrder") data = data.filter(r => Math.round(r.RecommendedOrder) >= 1);
     else if (mode === "returnable") data = data.filter(r => r.ReturnQty > 0);
     else if (mode === "afterReturn") data = data.map(r => ({...r, Unrestricted: r.Unrestricted - r.ReturnQty}));
-
     if (abcFilter) data = data.filter(r => r.ABCValue === abcFilter);
     if (movingFilter) data = data.filter(r => r.Moving === movingFilter);
-
     data.sort((a,b) => b.Value - a.Value);
     filteredData = data;
     currentPage = 1;
-
     // อัปเดต Card ส่งคืน (ใช้ค่าที่รับมา)
     document.getElementById("returnValue").textContent = formatShortCurrency(totalReturnValue);
     document.getElementById("afterReturnValue").textContent = formatShortCurrency(totalAfterReturn);
@@ -424,7 +509,6 @@ filteredData.sort((a, b) => {
             if (typeof y === "string") y = y.toLowerCase();
             return sortDir === "asc" ? (x > y ? 1 : -1) : (x < y ? 1 : -1);
         });
-
         currentPage = 1;
         renderTable();
         renderPagination();
@@ -434,34 +518,30 @@ filteredData.sort((a, b) => {
 function updateAllCards() {
     const data = filteredData;
     const abc = {A:0,B:0,C:0}, cntABC = {A:0,B:0,C:0};
-    const mov = {Fast:0,Medium:0,Slow:0,Dead:0}, cntMov = {Fast:0,Medium:0,Slow:0,Dead:0};
+    const mov = {Fast:0,Medium:0,Slow:0,Slowly:0,Dead:0}, cntMov = {Fast:0,Medium:0,Slow:0,Slowly:0,Dead:0};
     let totalStock = 0, orderItems = 0, orderValue = 0, returnCount = 0;
-
     data.forEach(r => {
         totalStock += r.Value;
         abc[r.ABCValue] += r.Value; cntABC[r.ABCValue]++;
         mov[r.Moving] += r.Value; cntMov[r.Moving]++;
-
         const qty = Math.round(r.RecommendedOrder);
-        if (qty > 0) { 
-            orderItems++; 
-            orderValue += qty * (r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0); 
+        if (qty > 0) {
+            orderItems++;
+            orderValue += qty * (r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0);
         }
         if (r.ReturnQty > 0) returnCount++;
     });
-
     // แสดงเป็น K/M
     document.getElementById("totalStockValue").textContent = formatShortCurrency(totalStock);
     document.getElementById("orderTotalValue").textContent = formatShortCurrency(orderValue);
-
     document.getElementById("sumA").textContent = formatShortCurrency(abc.A);
     document.getElementById("sumB").textContent = formatShortCurrency(abc.B);
     document.getElementById("sumC").textContent = formatShortCurrency(abc.C);
     document.getElementById("valFast").textContent = formatShortCurrency(mov.Fast);
     document.getElementById("valMedium").textContent = formatShortCurrency(mov.Medium);
     document.getElementById("valSlow").textContent = formatShortCurrency(mov.Slow);
+    document.getElementById("valSlowly").textContent = formatShortCurrency(mov.Slowly);
     document.getElementById("valDead").textContent = formatShortCurrency(mov.Dead);
-
     document.getElementById("totalCount").textContent = data.length + " รายการ";
     document.getElementById("orderItemCount").textContent = orderItems;
     document.getElementById("returnItemCount").textContent = returnCount + " รายการ";
@@ -471,56 +551,57 @@ function updateAllCards() {
     document.getElementById("countFast").textContent = cntMov.Fast + " รายการ";
     document.getElementById("countMedium").textContent = cntMov.Medium + " รายการ";
     document.getElementById("countSlow").textContent = cntMov.Slow + " รายการ";
+    document.getElementById("countSlowly").textContent = cntMov.Slowly + " รายการ";
     document.getElementById("countDead").textContent = cntMov.Dead + " รายการ";
 }
     function renderTable() {
         const container = document.getElementById("dataList");
         container.innerHTML = "";
-        const start = (currentPage-1)*25;
-        const end = start + 25;
+        const start = (currentPage-1)*rowsPerPage;
+        const end = start + rowsPerPage;
         const pageData = filteredData.slice(start, end);
-
         if (pageData.length === 0) {
-            container.innerHTML = `<div style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</div>`;
+            container.innerHTML = `<tr><td colspan="20" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
             return;
         }
-
         pageData.forEach(r => {
             const orderQty = Math.round(r.RecommendedOrder);
             const orderClass = orderQty === 0 ? "order-0" :
                               orderQty <= 10 ? "order-1-10" :
                               orderQty <= 50 ? "order-11-50" :
                               orderQty <= 200 ? "order-51-200" : "order-200";
-
-            const card = document.createElement("div");
-            card.className = "item-card";
-            card.innerHTML = `
-                <div>${r.Plant}</div>
-                <div class="material">${r.Material}</div>
-                <div class="desc">${r.Description}</div>
-                <div>${r.Unit}</div>
-                <div>${formatNumber(r.Unrestricted)}</div>
-                <div class="value">${formatCurrency(r.Value)}</div>
-                <div>${formatNumber(r.Qty6Month)}</div>
-                <div>${formatNumber(r.Qty4Month)}</div>
-                <div>${formatNumber(Math.round(r.AvgMonthly))}</div>
-                <div>${formatNumber(r.SafetyStock)}</div>
-                <div>${formatNumber(r.ROP)}</div>
-                <div>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</div>
-                <div class="${orderClass} order">${formatNumber(orderQty)}</div>
-                <div><strong>${r.ABCValue}</strong></div>
-                <div class="moving-${r.Moving.toLowerCase()}">${r.Moving}</div>
-                <div style="background:#e74c3c;color:white;padding:2px 8px;border-radius:6px;">${formatNumber(r.ReturnQty)}</div>
-                <div>${r.CumPercent.toFixed(1)}%</div>
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${r.Plant}</td>
+                <td class="material">${r.Material}</td>
+                <td class="desc">${r.Description}</td>
+                <td>${r.Unit}</td>
+                <td>${formatNumber(r.Unrestricted)}</td>
+                <td><span class="value">${formatCurrency(r.Value)}</span></td>
+                <td>${formatNumber(r.Qty6Month)}</td>
+                <td>${formatNumber(r.Qty4Month)}</td>
+                <td>${r.AvgMonthly.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                <td>${formatNumber(r.ThirtyDay)}</td>
+                <td>${r.Mean.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
+                <td>${formatNumber(r.SafetyStock)}</td>
+                <td>${formatNumber(r.ROP)}</td>
+                <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
+                <td><span class="${orderClass} order">${formatNumber(orderQty)}</span></td>
+                <td>${r.Note}</td>
+                <td>${formatNumber(r.MultiplyUnit)}</td>
+                <td>${r.Product}</td>
+                <td><strong>${r.ABCValue}</strong></td>
+                <td><span class="moving-${r.Moving.toLowerCase()}">${r.Moving}</span></td>
+                <td><span class="return-qty">${formatNumber(r.ReturnQty)}</span></td>
+                <td>${r.CumPercent.toFixed(1)}%</td>
             `;
-            container.appendChild(card);
+            container.appendChild(row);
         });
     }
     function renderPagination() {
-        const totalPages = Math.max(1, Math.ceil(filteredData.length / 25));
+        const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
         const p = document.getElementById("pagination");
         p.innerHTML = "";
-
         const createBtn = (text, page, disabled = false) => {
             const btn = document.createElement("button");
             btn.className = "page-btn";
@@ -530,29 +611,26 @@ function updateAllCards() {
             if (!disabled) btn.onclick = () => { currentPage = page; renderTable(); renderPagination(); };
             return btn;
         };
-
         p.appendChild(createBtn("<<", 1, currentPage === 1));
         p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
         p.appendChild(createBtn(currentPage, currentPage, true));
         p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
         p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
     }
-
     function exportToCSV() {
-        const headers = ["Plant","Material","รายการอะไหล่","หน่วย","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน","เฉลี่ย/เดือน","Safety","ROP","DOS","แนะนำสั่งซื้อ","ABC","Moving","ส่งคืนได้ (ชิ้น)","% สะสม"];
+        const headers = ["Plant","Material","รายการอะไหล่","หน่วย","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน","เฉลี่ย/ด.","30Day","Mean","Safety","ROP","DOS","แนะนำสั่งซื้อ","หมายเหตุ","คูณหน่วย","Product","ABC","Moving","ส่งคืนได้ (ชิ้น)","% สะสม"];
         let csv = "\uFEFF" + headers.join(",") + "\n";
-
         filteredData.forEach(r => {
             const row = [
                 r.Plant, r.Material, r.Description.replace(/"/g, '""'), r.Unit,
                 r.Unrestricted, r.Value, r.Qty6Month, r.Qty4Month,
-                Math.round(r.AvgMonthly), Math.round(r.SafetyStock), Math.round(r.ROP),
+                r.AvgDailyUse.toFixed(1), r.ThirtyDay, r.Mean.toFixed(1), Math.round(r.SafetyStock), Math.round(r.ROP),
                 r.DOS > 9999 ? "มาก" : r.DOS.toFixed(1), Math.round(r.RecommendedOrder),
+                r.Note, r.MultiplyUnit, r.Product,
                 r.ABCValue, r.Moving, r.ReturnQty, r.CumPercent.toFixed(2)
             ];
             csv += row.map(v => `"${v}"`).join(",") + "\n";
         });
-
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -561,13 +639,11 @@ function updateAllCards() {
         a.click();
         URL.revokeObjectURL(url);
     }
-
     // คลิก Card หลัก - รีเซ็ต ABC/Moving filter
     document.getElementById("cardTotalStock").onclick = () => { mode = "all"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardOrderItems").onclick = () => { mode = "onlyOrder"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardReturnValue").onclick = () => { mode = "returnable"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardAfterReturn").onclick = () => { mode = "afterReturn"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
-
     // คลิก Card ABC / Moving - กรองต่อเนื่อง (คง Plant + mode เดิม)
     document.getElementById("abcA").onclick = () => { abcFilter = "A"; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("abcB").onclick = () => { abcFilter = "B"; movingFilter = ""; applyFiltersAndRender(); };
@@ -575,14 +651,12 @@ function updateAllCards() {
     document.getElementById("cardFast").onclick = () => { movingFilter = "Fast"; abcFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardMedium").onclick = () => { movingFilter = "Medium"; abcFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardSlow").onclick = () => { movingFilter = "Slow"; abcFilter = ""; applyFiltersAndRender(); };
+    document.getElementById("cardSlowly").onclick = () => { movingFilter = "Slowly"; abcFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardDead").onclick = () => { movingFilter = "Dead"; abcFilter = ""; applyFiltersAndRender(); };
-
-    ["plantFilter","leadTimeDays","safetyDays","coverDays"].forEach(id => {
-        document.getElementById(id).addEventListener("change", applyFiltersAndRender);
+    ["plantFilter","leadTimeDays","safetyDays","coverDays","searchInput"].forEach(id => {
+        document.getElementById(id).addEventListener("input", applyFiltersAndRender);
     });
-
     document.getElementById("exportBtn").onclick = exportToCSV;
-
     loadData();
 });
 </script>
