@@ -105,11 +105,31 @@
             th, td { padding: 8px 5px; font-size: 12px; }
             .pagination { font-size: 14px; }
         }
+
+        /* Login Modal Styles */
+        #loginModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .login-form { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; width: 300px; }
+        .login-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccd1ff; border-radius: 10px; }
+        .login-form button { padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; }
+        .login-form label { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0; }
+        #loginError { color: red; margin-top: 10px; }
+
+        /* Menu Button and Dropdown */
+        #menuBtn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: white; cursor: pointer; }
+        #userMenu { position: absolute; top: 50px; right: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; text-align: left; }
+        #userMenu p { margin: 5px 0; }
+        #logoutBtn { padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>ABC Analysis & Smart Ordering System</h1>
+    <button id="menuBtn" style="display: none;"><i class="fas fa-user-circle"></i></button>
+    <div id="userMenu">
+        <p id="userID"></p>
+        <p id="userName"></p>
+        <button id="logoutBtn">Log out</button>
+    </div>
     <div id="loadingBarContainer" style="height: 4px; background: #f0f0f0; position: relative; margin-bottom: 10px; border-radius: 2px; overflow: hidden;">
         <div id="loadingBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s;"></div>
     </div>
@@ -186,9 +206,9 @@
                     <th data-sort="Unit">หน่วย</th>
                     <th data-sort="Unrestricted" title="จำนวนอะไหล่คงเหลือในคลัง">คงเหลือ <i class="fas fa-sort sort-icon"></i></th>
                     <th data-sort="Value" title="มูลค่าคงเหลือ = คงเหลือ * ราคาต่อหน่วย">มูลค่า <i class="fas fa-sort sort-icon"></i></th>
-                    <th data-sort="Qty6Month" title="จำนวนเบิกออกใน 6 เดือนที่ผ่านมา">เบิก 6ด.</th>
-                    <th data-sort="Qty4Month" title="จำนวนเบิกออกใน 4 เดือนที่ผ่านมา">เบิก 4ด.</th>
-                    <th data-sort="AvgMonthly" title="เฉลี่ยต่อวัน = เบิก 4ด. / 120">เฉลี่ย/ด.</th>
+                    <th data-sort="Qty6Month" title="จำนวนเบิกออกใน 6 เดือนที่ผ่านมา">6M</th>
+                    <th data-sort="Qty4Month" title="จำนวนเบิกออกใน 4 เดือนที่ผ่านมา">4M</th>
+                    <th data-sort="AvgMonthly" title="เฉลี่ยต่อวัน = เบิก 4ด. / 120">AvgM</th>
                     <th data-sort="ThirtyDay" title="จำนวนเบิกใน 30 วันล่าสุด">30Day</th>
                     <th data-sort="Mean" title="ค่ามากสุดระหว่างเฉลี่ย/เดือน เดิม และ 30Day ">Mean</th>
                     <th data-sort="SafetyStock" title="Safety Stock = เฉลี่ยต่อวัน * จำนวนวัน Safety (เฉลี่ยต่อวัน = เฉลี่ยต่อเดือน / 30)">Safety</th>
@@ -209,6 +229,19 @@
     </div>
     <div class="pagination" id="pagination" style="display:none;"></div>
 </div>
+
+<!-- Login Modal -->
+<div id="loginModal" style="display: none;">
+    <div class="login-form">
+        <h2>Login</h2>
+        <input type="text" id="idUserInput" placeholder="IDUser">
+        <input type="password" id="passwordInput" placeholder="Password">
+        <label><input type="checkbox" id="rememberMe"> จดจำฉัน</label>
+        <button id="loginBtn">เข้าสู่ระบบ</button>
+        <div id="loginError"></div>
+    </div>
+</div>
+
 <script>
 // ฟังก์ชันแปลงตัวเลขเป็น K / M
 function formatShortCurrency(n) {
@@ -219,6 +252,9 @@ function formatShortCurrency(n) {
 }
 let sortKey = "CumPercent", sortDir = "asc";
 document.addEventListener("DOMContentLoaded", function () {
+    const userSheetID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
+    const userSheetName = 'UserPlant';
+    const userUrl = `https://opensheet.elk.sh/${userSheetID}/${userSheetName}`;
     const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
     const inventoryUrl = 'https://opensheet.elk.sh/1OtcgbmQdrI3gKJCGiDge6xuOsrT0GPxdKeFPjpvK3Rg/Sheet1';
     const mainsapUrl = 'https://opensheet.elk.sh/1CkfOIe2nDYBLs5aPGkPyZhOeqJkyS7UQ6tuMzxy-mfk/mainsap';
@@ -226,6 +262,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let mode = "all", abcFilter = "", movingFilter = ""; // ใช้ตัวแปรแยก
     let currentPage = 1;
     const rowsPerPage = 25;
+    let users = [];
+    let loggedUser = null;
     function toNumber(v) { return parseFloat((v||"0").toString().replace(/,/g,'')) || 0; }
     function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
     function formatCurrency(n) { return Number(n).toLocaleString('th-TH', {minimumFractionDigits:2, maximumFractionDigits:2}); }
@@ -243,6 +281,91 @@ document.addEventListener("DOMContentLoaded", function () {
         if (r.Moving === "Fast" && r.ABCValue === "A") return Math.max(10, Math.round(avg * 120));
         return Math.max(1, Math.round(avg * 40));
     }
+    async function loadUsers() {
+        try {
+            const res = await fetch(userUrl);
+            users = await res.json();
+        } catch (e) {
+            console.error(e);
+            alert("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
+        }
+    }
+    function checkLogin() {
+        const remembered = localStorage.getItem('rememberedUser');
+        if (remembered) {
+            const user = JSON.parse(remembered);
+            loggedUser = user;
+            showUserMenu();
+            loadData();
+            return true;
+        }
+        const sessionUser = sessionStorage.getItem('loggedUser');
+        if (sessionUser) {
+            const user = JSON.parse(sessionUser);
+            loggedUser = user;
+            showUserMenu();
+            loadData();
+            return true;
+        }
+        return false;
+    }
+    function showLogin() {
+        document.getElementById('loginModal').style.display = 'flex';
+    }
+    function hideLogin() {
+        document.getElementById('loginModal').style.display = 'none';
+    }
+    function login() {
+        const idUser = document.getElementById('idUserInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const remember = document.getElementById('rememberMe').checked;
+        const user = users.find(u => u.IDUser === idUser);
+        if (user && password === idUser.slice(-4)) {
+            loggedUser = { IDUser: user.IDUser, Name: user.Name || 'ไม่ระบุ' };
+            if (remember) {
+                localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
+            } else {
+                sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+            }
+            hideLogin();
+            showUserMenu();
+            loadData();
+        } else {
+            document.getElementById('loginError').textContent = 'IDUser หรือ Password ไม่ถูกต้อง';
+        }
+    }
+    function logout() {
+        localStorage.removeItem('rememberedUser');
+        sessionStorage.removeItem('loggedUser');
+        loggedUser = null;
+        document.getElementById('userMenu').style.display = 'none';
+        document.getElementById('menuBtn').style.display = 'none';
+        // ซ่อนเนื้อหาและแสดง login อีกครั้ง
+        document.getElementById("mainCardsSection").style.display = "none";
+        document.getElementById("summarySection").style.display = "none";
+        document.getElementById("controlsSection").style.display = "none";
+        document.getElementById("tableSection").style.display = "none";
+        document.getElementById("pagination").style.display = "none";
+        showLogin();
+    }
+    function showUserMenu() {
+        document.getElementById('menuBtn').style.display = 'block';
+        document.getElementById('userID').textContent = `IDUser: ${loggedUser.IDUser}`;
+        document.getElementById('userName').textContent = `Name: ${loggedUser.Name}`;
+    }
+    document.getElementById('menuBtn').addEventListener('click', () => {
+        const menu = document.getElementById('userMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('loginBtn').addEventListener('click', login);
+    async function init() {
+        await loadUsers();
+        if (!checkLogin()) {
+            showLogin();
+        }
+    }
+    init();
     async function loadData() {
    const loadingBar = document.getElementById("loadingBar");
 const summarySection = document.getElementById("summarySection");
@@ -657,7 +780,6 @@ function updateAllCards() {
         document.getElementById(id).addEventListener("input", applyFiltersAndRender);
     });
     document.getElementById("exportBtn").onclick = exportToCSV;
-    loadData();
 });
 </script>
 </body>
