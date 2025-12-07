@@ -123,6 +123,13 @@
         #userMenu p { margin: 5px 0; }
         #logoutBtn { padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
 
+        /* Help Modal Styles */
+        #helpModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        .help-content { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: left; width: 600px; max-height: 80vh; overflow-y: auto; }
+        .help-content h2 { text-align: center; }
+        .help-content button { padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 20px; }
+        #helpBtn { padding: 8px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px; }
+
         /* Loader */
         .loader {
           --w:10ch;
@@ -204,6 +211,7 @@
     <div id="userMenu">
         <p id="userID"></p>
         <p id="userName"></p>
+        <button id="helpBtn">Help</button>
         <button id="logoutBtn">Log out</button>
     </div>
     <div class="loader" id="loader" style="display: none;"></div>
@@ -320,6 +328,54 @@
         <label><input type="checkbox" id="rememberMe"> จดจำฉัน</label>
         <button id="loginBtn">เข้าสู่ระบบ</button>
         <div id="loginError"></div>
+    </div>
+</div>
+<!-- Help Modal -->
+<div id="helpModal" style="display: none;">
+    <div class="help-content">
+        <h2>คู่มือการใช้งานระบบ ABC Analysis & Smart Ordering System</h2>
+        <p><strong>เกี่ยวกับระบบ:</strong> ระบบนี้เป็นเครื่องมือวิเคราะห์อะไหล่ด้วยวิธี ABC Analysis และระบบแนะนำการสั่งซื้ออัจฉริยะ ช่วยในการจัดการสต็อกอะไหล่ให้มีประสิทธิภาพ โดยคำนวณจากข้อมูลการเบิกใช้งาน มูลค่าคงเหลือ และปัจจัยอื่นๆ เพื่อลดต้นทุนและป้องกันสต็อกเกิน</p>
+        
+        <h3>ฟังก์ชันหลักและวิธีใช้งาน:</h3>
+        
+        <p><strong>1. การเข้าสู่ระบบ (Login):</strong><br>
+        - ป้อน IDUser และ Password (ใช้ 4 ตัวท้ายของ IDUser เป็น Password)<br>
+        - เลือก "จดจำฉัน" เพื่อเข้าสู่ระบบอัตโนมัติครั้งถัดไป<br>
+        - กด "เข้าสู่ระบบ" เพื่อเข้าใช้งาน</p>
+        
+        <p><strong>2. เมนูผู้ใช้ (User Menu):</strong><br>
+        - กดไอคอนผู้ใช้ที่มุมขวาบนเพื่อเปิดเมนู<br>
+        - แสดงรหัสและชื่อผู้ใช้<br>
+        - กด "Help" เพื่อเปิดคู่มือนี้<br>
+        - กด "Log out" เพื่อออกจากระบบ</p>
+        
+        <p><strong>3. การ์ดสรุป (Summary Cards):</strong><br>
+        - แสดงข้อมูลสรุป เช่น มูลค่ารวม, Order, OverStock, เบิก/เดือน, Stock Days, After Stock Days<br>
+        - กดการ์ดเพื่อกรองข้อมูล เช่น กด "Order" เพื่อแสดงเฉพาะรายการที่แนะนำสั่งซื้อ<br>
+        - การ์ด ABC (A, B, C) และ Moving (Fast, Medium, Slow, Slowly, Dead) สำหรับกรองกลุ่มอะไหล่</p>
+        
+        <p><strong>4. ตัวควบคุม (Controls):</strong><br>
+        - Plant: เลือก Plant เพื่อกรองข้อมูล (เลือก "ทุก Plant" เพื่อแสดงทั้งหมด)<br>
+        - Lead Time, Safety, Cover: ปรับจำนวนวันเพื่อคำนวณ ROP, Safety Stock, และแนะนำสั่ง (หน่วยเป็นวัน)<br>
+        - ค้นหา: พิมพ์ Material หรือ Description เพื่อค้นหา<br>
+        - กดปุ่ม Export เพื่อดาวน์โหลดข้อมูลเป็น CSV</p>
+        
+        <p><strong>5. ตารางข้อมูล (Table):</strong><br>
+        - แสดงรายละเอียดอะไหล่ เช่น Plant, Material, คงเหลือ, มูลค่า, การใช้งาน (6M, 4M, AvgM, 30Day), Mean, Safety, ROP, DOS, แนะนำสั่ง, ABC, Moving, จำนวนส่งคืน, %สะสม<br>
+        - กดหัวคอลัมน์เพื่อเรียงข้อมูล (มีไอคอนลูกศร)<br>
+        - เลื่อนลงเพื่อดูข้อมูลเพิ่มเติม</p>
+        
+        <p><strong>6. การนำทางหน้า (Pagination):</strong><br>
+        - กดปุ่ม <<, <, >, >> เพื่อเปลี่ยนหน้า<br>
+        - แสดงข้อมูลทีละ 25 รายการ</p>
+        
+        <p><strong>7. การกรองข้อมูล:</strong><br>
+        - กดการ์ดสรุปเพื่อกรอง เช่น กด "OverStock" เพื่อแสดงเฉพาะรายการที่สามารถส่งคืนได้<br>
+        - การเปลี่ยน Plant จะรีเซ็ตการกรองเป็นค่าเริ่มต้น (แสดงทั้งหมด)<br>
+        - การค้นหาจะกรองตามคำที่พิมพ์แบบเรียลไทม์</p>
+        
+        <p><strong>หมายเหตุ:</strong> ข้อมูลอัปเดตจากแหล่งข้อมูลภายนอก หากมีปัญหาโปรดติดต่อผู้ดูแลระบบ</p>
+        <button id="closeHelpBtn">ปิด</button>
     </div>
 </div>
 <script>
@@ -856,6 +912,13 @@ function updateAllCards(baseData, filteredData) {
         document.getElementById(id).addEventListener("input", applyFiltersAndRender);
     });
     document.getElementById("exportBtn").onclick = exportToCSV;
+    // Help Modal Logic
+    document.getElementById('helpBtn').addEventListener('click', () => {
+        document.getElementById('helpModal').style.display = 'flex';
+    });
+    document.getElementById('closeHelpBtn').addEventListener('click', () => {
+        document.getElementById('helpModal').style.display = 'none';
+    });
 });
 </script>
 </body>
