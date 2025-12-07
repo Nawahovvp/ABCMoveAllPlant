@@ -350,8 +350,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     function showUserMenu() {
         document.getElementById('menuBtn').style.display = 'block';
-        document.getElementById('userID').textContent = `IDUser: ${loggedUser.IDUser}`;
-        document.getElementById('userName').textContent = `Name: ${loggedUser.Name}`;
+        document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
+        document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
     }
     document.getElementById('menuBtn').addEventListener('click', () => {
         const menu = document.getElementById('userMenu');
