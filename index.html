@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABC Analysis & Smart Ordering System</title>
+    <title>ระบบวิเคราะห์ ABC อะไหล่ (เวอร์ชันสวยสุด)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -23,7 +23,9 @@
         .total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
         .order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         .return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
-        .after-return { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        .monthly-withdrawal { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+        .stock-days { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .after-stock-days { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .abc-a { background: linear-gradient(135deg, #ff7675, #ff4757); }
         .abc-b { background: linear-gradient(135deg, #ffeaa7, #ffd32a); }
         .abc-c { background: linear-gradient(135deg, #a3daff, #74b9ff); }
@@ -222,9 +224,17 @@
             <div class="card-value" id="returnValue">0.00</div>
             <div class="card-count" id="returnItemCount">0 รายการ</div>
         </div>
-        <div class="card after-return" id="cardAfterReturn">
-            <div class="card-title">After Value</div>
-            <div class="card-value" id="afterReturnValue">0.00</div>
+        <div class="card monthly-withdrawal" id="cardMonthlyWithdrawal">
+            <div class="card-title">เบิก/เดือน</div>
+            <div class="card-value" id="monthlyWithdrawalValue">0.00</div>
+        </div>
+        <div class="card stock-days" id="cardStockDays">
+            <div class="card-title">Stock Days</div>
+            <div class="card-value" id="stockDaysValue">0</div>
+        </div>
+        <div class="card after-stock-days" id="cardAfterStockDays">
+            <div class="card-title">After Stock Days</div>
+            <div class="card-value" id="afterStockDaysValue">0</div>
         </div>
     </div>
     <!-- ABC + Moving -->
@@ -551,8 +561,6 @@ const paginationSection = document.getElementById("pagination"); // ✅ ถู�
     }
     // 1. แก้ recalculateStockFields ให้ return ค่ากลับมา
 function recalculateStockFields(data, params) {
-    let totalReturnValue = 0;
-    let totalAfterReturn = 0;
     data.forEach(r => {
         const d = r.AvgDailyUse || 0;
         const leadTime = params.leadTime || 5;
@@ -623,10 +631,7 @@ function recalculateStockFields(data, params) {
         const returnValue = returnQty * unitPrice;
         r.ReturnQty = Math.round(returnQty);
         r.ReturnValue = returnValue;
-        totalReturnValue += returnValue;
-        totalAfterReturn += (r.Value - returnValue);
     });
-    return { totalReturnValue, totalAfterReturn };
 }
     function fillPlantDropdown() {
         const sel = document.getElementById("plantFilter");
@@ -665,19 +670,17 @@ function applyFiltersAndRender() {
         cover: parseInt(document.getElementById("coverDays").value) || 40
     };
     // รับค่ากลับมาจากฟังก์ชัน
-    const { totalReturnValue, totalAfterReturn } = recalculateStockFields(data, params);
+    recalculateStockFields(data, params);
+    let baseData = [...data];
     // กรอง mode
     if (mode === "onlyOrder") data = data.filter(r => Math.round(r.RecommendedOrder) >= 1);
     else if (mode === "returnable") data = data.filter(r => r.ReturnQty > 0);
-    else if (mode === "afterReturn") data = data.map(r => ({...r, Unrestricted: r.Unrestricted - r.ReturnQty}));
+    else if (mode === "afterReturn") data = data.map(r => ({...r, Unrestricted: r.Unrestricted - r.ReturnQty, Value: r.Value - r.ReturnValue}));
     if (abcFilter) data = data.filter(r => r.ABCValue === abcFilter);
     if (movingFilter) data = data.filter(r => r.Moving === movingFilter);
     data.sort((a,b) => b.Value - a.Value);
     filteredData = data;
     currentPage = 1;
-    // อัปเดต Card ส่งคืน (ใช้ค่าที่รับมา)
-    document.getElementById("returnValue").textContent = formatShortCurrency(totalReturnValue);
-    document.getElementById("afterReturnValue").textContent = formatShortCurrency(totalAfterReturn);
 filteredData.sort((a, b) => {
             let x = a[sortKey] || 0;
             let y = b[sortKey] || 0;
@@ -688,15 +691,15 @@ filteredData.sort((a, b) => {
         currentPage = 1;
         renderTable();
         renderPagination();
-        updateAllCards();
+        updateAllCards(baseData, filteredData);
     }
    // 3. แก้ updateAllCards ให้ไม่ใช้ totalReturnValue อีก (เพราะอัปเดตไปแล้ว)
-function updateAllCards() {
-    const data = filteredData;
+function updateAllCards(baseData, filteredData) {
     const abc = {A:0,B:0,C:0}, cntABC = {A:0,B:0,C:0};
     const mov = {Fast:0,Medium:0,Slow:0,Slowly:0,Dead:0}, cntMov = {Fast:0,Medium:0,Slow:0,Slowly:0,Dead:0};
-    let totalStock = 0, orderItems = 0, orderValue = 0, returnCount = 0;
-    data.forEach(r => {
+    let totalStock = 0, orderItems = 0, orderValue = 0, returnCount = 0, totalReturnValue = 0;
+    let total_usage_4m_filtered = 0;
+    filteredData.forEach(r => {
         totalStock += r.Value;
         abc[r.ABCValue] += r.Value; cntABC[r.ABCValue]++;
         mov[r.Moving] += r.Value; cntMov[r.Moving]++;
@@ -706,7 +709,23 @@ function updateAllCards() {
             orderValue += qty * (r.Unrestricted > 0 ? r.Value / r.Unrestricted : 0);
         }
         if (r.ReturnQty > 0) returnCount++;
+        totalReturnValue += r.ReturnValue;
     });
+    let total_usage_4m_base = 0;
+    let totalStock_base = 0;
+    let totalReturnValue_base = 0;
+    baseData.forEach(r => {
+        totalStock_base += r.Value;
+        totalReturnValue_base += r.ReturnValue;
+        if (r.Unrestricted > 0) {
+            const unit_price = r.Value / r.Unrestricted;
+            total_usage_4m_base += r.Qty4Month * unit_price;
+        }
+    });
+    const monthly_withdrawal = total_usage_4m_base / 4 || 0;
+    const daily_usage = total_usage_4m_base / 120 || 0;
+    const stock_days = daily_usage > 0 ? Math.round(totalStock_base / daily_usage) : 'N/A';
+    const after_stock_days = daily_usage > 0 ? Math.round((totalStock_base - totalReturnValue_base) / daily_usage) : 'N/A';
     // แสดงเป็น K/M
     document.getElementById("totalStockValue").textContent = formatShortCurrency(totalStock);
     document.getElementById("orderTotalValue").textContent = formatShortCurrency(orderValue);
@@ -718,9 +737,13 @@ function updateAllCards() {
     document.getElementById("valSlow").textContent = formatShortCurrency(mov.Slow);
     document.getElementById("valSlowly").textContent = formatShortCurrency(mov.Slowly);
     document.getElementById("valDead").textContent = formatShortCurrency(mov.Dead);
-    document.getElementById("totalCount").textContent = data.length + " รายการ";
+    document.getElementById("totalCount").textContent = filteredData.length + " รายการ";
     document.getElementById("orderItemCount").textContent = orderItems;
     document.getElementById("returnItemCount").textContent = returnCount + " รายการ";
+    document.getElementById("returnValue").textContent = formatShortCurrency(totalReturnValue);
+    document.getElementById("monthlyWithdrawalValue").textContent = formatShortCurrency(monthly_withdrawal);
+    document.getElementById("stockDaysValue").textContent = stock_days > 9999 ? 'มาก' : stock_days;
+    document.getElementById("afterStockDaysValue").textContent = after_stock_days > 9999 ? 'มาก' : after_stock_days;
     document.getElementById("countA").textContent = cntABC.A + " รายการ";
     document.getElementById("countB").textContent = cntABC.B + " รายการ";
     document.getElementById("countC").textContent = cntABC.C + " รายการ";
@@ -819,7 +842,6 @@ function updateAllCards() {
     document.getElementById("cardTotalStock").onclick = () => { mode = "all"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardOrderItems").onclick = () => { mode = "onlyOrder"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardReturnValue").onclick = () => { mode = "returnable"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
-    document.getElementById("cardAfterReturn").onclick = () => { mode = "afterReturn"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
     // คลิก Card ABC / Moving - กรองต่อเนื่อง (คง Plant + mode เดิม)
     document.getElementById("abcA").onclick = () => { abcFilter = "A"; movingFilter = ""; applyFiltersAndRender(); };
     document.getElementById("abcB").onclick = () => { abcFilter = "B"; movingFilter = ""; applyFiltersAndRender(); };
@@ -829,7 +851,8 @@ function updateAllCards() {
     document.getElementById("cardSlow").onclick = () => { movingFilter = "Slow"; abcFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardSlowly").onclick = () => { movingFilter = "Slowly"; abcFilter = ""; applyFiltersAndRender(); };
     document.getElementById("cardDead").onclick = () => { movingFilter = "Dead"; abcFilter = ""; applyFiltersAndRender(); };
-    ["plantFilter","leadTimeDays","safetyDays","coverDays","searchInput"].forEach(id => {
+    document.getElementById("plantFilter").addEventListener("change", () => { mode = "all"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); });
+    ["leadTimeDays","safetyDays","coverDays","searchInput"].forEach(id => {
         document.getElementById(id).addEventListener("input", applyFiltersAndRender);
     });
     document.getElementById("exportBtn").onclick = exportToCSV;
