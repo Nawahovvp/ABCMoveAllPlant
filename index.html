@@ -70,6 +70,22 @@
             font-size: 18px;
         }
 
+        /* ★ ปุ่มตะกร้ารวม + badge จำนวน */
+        .cart-main-btn {
+            position: relative;
+        }
+        #cartCountBadge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 999px;
+            padding: 1px 6px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
         .table-container { overflow: auto; max-height: 70vh; position: relative; padding: 0 16px; }
         table { width: 100%; border-collapse: collapse; min-width: 1600px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: white; }
         thead { position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
@@ -242,103 +258,133 @@
             display: inline-block;
         }
 
+        /* ★ Modal ตะกร้า */
+        .cart-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .cart-modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 95%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+        .cart-modal-header,
+        .cart-modal-footer {
+            padding: 12px 18px;
+            background: #f5f7fb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .cart-modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .cart-modal-body {
+            padding: 12px 18px 18px;
+            overflow: auto;
+            background: #fff;
+        }
+        .cart-emp-input label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cart-emp-input input {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccd1ff;
+            min-width: 160px;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        .cart-table th,
+        .cart-table td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+        .cart-table th {
+            background: #f0f4ff;
+        }
+        .cart-table input[type="number"] {
+            width: 80px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid #ccd1ff;
+            text-align: right;
+        }
+        .cart-empty {
+            text-align: center;
+            padding: 24px 0;
+            color: #7f8c8d;
+        }
+
         /* ==================== RESPONSIVE ==================== */
 
-        /* Tablet ลงมา */
         @media (max-width: 1200px) {
-            body {
-                padding: 0;
-            }
-            .container {
-                max-width: 100%;
-                border-radius: 0;
-                box-shadow: none;
-            }
-            h1 {
-                font-size: 22px;
-                padding: 14px;
-            }
-            .summary-row {
-                padding: 10px;
-                gap: 8px;
-            }
-            .card {
-                max-width: none;
-                flex: 1 1 calc(50% - 10px); /* 2 คอลัมน์ */
-            }
-            .controls {
-                padding: 12px;
-                gap: 10px;
-            }
-            .control-group {
-                width: 100%;
-                justify-content: space-between;
-                flex-wrap: wrap;
-            }
-            .control-group label {
-                width: 100%;
-                margin-bottom: 4px;
-            }
+            body { padding: 0; }
+            .container { max-width: 100%; border-radius: 0; box-shadow: none; }
+            h1 { font-size: 22px; padding: 14px; }
+            .summary-row { padding: 10px; gap: 8px; }
+            .card { max-width: none; flex: 1 1 calc(50% - 10px); }
+            .controls { padding: 12px; gap: 10px; }
+            .control-group { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+            .control-group label { width: 100%; margin-bottom: 4px; }
             .control-group select,
             .control-group input[type=number],
             .control-group input[type=text] {
                 width: 100% !important;
             }
-            .export-btn {
-                margin-left: 0;
-            }
+            .export-btn { margin-left: 0; }
             .search-row,
-            .filter-row {
-                gap: 10px;
-            }
-            #responsibleFilterContainer {
-                width: 100%;
-            }
+            .filter-row { gap: 10px; }
+            #responsibleFilterContainer { width: 100%; }
         }
 
-        /* มือถือ */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 18px;
-            }
-            .summary-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .card {
-                flex: 1 1 100%; /* 1 คอลัมน์ */
-            }
-            .export-btn {
-                width: 100%;
-                justify-content: center;
-            }
-            .icon-btn {
-                margin-left: 0;
-            }
-            table {
-                min-width: 1000px; /* ลดลงนิดให้เลื่อนง่ายขึ้นบนมือถือ */
-            }
-            th, td {
-                padding: 8px 6px;
-                font-size: 12px;
-            }
+            h1 { font-size: 18px; }
+            .summary-row { flex-direction: column; align-items: stretch; }
+            .card { flex: 1 1 100%; }
+            .export-btn { width: 100%; justify-content: center; }
+            .icon-btn { margin-left: 0; }
+            table { min-width: 1000px; }
+            th, td { padding: 8px 6px; font-size: 12px; }
         }
 
-        /* จอเล็กมาก */
         @media (max-width: 480px) {
-            h1 {
-                font-size: 16px;
-                padding: 10px;
-            }
-            .login-form {
-                width: 260px;
-                padding: 20px;
-            }
-            .page-btn {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
+            h1 { font-size: 16px; padding: 10px; }
+            .login-form { width: 260px; padding: 20px; }
+            .page-btn { padding: 6px 10px; font-size: 12px; }
         }
+        .cart-emp-info {
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    margin-top: 4px;
+    color: #2c3e50;
+}
+.cart-emp-info span {
+    line-height: 1.3;
+}
     </style>
 </head>
 <body>
@@ -447,6 +493,16 @@
                     <option value="ไม่มีสถานะ">ไม่มีสถานะ</option>
                 </select>
             </div>
+
+            <!-- ★ ปุ่มตะกร้ารวม -->
+            <button class="icon-btn cart-main-btn" id="cartMainBtn" title="ตะกร้ารวม">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cartCountBadge">0</span>
+            </button>
+              <button class="icon-btn" id="cartClearBtn" title="ล้างตะกร้า">
+    <i class="fas fa-trash"></i>
+</button>
+
             <button class="export-btn" id="exportBtn"><i class="fas fa-file-export"></i> Export</button>
         </div>
     </div>
@@ -455,6 +511,8 @@
         <table id="dataTable">
             <thead>
             <tr id="tableHeader">
+                <!-- ★ คอลัมน์ตะกร้าใหม่ -->
+                <th style="width:50px;">Cart</th>
                 <th data-sort="Plant">Plant <i class="fas fa-sort sort-icon"></i></th>
                 <th data-sort="Material">Material <i class="fas fa-sort sort-icon"></i></th>
                 <th>รายการอะไหล่</th>
@@ -504,6 +562,48 @@
     </div>
 </div>
 
+<!-- ★ Cart Modal -->
+<div id="cartModal" class="cart-modal">
+    <div class="cart-modal-content" id="cartModalPrintArea">
+        <div class="cart-modal-header">
+    <h2><i class="fas fa-shopping-cart"></i> ตะกร้าอะไหล่</h2>
+    <div class="cart-emp-input">
+        <label>
+            รหัสพนักงาน:
+            <input type="text" id="employeeCode" placeholder="กรอกรหัสพนักงาน">
+        </label>
+        <!-- ★ แสดงชื่อและทีมที่ดึงจาก Employee sheet -->
+        <div class="cart-emp-info">
+            <span id="employeeNameLabel"></span>
+            <span id="employeeTeamLabel"></span>
+        </div>
+    </div>
+</div>
+
+        <div class="cart-modal-body">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Material</th>
+                        <th>รายการอะไหล่</th>
+                        <th>Storage bin</th>
+                        <th>จำนวน</th>
+                        <th>Pack</th>
+                    </tr>
+                </thead>
+                <tbody id="cartTableBody">
+                    <!-- เติมด้วย JS -->
+                </tbody>
+            </table>
+        </div>
+        <div class="cart-modal-footer">
+            <button class="export-btn" id="cartPrintBtn"><i class="fas fa-print"></i> Print</button>
+            <button class="export-btn" id="cartCloseBtn" style="background:linear-gradient(135deg,#e74c3c,#c0392b);"><i class="fas fa-times"></i> ปิดหน้าต่าง</button>
+        </div>
+    </div>
+</div>
+
 <script>
 let sortKey = "CumPercent", sortDir = "asc";
 let allData = [], filteredData = [];
@@ -514,6 +614,10 @@ let users = [];
 let loggedUser = null;
 let inventoryUrl;
 let selectedPlant = "";
+
+
+/* ★ ตะกร้า */
+let cartItems = [];
 
 const userSheetID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
 const userSheetName = 'UserPlant';
@@ -529,6 +633,8 @@ const shelfUrl   = 'https://opensheet.elk.sh/1KhwMIVL-E3XDixbxLT3o-Qg57-hvy_DW0y
 let locationMap = new Map();
 let shelfOwnerMap = new Map();
 
+const employeeUrl = 'https://opensheet.elk.sh/1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw/Employee';
+let employees = [];
 const inventoryUrls = {
     '0301': 'https://opensheet.elk.sh/1x-B1xekpMm4p7fkKucvLjaewtp66uGIp8ZIxJJZAxMk/Sheet1',
     '0304': 'https://opensheet.elk.sh/1miQgObvPdIocjf2Mwn-GZxRvDZy0R5gIl1zhxMWvM-E/Sheet1',
@@ -638,6 +744,364 @@ function calculateKeepQty(r){
     return Math.max(1,Math.round(avg*40));
 }
 
+/* ★ ฟังก์ชันตะกร้า */
+function updateCartCount(){
+    const badge = document.getElementById('cartCountBadge');
+    if(!badge) return;
+    badge.textContent = cartItems.length;
+}
+
+function addToCart(item){
+    const exist = cartItems.find(x => x.Material === item.Material && x.StorageBin === item.StorageBin);
+    if(exist){
+        exist.Qty = (exist.Qty || 1) + 1;
+    }else{
+        cartItems.push({
+            Material: item.Material,
+            Description: item.Description,
+            StorageBin: item.StorageBin,
+            Qty: 1,
+            Pack: 1
+        });
+    }
+    updateCartCount();
+}
+/* ★ หา Employee ตามรหัสที่กรอก */
+function updateEmployeeInfo(){
+    const codeInput = document.getElementById('employeeCode');
+    const nameLabel = document.getElementById('employeeNameLabel');
+    const teamLabel = document.getElementById('employeeTeamLabel');
+    if(!codeInput || !nameLabel || !teamLabel) return;
+
+    const id = (codeInput.value || '').trim();
+    if(!id){
+        nameLabel.textContent = '';
+        teamLabel.textContent = '';
+        return;
+    }
+
+    // หา row ที่ IDRec ตรงกับรหัสพนักงาน
+    const emp = employees.find(e => (e.IDRec || '').toString().trim() === id);
+
+    if(emp){
+        nameLabel.textContent = `ชื่อ: ${emp.Name || '-'}`;
+        teamLabel.textContent = `ทีม: ${emp.Team || '-'}`;
+    }else{
+        nameLabel.textContent = 'ไม่พบรหัสพนักงานนี้';
+        teamLabel.textContent = '';
+    }
+}
+
+function renderCartTable(){
+    const tbody = document.getElementById('cartTableBody');
+    tbody.innerHTML = "";
+    if(cartItems.length === 0){
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 6;
+        td.className = "cart-empty";
+        td.textContent = "ยังไม่มีรายการในตะกร้า";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+    }
+    cartItems.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${idx+1}</td>
+            <td>${item.Material}</td>
+            <td>${item.Description}</td>
+            <td>${item.StorageBin}</td>
+            <td></td>
+            <td></td>
+        `;
+        const qtyInput = document.createElement('input');
+        qtyInput.type = "number";
+        qtyInput.min = "0";
+        qtyInput.value = item.Qty ?? 1;
+        qtyInput.addEventListener('input', () => {
+            const v = parseFloat(qtyInput.value);
+            item.Qty = isNaN(v) ? 0 : v;
+        });
+
+        const packInput = document.createElement('input');
+        packInput.type = "number";
+        packInput.min = "0";
+        packInput.value = item.Pack ?? 1;
+        packInput.addEventListener('input', () => {
+            const v = parseFloat(packInput.value);
+            item.Pack = isNaN(v) ? 0 : v;
+        });
+
+        tr.cells[4].appendChild(qtyInput);
+        tr.cells[5].appendChild(packInput);
+        tbody.appendChild(tr);
+    });
+}
+
+function openCartModal(){
+    renderCartTable();
+    updateEmployeeInfo(); // ★ อัปเดตชื่อ/ทีมตามรหัสที่มีอยู่
+    document.getElementById('cartModal').style.display = 'flex';
+}
+
+function closeCartModal(){
+    document.getElementById('cartModal').style.display = 'none';
+}
+function clearCart(){
+    cartItems = [];
+    updateCartCount();
+    // ถ้าเปิด modal อยู่ ให้รีเฟรชตารางในตะกร้าด้วย
+    const cartModal = document.getElementById('cartModal');
+    if(cartModal && cartModal.style.display === 'flex'){
+        renderCartTable();
+    }
+}
+
+function printCart() {
+
+    // ✅ ใช้ cartItems โดยตรง
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        alert("ไม่มีรายการในตะกร้า");
+        return;
+    }
+
+    // อ่านรหัสพนักงานจากช่องใน Modal
+    var empCode = document.getElementById("employeeCode")
+        ? document.getElementById("employeeCode").value.trim()
+        : "";
+
+    // หา Name & Team จาก employees (Sheet Employee)
+    var empName = "";
+    var empTeam = "";
+    if (empCode && Array.isArray(employees)) {
+        var emp = employees.find(function (e) {
+            return (e.IDRec || "").toString().trim() === empCode;
+        });
+        if (emp) {
+            empName = emp.Name || "";
+            empTeam = emp.Team || "";
+        }
+    }
+
+    // ✅ เตรียมข้อมูลให้ชื่อฟิลด์ตรงกับโค้ด template เดิม
+    var dataForPrint = cartItems.map(function (item) {
+        return {
+            Material: item.Material || "",
+            จำนวน: item.Qty ? parseInt(item.Qty) || 1 : 1,
+            Pack: item.Pack ? item.Pack : "",
+            IDช่าง: empCode,
+            Serial: "-",                         // ไม่ใช้ Serial = TRUE แล้ว
+            Description: item.Description || "",
+            Storagebin: item.StorageBin || "",
+            ชื่อช่าง: empName,
+            Unit: "Pc",
+            แผนก: empTeam
+        };
+    });
+
+    // เปิดหน้าต่างใหม่
+    var win = window.open("", "_blank", "width=1024,height=768");
+
+    // แปลงข้อมูลเป็น JSON ปลอดภัย (กัน < กลายเป็น tag)
+    var jsonText = JSON.stringify(dataForPrint).replace(/</g, "&lt;");
+
+    // ================== เขียน HTML หน้า Label ==================
+    win.document.write("<!DOCTYPE html>");
+    win.document.write("<html lang='th'>");
+    win.document.write("<head>");
+    win.document.write("<meta charset='UTF-8' />");
+    win.document.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'/>");
+    win.document.write("<title>Label 102x30 mm</title>");
+    win.document.write("<script src='https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js'><\/script>");
+    win.document.write("<script src='https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js'><\/script>");
+    win.document.write("<style>");
+    win.document.write("@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap');");
+    win.document.write("body{font-family:'Noto Sans Thai',sans-serif;margin:0;padding:0;}");
+    win.document.write(".container{display:block;width:106mm;}");
+    win.document.write(".sticker{width:106mm;height:30mm;display:flex;flex-direction:row;background:white;box-sizing:border-box;margin-bottom:0;}");
+    win.document.write(".label{width:53mm;height:30mm;box-sizing:border-box;padding:1mm;display:flex;flex-direction:column;justify-content:space-between;border-right:0.5px solid #ccc;}");
+    win.document.write(".label:last-child{border-right:none;}");
+    win.document.write(".row{display:flex;flex-direction:row;align-items:center;margin-bottom:1mm;}");
+    win.document.write(".qr{width:10mm;height:10mm;margin-right:5mm;margin-left:3mm;}");
+    win.document.write(".material{font-size:24px;font-weight:bold;text-align:left;margin:0;line-height:1;}");
+    win.document.write(".technician{font-size:10px;text-align:left;margin:0;margin-right:2mm;line-height:1;}");
+    win.document.write(".department{font-size:10px;text-align:left;margin:0;margin-right:2mm;line-height:1;}");
+    win.document.write(".description{font-size:10px;font-weight:bold;text-align:left;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;word-wrap:break-word;margin:0;margin-left:2mm;}");
+    win.document.write(".location{font-size:12px;font-weight:bold;text-align:left;margin-top:1px;margin-bottom:0;line-height:1.1;margin-left:2mm;}");
+    win.document.write(".lot-line{display:flex;justify-content:space-between;font-size:12px;font-weight:bold;margin-top:0;margin-bottom:0;line-height:1.1;margin-left:2mm;margin-right:1mm;}");
+    win.document.write(".lot{font-size:8px;text-align:left;line-height:1;margin:0;}");
+    win.document.write(".barcode{margin-left:2mm;width:15mm !important;height:6mm !important;}");
+    win.document.write(".print-button{position:fixed;top:10px;right:10px;padding:8px 16px;background-color:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;z-index:1000;}");
+    win.document.write(".print-button:hover{background-color:#45a049;}");
+    win.document.write(".spinner-container{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;}");
+    win.document.write(".spinner{border:4px solid #f3f3f3;border-top:4px solid #4CAF50;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;}");
+    win.document.write("@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}");
+    win.document.write("@media print{.print-button,.spinner-container{display:none;}body{margin:0;padding:0;}.container{width:102mm;margin:0;}.sticker{page-break-inside:avoid;margin:0;}}");
+    win.document.write("</style>");
+    win.document.write("</head>");
+    win.document.write("<body>");
+    win.document.write("<button class='print-button' onclick='window.print()'>Print Preview</button>");
+    win.document.write("<div class='spinner-container' id='spinner'><div class='spinner'></div></div>");
+    win.document.write("<div id='app'><p style='text-align:center;'>กำลังโหลดข้อมูล...</p></div>");
+
+    // ================== JS ภายในหน้าพิมพ์ ==================
+    win.document.write("<script>");
+    win.document.write("var dataFromParent = " + jsonText + ";");
+
+    win.document.write("function loadAndRender(){");
+    win.document.write("  var cleanedData = dataFromParent || [];");  // ใช้ข้อมูลจาก parent");
+    // ให้ spinner โชว์อย่างน้อย 3 วินาที เหมือนตัวอย่าง
+    win.document.write("  setTimeout(function(){");
+    win.document.write("    var sp = document.getElementById('spinner'); if(sp) sp.style.display='none';");
+    win.document.write("    renderLabels(cleanedData);");
+    win.document.write("  }, 3000);");
+    win.document.write("}");
+
+    win.document.write("function renderLabels(data){");
+    win.document.write("  var app = document.getElementById('app');");
+    win.document.write("  app.innerHTML = '<div class=\"container\"></div>';"); // ใช้ container width:106mm");
+    win.document.write("  var container = app.querySelector('.container');");
+    win.document.write("  var expandedData = [];");
+
+    // ขยายตามจำนวนชิ้น (จำนวน)
+    win.document.write("  data.forEach(function(row){");
+    win.document.write("    var qty = Math.max(1, parseInt(row.จำนวน) || 1);");
+    win.document.write("    for(var i=0;i<qty;i++){ expandedData.push(row); }");
+    win.document.write("  });");
+
+    // วาง 2 label ต่อ 1 sticker
+    win.document.write("  for(var i=0;i<expandedData.length;i+=2){");
+    win.document.write("    var sticker = document.createElement('div');");
+    win.document.write("    sticker.className = 'sticker';");
+    win.document.write("    var label1 = createLabel(expandedData[i]);");
+    win.document.write("    sticker.appendChild(label1);");
+    win.document.write("    if(i+1 < expandedData.length){");
+    win.document.write("      var label2 = createLabel(expandedData[i+1]);");
+    win.document.write("      sticker.appendChild(label2);");
+    win.document.write("    } else {");
+    win.document.write("      var emptyLabel = document.createElement('div');");
+    win.document.write("      emptyLabel.className = 'label';");
+    win.document.write("      emptyLabel.innerHTML = '<div class=\"description\">ไม่มีข้อมูล</div>';");    
+    win.document.write("      sticker.appendChild(emptyLabel);");
+    win.document.write("    }");
+    win.document.write("    container.appendChild(sticker);");
+    win.document.write("  }");
+    win.document.write("}");
+
+    win.document.write("function createLabel(row){");
+    win.document.write("  var label = document.createElement('div');");
+    win.document.write("  label.className = 'label';");
+
+    // แถวบน: QR + Material + ชื่อช่าง + แผนก
+    win.document.write("  var rowDiv = document.createElement('div');");
+    win.document.write("  rowDiv.className = 'row';");
+
+    win.document.write("  var qrCanvas = document.createElement('canvas');");
+    win.document.write("  qrCanvas.className = 'qr';");
+    win.document.write("  rowDiv.appendChild(qrCanvas);");
+
+    win.document.write("  var textContainer = document.createElement('div');");
+    win.document.write("  textContainer.style.display = 'flex';");
+    win.document.write("  textContainer.style.flexDirection = 'column';");
+
+    win.document.write("  var materialDiv = document.createElement('div');");
+    win.document.write("  materialDiv.className = 'material';");
+    win.document.write("  materialDiv.textContent = row.Material || '';");    
+    win.document.write("  textContainer.appendChild(materialDiv);");
+
+    win.document.write("  var technicianDiv = document.createElement('div');");
+    win.document.write("  technicianDiv.className = 'technician';");
+    win.document.write("  var techName = row['ชื่อช่าง'] || '';");    
+    win.document.write("  techName = techName.replace(/^นาย\\s+/, '');");    
+    win.document.write("  technicianDiv.textContent = techName;");
+    win.document.write("  textContainer.appendChild(technicianDiv);");
+
+    win.document.write("  var departmentDiv = document.createElement('div');");
+    win.document.write("  departmentDiv.className = 'department';");
+    win.document.write("  departmentDiv.textContent = row['แผนก'] || '';");
+    win.document.write("  textContainer.appendChild(departmentDiv);");
+
+    win.document.write("  rowDiv.appendChild(textContainer);");
+    win.document.write("  label.appendChild(rowDiv);");
+
+    // Description
+    win.document.write("  var desc = document.createElement('div');");
+    win.document.write("  desc.className = 'description';");
+    win.document.write("  desc.textContent = row.Description || '';");
+    win.document.write("  label.appendChild(desc);");
+
+    // บรรทัด Loc + Barcode
+    win.document.write("  var locLine = document.createElement('div');");
+    win.document.write("  locLine.style.display = 'flex';");
+    win.document.write("  locLine.style.alignItems = 'center';");
+    win.document.write("  locLine.style.fontSize = '12px';");
+    win.document.write("  locLine.style.fontWeight = 'bold';");
+    win.document.write("  locLine.style.lineHeight = '1.1';");
+    win.document.write("  locLine.style.marginLeft = '2mm';");
+    win.document.write("  locLine.style.marginTop = '1px';");
+    win.document.write("  locLine.style.marginBottom = '0';");
+
+    win.document.write("  var locText = document.createElement('span');");
+    win.document.write("  locText.textContent = 'Loc: ' + (row.Storagebin || '');");
+    win.document.write("  locLine.appendChild(locText);");
+
+    win.document.write("  var barcodeCanvas = document.createElement('canvas');");
+    win.document.write("  barcodeCanvas.className = 'barcode';");
+    win.document.write("  locLine.appendChild(barcodeCanvas);");
+
+    win.document.write("  label.appendChild(locLine);");
+
+    // บรรทัด Lot
+    win.document.write("  var now = new Date();");
+    win.document.write("  var formattedDate = ");
+    win.document.write("    now.getFullYear().toString().slice(2) +");
+    win.document.write("    ('0' + (now.getMonth() + 1)).slice(-2) +");
+    win.document.write("    ('0' + now.getDate()).slice(-2) +");
+    win.document.write("    ('0' + now.getHours()).slice(-2) +");
+    win.document.write("    ('0' + now.getMinutes()).slice(-2);");
+
+    win.document.write("  var lot = document.createElement('div');");
+    win.document.write("  lot.className = 'lot-line';");
+    win.document.write("  var lotSpan = document.createElement('span');");
+    win.document.write("  lotSpan.textContent = 'Lot: ' + formattedDate + ' (' + (row.จำนวน || 1) + ') ' + (row.Pack || '') + ' ' + (row.Unit || '');");
+    win.document.write("  lot.appendChild(lotSpan);");
+    win.document.write("  label.appendChild(lot);");
+
+    // สร้าง QR
+    win.document.write("  if (typeof QRCode !== 'undefined') {");
+    win.document.write("    QRCode.toCanvas(qrCanvas, row.Material || 'N/A', {");
+    win.document.write("      width: 40,");
+    win.document.write("      height: 40,");
+    win.document.write("      margin: 0,");
+    win.document.write("      errorCorrectionLevel: 'L'");
+    win.document.write("    }, function(err){ if(err) console.error('QR Error:', err); });");
+    win.document.write("  }");
+
+    // สร้าง Barcode
+    win.document.write("  if (typeof JsBarcode !== 'undefined' && row.Material) {");
+    win.document.write("    JsBarcode(barcodeCanvas, row.Material, {");
+    win.document.write("      format: 'CODE128',");
+    win.document.write("      width: 1,");
+    win.document.write("      height: 15,");
+    win.document.write("      displayValue: false,");
+    win.document.write("      margin: 0");
+    win.document.write("    }, function(err){ if(err) console.error('Barcode Error:', err); });");
+    win.document.write("  }");
+
+    win.document.write("  return label;");
+    win.document.write("}");
+
+    win.document.write("loadAndRender();");
+    win.document.write("<\/script>");
+
+    win.document.write("</body></html>");
+    win.document.close();
+}
+
+
+/* =================== เดิม =================== */
+
 async function loadUsers(){
     try{
         const res=await fetch(userUrl);
@@ -645,6 +1109,18 @@ async function loadUsers(){
     }catch(e){
         console.error(e);
         alert("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
+    }
+}
+
+/* ★ โหลดข้อมูล Employee */
+async function loadEmployees(){
+    try{
+        const res = await fetch(employeeUrl);
+        employees = await res.json();
+        // console.log('employees', employees);
+    }catch(e){
+        console.error(e);
+        // ถ้าโหลดไม่ได้ ไม่ต้อง alert เพื่อไม่ให้รบกวนการใช้งานหลัก
     }
 }
 
@@ -686,6 +1162,8 @@ function logout(){
     localStorage.removeItem('rememberedUser');
     sessionStorage.removeItem('loggedUser');
     loggedUser=null;
+    cartItems = [];       // ★ เคลียร์ตะกร้าเมื่อ logout
+    updateCartCount();
     document.getElementById('userMenu').style.display='none';
     document.getElementById('menuBtn').style.display='none';
     document.getElementById("mainCardsSection").style.display="none";
@@ -711,12 +1189,25 @@ document.getElementById('loginBtn').addEventListener('click',login);
 
 async function init(){
     await loadUsers();
+    await loadEmployees();   // ★ โหลดพนักงานเพิ่ม
     if(!checkLogin())showLogin();
     const plantSelect=document.getElementById('plantSelect');
     Object.keys(inventoryUrls).sort().forEach(p=>{
         const name=plantNames[p]||p;
         plantSelect.add(new Option(`${p} - ${name}`,p));
     });
+
+    /* ★ ผูก event ตะกร้ารวม */
+       document.getElementById('cartMainBtn').addEventListener('click', openCartModal);
+    document.getElementById('cartCloseBtn').addEventListener('click', closeCartModal);
+    document.getElementById('cartPrintBtn').addEventListener('click', printCart);
+    document.getElementById('cartClearBtn').addEventListener('click', clearCart); // ★
+
+      const empCodeInput = document.getElementById('employeeCode');
+    if(empCodeInput){
+        empCodeInput.addEventListener('input', updateEmployeeInfo);
+        empCodeInput.addEventListener('blur', updateEmployeeInfo);
+    }
 }
 init();
 
@@ -839,7 +1330,7 @@ async function loadData(){
             if(!mat)return;
             mainsapMap.set(mat,{
                 Note:r['หมายเหตุ']||'',
-                MultiplyUnit:toNumber(r['คูณหน่วย']||1),
+                MultiplyUnit:r['คูณหน่วย']?toNumber(r['คูณหน่วย']):1,
                 Product:r.Product||''
             });
         });
@@ -951,7 +1442,6 @@ async function loadData(){
             updateBtn.style.display = "none";
         }
 
-        // เวลาอัปเดตล่าสุด
         const lastLabel = document.getElementById("lastUpdateLabel");
         lastLabel.textContent = "";
         const apiUrl = lastUpdateApiByPlant[selectedPlant];
@@ -1381,7 +1871,7 @@ function renderTable(){
     const end=start+rowsPerPage;
     const pageData=filteredData.slice(start,end);
     if(pageData.length===0){
-        container.innerHTML=`<tr><td colspan="27" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
+        container.innerHTML=`<tr><td colspan="28" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
         return;
     }
     pageData.forEach(r=>{
@@ -1405,6 +1895,7 @@ function renderTable(){
 
         const row=document.createElement("tr");
         row.innerHTML=`
+            <td></td>
             <td>${r.Plant}</td>
             <td>${r.Material}</td>
             <td>${r.Description}</td>
@@ -1434,6 +1925,22 @@ function renderTable(){
             <td class="responsible-cell"><span class="responsible-user">${ownerDisplay}</span></td>
             <td><span class="${statusClass}">${displayStatus}</span></td>
         `;
+
+        // ★ ปุ่มตะกร้าในคอลัมน์แรก
+        const cartCell = row.cells[0];
+        const cartBtn = document.createElement('button');
+        cartBtn.className = "icon-btn";
+        cartBtn.title = "เพิ่มลงตะกร้า";
+        cartBtn.innerHTML = '<i class="fas fa-cart-plus"></i>';
+        cartBtn.addEventListener('click', () => {
+            addToCart({
+                Material: r.Material,
+                Description: r.Description,
+                StorageBin: r.StorageBin
+            });
+        });
+        cartCell.appendChild(cartBtn);
+
         container.appendChild(row);
     });
 }
