@@ -1627,7 +1627,7 @@ document.getElementById("tableHeader").addEventListener("click",e=>{
 
 function applyFiltersAndRender(){
     let data = [...allData];
-
+    data = data.filter(r => !(r.Qty6Month === 0 && r.Unrestricted === 0));
     const search = document.getElementById("searchInput").value.toLowerCase();
     if (search) {
         data = data.filter(r =>
@@ -1695,9 +1695,6 @@ function applyFiltersAndRender(){
         viewData = viewData.filter(r => r.Moving === movingFilter);
     }
 
-    if (mode === "all" && abcFilter === "" && movingFilter === "") {
-        viewData = viewData.filter(r => r.Qty6Month > 0);
-    }
 
     filteredData = [...viewData];
     filteredData.sort((a, b) => {
@@ -1751,8 +1748,8 @@ function updateAllCards(baseData, filteredData) {
     const mov = { Fast:0, Medium:0, Slow:0, Slowly:0, Dead:0 },
           cntMov = { Fast:0, Medium:0, Slow:0, Slowly:0, Dead:0 };
 
+    // ✅ ไม่กรอง Qty6Month อีกแล้ว ใช้ filteredData ตรง ๆ ตามโหมด/ตัวกรองที่เลือก
     filteredData.forEach(r => {
-        if (mode === "all" && r.Qty6Month <= 0) return;
 
         let valueToUse = 0;
         if (mode === "onlyOrder") {
@@ -1774,6 +1771,7 @@ function updateAllCards(baseData, filteredData) {
         }
     });
 
+    // ✅ การ์ด ABC
     document.getElementById("sumA").textContent   = formatShortCurrency(abc.A);
     document.getElementById("sumB").textContent   = formatShortCurrency(abc.B);
     document.getElementById("sumC").textContent   = formatShortCurrency(abc.C);
@@ -1781,6 +1779,7 @@ function updateAllCards(baseData, filteredData) {
     document.getElementById("countB").textContent = cntABC.B + " รายการ";
     document.getElementById("countC").textContent = cntABC.C + " รายการ";
 
+    // ✅ การ์ด Moving
     document.getElementById("valFast").textContent   = formatShortCurrency(mov.Fast);
     document.getElementById("valMedium").textContent = formatShortCurrency(mov.Medium);
     document.getElementById("valSlow").textContent   = formatShortCurrency(mov.Slow);
@@ -1792,13 +1791,16 @@ function updateAllCards(baseData, filteredData) {
     document.getElementById("countSlowly").textContent = cntMov.Slowly + " รายการ";
     document.getElementById("countDead").textContent   = cntMov.Dead   + " รายการ";
 
+    // ✅ ข้อมูลสำหรับการ์ดมุมบน (มูลค่ารวม / Order / OverStock)
     let dataForMainCards;
     if (mode === "onlyOrder") {
         dataForMainCards = baseData.filter(r => Math.round(r.RecommendedOrder) >= 1);
     } else if (mode === "returnable") {
         dataForMainCards = baseData.filter(r => r.ReturnQty > 0);
     } else {
-        dataForMainCards = baseData.filter(r => r.Qty6Month > 0);
+        // เดิมใช้ baseData.filter(r => r.Qty6Month > 0)
+        // ตอนนี้ “เอาทั้งหมด” → ใช้ baseData ตรง ๆ
+        dataForMainCards = baseData;
     }
 
     let totalStock = 0,
@@ -1836,18 +1838,18 @@ function updateAllCards(baseData, filteredData) {
     document.getElementById("returnItemCount").textContent = returnCount + " รายการ";
     document.getElementById("returnValue").textContent     = formatShortCurrency(totalReturnValue);
 
+    // ✅ ส่วนคำนวณ เบิก/เดือน, Stock Days, After Stock Days → เอาทั้งหมดเหมือนกัน
     let total_usage_4m_base = 0;
     let totalStock_base = 0;
     let totalReturnValue_base = 0;
 
     baseData.forEach(r => {
-        if (r.Qty6Month > 0) {
-            totalStock_base += r.Value;
-            totalReturnValue_base += r.ReturnValue;
-            if (r.Unrestricted > 0) {
-                const unit_price = r.Value / r.Unrestricted;
-                total_usage_4m_base += r.Qty4Month * unit_price;
-            }
+        // เดิมเคยกรอง r.Qty6Month > 0 ตอนนี้ไม่กรองแล้ว
+        totalStock_base += r.Value;
+        totalReturnValue_base += r.ReturnValue;
+        if (r.Unrestricted > 0) {
+            const unit_price = r.Value / r.Unrestricted;
+            total_usage_4m_base += r.Qty4Month * unit_price;
         }
     });
 
