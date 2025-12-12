@@ -8,388 +8,306 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: "Prompt", sans-serif; margin: 0; background: #f5f7fa; padding: 10px; }
-        .container { max-width: 1920px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-        h1 { text-align: center; color: white; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 26px; margin: 0; }
-        .summary-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 16px; background: #f8f9fa; }
-        .card { flex: 1 1 140px; min-width: 140px; max-width: 180px; padding: 12px; border-radius: 14px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
-        .card:hover { transform: translateY(-6px); }
-        .card-title { font-size: 12px; opacity: 0.95; margin-bottom: 6px; }
-        .card-value { font-size: 20px; font-weight: 900; margin: 6px 0; }
-        .card-count { font-size: 11px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 3px 8px; }
-        .total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
-        .order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-        .return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
-        .monthly-withdrawal { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
-        .stock-days { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .after-stock-days { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .abc-a { background: linear-gradient(135deg, #ff7675, #ff4757); }
-        .abc-b { background: linear-gradient(135deg, #ffeaa7, #ffd32a); }
-        .abc-c { background: linear-gradient(135deg, #a3daff, #74b9ff); }
-        .fast { background: linear-gradient(135deg, #55efc4, #00b894); }
-        .medium { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
-        .slow { background: linear-gradient(135deg, #fab1a0, #e17055); }
-        .slowly { background: linear-gradient(135deg, #dfe6e9, #b2bec3); }
-        .dead { background: linear-gradient(135deg, #b2bec3, #636e72); }
+      body { font-family: "Prompt", sans-serif; margin: 0; background: #f5f7fa; padding: 10px; }
+.container { max-width: 1920px; margin: 0 auto; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+h1 { text-align: center; color: white; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); font-size: 26px; margin: 0; }
 
-        .controls { padding: 20px; background: #fff; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #eee; }
-        .filter-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .search-row { display: flex; gap: 15px; align-items: center; width: 100%; flex-wrap: wrap; }
+.summary-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 16px; background: #f8f9fa; }
+.card { flex: 1 1 140px; min-width: 140px; max-width: 180px; padding: 12px; border-radius: 14px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 15px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
+.card:hover { transform: translateY(-6px); }
+.card-title { font-size: 12px; opacity: 0.95; margin-bottom: 6px; }
+.card-value { font-size: 20px; font-weight: 900; margin: 6px 0; }
+.card-count { font-size: 11px; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 3px 8px; }
 
-        .control-group { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #f0f4ff, #e0eaff); padding: 12px 20px; border-radius: 16px; font-size: 14px; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1); transition: all 0.3s; }
-        .control-group:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2); }
-        .control-icon { font-size: 18px; color: #667eea; }
+.total-stock { background: linear-gradient(135deg, #2c3e50, #34495e); }
+.order-items { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.return-value { background: linear-gradient(135deg, #e67e22, #d35400); }
+.monthly-withdrawal { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+.stock-days { background: linear-gradient(135deg, #3498db, #2980b9); }
+.after-stock-days { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.abc-a { background: linear-gradient(135deg, #ff7675, #ff4757); }
+.abc-b { background: linear-gradient(135deg, #ffeaa7, #ffd32a); }
+.abc-c { background: linear-gradient(135deg, #a3daff, #74b9ff); }
+.fast { background: linear-gradient(135deg, #55efc4, #00b894); }
+.medium { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); }
+.slow { background: linear-gradient(135deg, #fab1a0, #e17055); }
+.slowly { background: linear-gradient(135deg, #dfe6e9, #b2bec3); }
+.dead { background: linear-gradient(135deg, #b2bec3, #636e72); }
 
-        label { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 5px; }
-        select, input[type=number], input[type=text] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ccd1ff; font-size: 14px; background: white; transition: border 0.2s; width: 80px; }
-        select { width: 120px; }
-        input[type=text] { width: 250px; }
-        select:focus, input[type=number]:focus, input[type=text]:focus { border-color: #667eea; outline: none; }
-        .unit { font-size: 14px; color: #667eea; font-weight: 500; }
+.controls { padding: 20px; background: #fff; display: flex; flex-direction: column; gap: 15px; border-bottom: 1px solid #eee; }
+.filter-row { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+.search-row { display: flex; gap: 15px; align-items: center; width: 100%; flex-wrap: wrap; }
 
-        .export-btn { padding: 12px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); transition: all 0.3s; flex: 0 1 auto; margin-left: auto; }
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .icon-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(52, 152, 219, 0.6);
-        }
-        .icon-btn i {
-            font-size: 18px;
-        }
+.control-group { display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #f0f4ff, #e0eaff); padding: 12px 20px; border-radius: 16px; font-size: 14px; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1); transition: all 0.3s; }
+.control-group:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2); }
+.control-icon { font-size: 18px; color: #667eea; }
 
-        /* ★ ปุ่มตะกร้ารวม + badge จำนวน */
-        .cart-main-btn {
-            position: relative;
-        }
-        #cartCountBadge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #e74c3c;
-            color: #fff;
-            border-radius: 999px;
-            padding: 1px 6px;
-            font-size: 10px;
-            font-weight: bold;
-        }
+label { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 5px; }
+select, input[type=number], input[type=text] { padding: 10px 14px; border-radius: 10px; border: 1px solid #ccd1ff; font-size: 14px; background: white; transition: border 0.2s; width: 80px; }
+select { width: 120px; }
+input[type=text] { width: 250px; }
+select:focus, input[type=number]:focus, input[type=text]:focus { border-color: #667eea; outline: none; }
+.unit { font-size: 14px; color: #667eea; font-weight: 500; }
 
-        .table-container { overflow: auto; max-height: 70vh; position: relative; padding: 0 16px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1600px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: white; }
-        thead { position: sticky; top: 0; z-index: 10; background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        th { padding: 14px 10px; text-align: left; font-size: 13px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        th:hover { background: rgba(255,255,255,0.1); }
-        .sort-icon { margin-left: 4px; font-size: 10px; }
+.export-btn { padding: 12px; background: linear-gradient(135deg, #27ae60, #1e8449); color: white; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 6px 15px rgba(39,174,96,0.4); transition: all 0.3s; flex: 0 1 auto; margin-left: auto; }
 
-        tbody tr { transition: background 0.2s; border-bottom: 1px solid #eee; }
-        tbody tr:hover { background: #f0f8ff; }
-        tbody tr:nth-child(even) { background: #f8f9fa; }
-        td { padding: 12px 10px; font-size: 13px; text-align: left; }
+.icon-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.icon-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(52, 152, 219, 0.6); }
+.icon-btn i { font-size: 18px; }
 
-        .value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 12px; display: inline-block; }
-
-        .order-0 { color: #95a5a6; }
-        .order-1-10 { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; display: inline-block; }
-        .order-11-50 { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; display: inline-block; }
-        .order-51-200 { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; display: inline-block; }
-        .order-200 { background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; }
-
-        .moving-fast, .moving-medium, .moving-slow, .moving-slowly, .moving-dead { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; }
-        .moving-fast { background: #d5f5e3; color: #1e8449; }
-        .moving-medium { background: #fef9e7; color: #d35400; }
-        .moving-slow { background: #fdecea; color: #c0392b; }
-        .moving-slowly { background: #f2f3f4; color: #616161; }
-        .moving-dead { background: #f0f0f0; color: #7f8c8d; }
-
-        .return-qty { background: #e74c3c; color: white; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
-
-        .status-pending { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
-        .status-approved { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
-        .status-rejected { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
-        .status-other { background: #f2f3f4; color: #616161; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
-
-        th:nth-child(6), td:nth-child(6),
-        th:nth-child(7), td:nth-child(7),
-        th:nth-child(8), td:nth-child(8),
-        th:nth-child(9), td:nth-child(9),
-        th:nth-child(10), td:nth-child(10),
-        th:nth-child(11), td:nth-child(11),
-        th:nth-child(12), td:nth-child(12),
-        th:nth-child(13), td:nth-child(13),
-        th:nth-child(14), td:nth-child(14),
-        th:nth-child(15), td:nth-child(15),
-        th:nth-child(17), td:nth-child(17),
-        th:nth-child(21), td:nth-child(21),
-        th:nth-child(22), td:nth-child(22),
-        th:nth-child(23), td:nth-child(23) {
-            text-align: center;
-        }
-
-        .pagination { padding: 16px; text-align: center; background: #f8f9fa; font-size: 16px; font-weight: bold; color: #2c3e50; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
-        .page-btn { padding: 8px 14px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-        .page-btn.active { background: #667eea; color: white; border: none; }
-        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .page-btn:hover:not(.active):not(:disabled) { background: #e9ecef; }
-
-        #loginModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
-        .login-form { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; width: 300px; }
-        .login-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccd1ff; border-radius: 10px; }
-        .login-form button { padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; }
-        .login-form label { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0; }
-        #loginError { color: red; margin-top: 10px; }
-
-        #menuBtn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: white; cursor: pointer; }
-        #userMenu { position: absolute; top: 50px; right: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; text-align: left; }
-        #userMenu p { margin: 5px 0; }
-        #logoutBtn { padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
-
-        .loader { --w:10ch; font-weight: bold; font-family: monospace; font-size: 30px; letter-spacing: var(--w); width: var(--w); overflow: hidden; white-space: nowrap; text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0, calc(-3*var(--w)) 0, calc(-4*var(--w)) 0, calc(-5*var(--w)) 0, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0, calc(-9*var(--w)) 0; animation: l16 2s infinite; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; }
-        .loader:before { content: "Loading..."; }
-        @keyframes l16 {
-            20% { text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0 red, calc(-3*var(--w)) 0, calc(-4*var(--w)) 0 #ffa516, calc(-5*var(--w)) 0 #63fff4, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0 green, calc(-9*var(--w)) 0; }
-            40% { text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0 red, calc(-3*var(--w)) 0 #e945e9, calc(-4*var(--w)) 0, calc(-5*var(--w)) 0 green, calc(-6*var(--w)) 0 orange, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0 green, calc(-9*var(--w)) 0; }
-            60% { text-shadow: calc(-1*var(--w)) 0 lightblue, calc(-2*var(--w)) 0, calc(-3*var(--w)) 0 #e945e9, calc(-4*var(--w)) 0, calc(-5*var(--w)) 0 green, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0 yellow, calc(-8*var(--w)) 0 #ffa516, calc(-9*var(--w)) 0 red; }
-            80% { text-shadow: calc(-1*var(--w)) 0 lightblue, calc(-2*var(--w)) 0 yellow, calc(-3*var(--w)) 0 #63fff4, calc(-4*var(--w)) 0 #ffa516, calc(-5*var(--w)) 0 red, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0 grey, calc(-8*var(--w)) 0 #63fff4, calc(-9*var(--w)) 0; }
-        }
-
-        #backBtn { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 24px; color: white; cursor: pointer; display: none; }
-
-        /* Filter ผู้รับคืน */
-        #responsibleFilterContainer {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: linear-gradient(135deg, #f0f4ff, #e0eaff);
-          padding: 12px 20px;
-          border-radius: 16px;
-          font-size: 14px;
-          box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
-          transition: all 0.3s;
-        }
-        #responsibleFilterContainer:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2);
-        }
-        #responsibleFilter {
-          min-width: 180px;
-          padding: 10px 14px;
-          border-radius: 10px;
-          border: 1px solid #ccd1ff;
-          font-size: 14px;
-          background: white;
-          transition: border 0.2s;
-        }
-        #responsibleFilter:focus {
-          border-color: #667eea;
-          outline: none;
-        }
-
-        .responsible-cell {
-          text-align: center;
-          font-size: 13px;
-        }
-        .responsible-user {
-          background: #e3f2fd;
-          color: #1976d2;
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-weight: bold;
-          font-size: 12px;
-          display: inline-block;
-        }
-
-        th.col-location, td.col-location,
-        th.col-shelf, td.col-shelf {
-          display: none;
-        }
-
-        th:nth-child(24), td:nth-child(24) { width: 100px; }
-        th:nth-child(25), td:nth-child(25) { width: 80px; }
-        th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
-
-        #controlsSection .filter-row .control-group:first-child {
-          flex: 1 1 280px;
-          min-width: 240px;
-        }
-        #controlsSection .filter-row .control-group:first-child select {
-          width: 100%;
-          min-width: 220px;
-        }
-
-        /* นวนคร = ส้ม */
-        .nava-orange {
-            background: #f6b26b;
-            color: #ffffff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        /* คงเหลือ = เขียว */
-        .stock-green {
-            background: #6aa84f;
-            color: #ffffff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        /* คงเหลือ = 0 และ Moving = Fast = แดง */
-        .stock-red {
-            background: #cc0000;
-            color: #ffffff;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: bold;
-            display: inline-block;
-        }
-
-        /* ★ Modal ตะกร้า */
-        .cart-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .cart-modal-content {
-            background: #ffffff;
-            border-radius: 16px;
-            max-width: 1000px;
-            width: 95%;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-            overflow: hidden;
-        }
-        .cart-modal-header,
-        .cart-modal-footer {
-            padding: 12px 18px;
-            background: #f5f7fb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-        .cart-modal-header h2 {
-            margin: 0;
-            font-size: 18px;
-            color: #2c3e50;
-        }
-        .cart-modal-body {
-            padding: 12px 18px 18px;
-            overflow: auto;
-            background: #fff;
-        }
-        .cart-emp-input label {
-            font-weight: 600;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .cart-emp-input input {
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid #ccd1ff;
-            min-width: 160px;
-        }
-        .cart-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-        .cart-table th,
-.cart-table td {
-    border: 1px solid #ddd;
-    padding: 6px 8px;
-    font-size: 13px;
+.cart-main-btn { position: relative; }
+#cartCountBadge {
+  position: absolute; top: -4px; right: -4px;
+  background: #e74c3c; color: #fff;
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: bold;
 }
 
-/* หัวคอลัมน์ตะกร้ารวม: แถบสีน้ำเงิน ตัวอักษรสีขาว */
-.cart-table th {
-    background: #2980b9;        /* น้ำเงิน */
-    color: #ffffff;             /* ตัวหนังสือขาว */
-    font-weight: 600;
-    text-align: center;
+/* =========================
+   ✅ TABLE SCROLL + STICKY HEADER (ชัวร์)
+   ========================= */
+
+/* ให้ scroll เกิดที่กล่องตาราง */
+.table-container{
+  overflow: auto;
+  max-height: calc(100vh - 320px);
+  position: relative;
+  padding: 0 16px;
 }
 
-        .cart-table input[type="number"] {
-            width: 80px;
-            padding: 4px 6px;
-            border-radius: 6px;
-            border: 1px solid #ccd1ff;
-            text-align: right;
-        }
-        .cart-empty {
-            text-align: center;
-            padding: 24px 0;
-            color: #7f8c8d;
-        }
+/* ตาราง */
+table{
+  width: 100%;
+  min-width: 1600px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  background: white;
 
-        /* ==================== RESPONSIVE ==================== */
-
-        @media (max-width: 1200px) {
-            body { padding: 0; }
-            .container { max-width: 100%; border-radius: 0; box-shadow: none; }
-            h1 { font-size: 22px; padding: 14px; }
-            .summary-row { padding: 10px; gap: 8px; }
-            .card { max-width: none; flex: 1 1 calc(50% - 10px); }
-            .controls { padding: 12px; gap: 10px; }
-            .control-group { width: 100%; justify-content: space-between; flex-wrap: wrap; }
-            .control-group label { width: 100%; margin-bottom: 4px; }
-            .control-group select,
-            .control-group input[type=number],
-            .control-group input[type=text] {
-                width: 100% !important;
-            }
-            .export-btn { margin-left: 0; }
-            .search-row,
-            .filter-row { gap: 10px; }
-            #responsibleFilterContainer { width: 100%; }
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 18px; }
-            .summary-row { flex-direction: column; align-items: stretch; }
-            .card { flex: 1 1 100%; }
-            .export-btn { width: 100%; justify-content: center; }
-            .icon-btn { margin-left: 0; }
-            table { min-width: 1000px; }
-            th, td { padding: 8px 6px; font-size: 12px; }
-        }
-
-        @media (max-width: 480px) {
-            h1 { font-size: 16px; padding: 10px; }
-            .login-form { width: 260px; padding: 20px; }
-            .page-btn { padding: 6px 10px; font-size: 12px; }
-        }
-        .cart-emp-info {
-    display: flex;
-    flex-direction: column;
-    font-size: 13px;
-    margin-top: 4px;
-    color: #2c3e50;
+  /* ★ สำคัญมากสำหรับ sticky: */
+  border-collapse: separate; /* ห้าม collapse */
+  border-spacing: 0;
 }
-.cart-emp-info span {
-    line-height: 1.3;
+
+/* ตรึงหัวตาราง */
+thead{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+}
+
+/* ตรึง th ทุกช่อง (กันหลุด/กันทะลุ) */
+th{
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+
+  padding: 14px 10px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+th:hover { background: rgba(255,255,255,0.1); }
+.sort-icon { margin-left: 4px; font-size: 10px; }
+
+/* แถว/เซลล์ */
+tbody tr { transition: background 0.2s; border-bottom: 1px solid #eee; }
+tbody tr:hover { background: #f0f8ff; }
+tbody tr:nth-child(even) { background: #f8f9fa; }
+td { padding: 12px 10px; font-size: 13px; text-align: left; }
+
+/* badges */
+.value { background: #667eea; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 12px; display: inline-block; }
+.return-qty { background: #e74c3c; color: white; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+
+.moving-fast, .moving-medium, .moving-slow, .moving-slowly, .moving-dead {
+  padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block;
+}
+.moving-fast { background: #d5f5e3; color: #1e8449; }
+.moving-medium { background: #fef9e7; color: #d35400; }
+.moving-slow { background: #fdecea; color: #c0392b; }
+.moving-slowly { background: #f2f3f4; color: #616161; }
+.moving-dead { background: #f0f0f0; color: #7f8c8d; }
+
+.status-pending { background: #fef9e7; color: #d35400; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+.status-approved { background: #d5f5e3; color: #1e8449; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+.status-rejected { background: #fdecea; color: #c0392b; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+.status-other { background: #f2f3f4; color: #616161; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+
+.pagination { padding: 16px; text-align: center; background: #f8f9fa; font-size: 16px; font-weight: bold; color: #2c3e50; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+.page-btn { padding: 8px 14px; background: white; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.page-btn.active { background: #667eea; color: white; border: none; }
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.page-btn:hover:not(.active):not(:disabled) { background: #e9ecef; }
+
+#loginModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
+.login-form { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; width: 300px; }
+.login-form input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccd1ff; border-radius: 10px; }
+.login-form button { padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer; width: 100%; }
+.login-form label { display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0; }
+#loginError { color: red; margin-top: 10px; }
+
+#menuBtn { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; color: white; cursor: pointer; }
+#userMenu { position: absolute; top: 50px; right: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; text-align: left; }
+#userMenu p { margin: 5px 0; }
+#logoutBtn { padding: 8px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
+
+.loader {
+  --w:10ch; font-weight: bold; font-family: monospace; font-size: 30px; letter-spacing: var(--w);
+  width: var(--w); overflow: hidden; white-space: nowrap;
+  text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0, calc(-3*var(--w)) 0, calc(-4*var(--w)) 0,
+               calc(-5*var(--w)) 0, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0, calc(-9*var(--w)) 0;
+  animation: l16 2s infinite;
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;
+}
+.loader:before { content: "Loading..."; }
+@keyframes l16 {
+  20% { text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0 red, calc(-3*var(--w)) 0, calc(-4*var(--w)) 0 #ffa516, calc(-5*var(--w)) 0 #63fff4, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0 green, calc(-9*var(--w)) 0; }
+  40% { text-shadow: calc(-1*var(--w)) 0, calc(-2*var(--w)) 0 red, calc(-3*var(--w)) 0 #e945e9, calc(-4*var(--w)) 0, calc(-5*var(--w)) 0 green, calc(-6*var(--w)) 0 orange, calc(-7*var(--w)) 0, calc(-8*var(--w)) 0 green, calc(-9*var(--w)) 0; }
+  60% { text-shadow: calc(-1*var(--w)) 0 lightblue, calc(-2*var(--w)) 0, calc(-3*var(--w)) 0 #e945e9, calc(-4*var(--w)) 0, calc(-5*var(--w)) 0 green, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0 yellow, calc(-8*var(--w)) 0 #ffa516, calc(-9*var(--w)) 0 red; }
+  80% { text-shadow: calc(-1*var(--w)) 0 lightblue, calc(-2*var(--w)) 0 yellow, calc(-3*var(--w)) 0 #63fff4, calc(-4*var(--w)) 0 #ffa516, calc(-5*var(--w)) 0 red, calc(-6*var(--w)) 0, calc(-7*var(--w)) 0 grey, calc(-8*var(--w)) 0 #63fff4, calc(-9*var(--w)) 0; }
+}
+
+#backBtn { position: absolute; top: 20px; left: 20px; background: none; border: none; font-size: 24px; color: white; cursor: pointer; display: none; }
+
+/* Filter ผู้รับคืน */
+#responsibleFilterContainer {
+  display: flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, #f0f4ff, #e0eaff);
+  padding: 12px 20px; border-radius: 16px; font-size: 14px;
+  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+  transition: all 0.3s;
+}
+#responsibleFilterContainer:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2); }
+#responsibleFilter {
+  min-width: 180px;
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid #ccd1ff; font-size: 14px;
+  background: white; transition: border 0.2s;
+}
+#responsibleFilter:focus { border-color: #667eea; outline: none; }
+
+.responsible-cell { text-align: center; font-size: 13px; }
+.responsible-user { background: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 12px; display: inline-block; }
+
+th.col-location, td.col-location,
+th.col-shelf, td.col-shelf { display: none; }
+
+th:nth-child(24), td:nth-child(24) { width: 100px; }
+th:nth-child(25), td:nth-child(25) { width: 80px; }
+th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
+
+#controlsSection .filter-row .control-group:first-child { flex: 1 1 280px; min-width: 240px; }
+#controlsSection .filter-row .control-group:first-child select { width: 100%; min-width: 220px; }
+
+/* นวนคร = ส้ม */
+.nava-orange { background: #f6b26b; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; }
+/* นวนคร = 0 = แดง */
+.nava-red { background:#cc0000; color:#fff; padding:4px 8px; border-radius:6px; font-weight:bold; display:inline-block; }
+
+/* คงเหลือ = เขียว */
+.stock-green { background: #6aa84f; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; }
+/* คงเหลือ = 0 และ Moving = Fast = แดง */
+.stock-red { background: #cc0000; color: #ffffff; padding: 4px 8px; border-radius: 6px; font-weight: bold; display: inline-block; }
+
+/* Modal ตะกร้า */
+.cart-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+.cart-modal-content {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 1000px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+.cart-modal-header, .cart-modal-footer {
+  padding: 12px 18px;
+  background: #f5f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cart-modal-header h2 { margin: 0; font-size: 18px; color: #2c3e50; }
+.cart-modal-body { padding: 12px 18px 18px; overflow: auto; background: #fff; }
+
+.cart-emp-input label { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 6px; }
+.cart-emp-input input { padding: 6px 10px; border-radius: 8px; border: 1px solid #ccd1ff; min-width: 160px; }
+
+.cart-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.cart-table th, .cart-table td { border: 1px solid #ddd; padding: 6px 8px; font-size: 13px; }
+.cart-table th { background: #2980b9; color: #ffffff; font-weight: 600; text-align: center; }
+
+.cart-table input[type="number"] { width: 80px; padding: 4px 6px; border-radius: 6px; border: 1px solid #ccd1ff; text-align: right; }
+.cart-empty { text-align: center; padding: 24px 0; color: #7f8c8d; }
+
+.cart-emp-info { display: flex; flex-direction: column; font-size: 13px; margin-top: 4px; color: #2c3e50; }
+.cart-emp-info span { line-height: 1.3; }
+
+.order-equal { background: #2ecc71; color: #ffffff; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+.order-less  { background: #e74c3c; color: #ffffff; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+.order-more  { background: #2980b9; color: #ffffff; padding: 4px 8px; border-radius: 6px; display: inline-block; font-weight: bold; }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1200px) {
+  body { padding: 0; }
+  .container { max-width: 100%; border-radius: 0; box-shadow: none; }
+  h1 { font-size: 22px; padding: 14px; }
+  .summary-row { padding: 10px; gap: 8px; }
+  .card { max-width: none; flex: 1 1 calc(50% - 10px); }
+  .controls { padding: 12px; gap: 10px; }
+  .control-group { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+  .control-group label { width: 100%; margin-bottom: 4px; }
+  .control-group select,
+  .control-group input[type=number],
+  .control-group input[type=text] { width: 100% !important; }
+  .export-btn { margin-left: 0; }
+  .search-row, .filter-row { gap: 10px; }
+  #responsibleFilterContainer { width: 100%; }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 18px; }
+  .summary-row { flex-direction: column; align-items: stretch; }
+  .card { flex: 1 1 100%; }
+  .export-btn { width: 100%; justify-content: center; }
+  .icon-btn { margin-left: 0; }
+  table { min-width: 1000px; }
+  th, td { padding: 8px 6px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 16px; padding: 10px; }
+  .login-form { width: 260px; padding: 20px; }
+  .page-btn { padding: 6px 10px; font-size: 12px; }
 }
     </style>
 </head>
@@ -499,6 +417,18 @@
                     <option value="ไม่มีสถานะ">ไม่มีสถานะ</option>
                 </select>
             </div>
+            <div class="control-group">
+    <label><i class="fas fa-balance-scale control-icon"></i> Option:</label>
+    <select id="orderDiffFilter">
+        <option value="">ทั้งหมด</option>
+        <option value="less">น้อยกว่า</option>
+        <option value="equal">เท่ากัน</option>
+        <option value="more">มากกว่า</option>
+        <option value="nav0">นวนคร = 0</option>
+        <option value="actualgt0">สั่งจริง > 0</option>
+        <option value="navgt0">นวนคร > 0</option>
+    </select>
+</div>
 
             <!-- ★ ปุ่มตะกร้ารวม -->
             <button class="icon-btn cart-main-btn" id="cartMainBtn" title="ตะกร้ารวม">
@@ -536,6 +466,7 @@
                 <th data-sort="ROP">ROP <i class="fas fa-sort sort-icon"></i></th>
                 <th data-sort="DOS">DOS</th>
                 <th data-sort="RecommendedOrder">แนะนำสั่ง <i class="fas fa-sort sort-icon"></i></th>
+                <th>สั่งจริง</th> <!-- ★ เพิ่มคอลัมนี้ -->
                 <th>หมายเหตุ</th>
                 <th data-sort="MultiplyUnit">Package</th>
                 <th data-sort="Product">Product</th>
@@ -760,7 +691,7 @@ function updateCartCount(){
 }
 
 function addToCart(item){
-    const exist = cartItems.find(x => x.Material === item.Material && x.StorageBin === item.StorageBin);
+   const exist = cartItems.find(x => x.Material === item.Material && x.StorageBin === item.StorageBin);
     if(exist){
         exist.Qty = (exist.Qty || 1) + 1;
     }else{
@@ -1400,38 +1331,42 @@ async function loadData(){
             const ownerId=shelfOwnerMap.get(shelf)||'';
             const ownerName=getOwnerName(ownerId);
 
-            allData.push({
-                Plant:plant,
-                Material:material,
-                Description:description,
-                StorageBin:storageBin,
-                Unit:unit,
-                Navanakorn: navanakornQty,
-                Unrestricted:unrestricted,
-                Value:value,
-                Qty6Month:qty6m,
-                Qty4Month:qty4m,
-                ThirtyDay:thirtyDay,
-                AvgDailyUse:qty4m/120||0,
-                AvgMonthly:qty4m/4,
-                SafetyStock:0,ROP:0,DOS:0,RecommendedOrder:0,Mean:0,
-                ABCValue:"",CumPercent:0,Moving:"",
-                ReturnQty:0,ReturnValue:0,
-                Note:main.Note,
-                MultiplyUnit:main.MultiplyUnit,
-                Product:main.Product,
-                AvgVal:avgVal,
-                OriginalValue:originalValue,
-                Status:status,
-                Location:location,
-                Shelf:shelf,
-                OwnerId:ownerId,
-                OwnerName:ownerName
-            });
+           allData.push({
+    Plant:plant,
+    Material:material,
+    Description:description,
+    StorageBin:storageBin,
+    Unit:unit,
+    Navanakorn: navanakornQty,
+    Unrestricted:unrestricted,
+    Value:value,
+    Qty6Month:qty6m,
+    Qty4Month:qty4m,
+    ThirtyDay:thirtyDay,
+    AvgDailyUse:qty4m/120||0,
+    AvgMonthly:qty4m/4,
+    SafetyStock:0,ROP:0,DOS:0,RecommendedOrder:0,Mean:0,
+    ABCValue:"",CumPercent:0,Moving:"",
+    ReturnQty:0,ReturnValue:0,
+    Note:main.Note,
+    MultiplyUnit:main.MultiplyUnit,
+    Product:main.Product,
+    AvgVal:avgVal,
+    OriginalValue:originalValue,
+    Status:status,
+    Location:location,
+    Shelf:shelf,
+    OwnerId:ownerId,
+    OwnerName:ownerName,
+    ActualOrder: null,          // ✅ ให้เป็น null แทน 0
+    _actualOrderTouched: false  // ยังไม่เคยแก้
+});
+
+
         });
-
-        calcABCValue();
-
+// หลังจากเติม allData เสร็จ
+loadActualOrdersFromLocalStorage();
+calcABCValue();
         const plantFilter=document.getElementById("plantFilter");
         plantFilter.innerHTML='';
         const name=plantNames[selectedPlant]||selectedPlant;
@@ -1531,6 +1466,13 @@ function recalculateStockFields(data,params){
         const mul=r.MultiplyUnit||1;
         if(mul>0)recommend=Math.ceil(recommend/mul)*mul;
         r.RecommendedOrder=Math.round(recommend);
+        if (!r._actualOrderTouched) {
+    // ถ้ายังไม่เคยให้ user แก้ และยังไม่มีค่า => set ตามแนะนำ
+    if (r.ActualOrder == null || isNaN(r.ActualOrder)) {
+        r.ActualOrder = r.RecommendedOrder;
+    }
+}
+        
         const avgMonthly=r.Qty4Month/4;
         if(avgMonthly===0)r.Moving="Dead";
         else if(avgMonthly<0.7)r.Moving="Slowly";
@@ -1679,6 +1621,32 @@ function applyFiltersAndRender(){
             baseData = baseData.filter(r => r.OwnerId === ownerVal);
         }
     }
+   const diffVal = document.getElementById("orderDiffFilter").value;
+
+if (diffVal) {
+
+  const matchDiff = (r) => {
+    const nav = Number(r.Navanakorn || 0);
+    const rec = Math.round(r.RecommendedOrder || 0);
+    const act = Math.round((r.ActualOrder ?? 0));
+
+    if (diffVal === "nav0")   return nav === 0;
+    if (diffVal === "navgt0") return nav > 0;
+
+    if (diffVal === "less")  return act < rec;
+    if (diffVal === "more")  return act > rec;
+    if (diffVal === "equal") return act === rec;
+
+    if (diffVal === "actualgt0") return act > 0;
+
+    return true;
+  };
+
+  viewData = viewData.filter(matchDiff);
+  baseData = baseData.filter(matchDiff);
+}
+
+
 
     if (mode === "onlyOrder") {
         calcABCForMode(viewData, "order");
@@ -1711,37 +1679,41 @@ function applyFiltersAndRender(){
     updateAllCards(baseData, filteredData);
 }
 
-function calcABCForMode(data,modeType){
-    let sorted=[...data];
-    if(modeType==="order"){
-        sorted.sort((a,b)=>{
-            const va=a.RecommendedOrder*(a.Unrestricted>0?a.Value/a.Unrestricted:0);
-            const vb=b.RecommendedOrder*(b.Unrestricted>0?b.Value/b.Unrestricted:0);
-            return vb-va;
-        });
-    }else if(modeType==="return"){
-        sorted.sort((a,b)=>b.ReturnValue-a.ReturnValue);
-    }
-    let total=0;
-    if(modeType==="order"){
-        total=sorted.reduce((s,r)=>s+r.RecommendedOrder*(r.Unrestricted>0?r.Value/r.Unrestricted:0),0);
-    }else if(modeType==="return"){
-        total=sorted.reduce((s,r)=>s+r.ReturnValue,0);
-    }
-    let cum=0;
-    sorted.forEach(r=>{
-        let val=0;
-        if(modeType==="order")val=r.RecommendedOrder*(r.Unrestricted>0?r.Value/r.Unrestricted:0);
-        else if(modeType==="return")val=r.ReturnValue;
-        cum+=val;
-        const pct=total?(cum/total)*100:0;
-        const orig=data.find(x=>x.Material===r.Material&&x.Plant===r.Plant);
-        if(orig){
-            orig.CumPercent=pct;
-            orig.ABCValue=pct<=70?"A":pct<=90?"B":"C";
+function calcABCForMode(data, modeType){
+    let sorted = [...data];
+
+    // ✅ เลือกตัวเลขที่จะใช้จัดอันดับ + รวมมูลค่า
+    const getVal = (r) => {
+        if (modeType === "order") {
+            return (r.RecommendedOrder || 0) * (r.Unrestricted > 0 ? (r.Value / r.Unrestricted) : 0);
+        }
+        if (modeType === "return") {
+            return (r.ReturnValue || 0);
+        }
+        // ✅ normal = ใช้ Value จริง
+        return (r.Value || 0);
+    };
+
+    // ✅ sort ตามค่าที่ใช้จริง
+    sorted.sort((a,b) => getVal(b) - getVal(a));
+
+    const total = sorted.reduce((s,r) => s + getVal(r), 0);
+    let cum = 0;
+
+    sorted.forEach(r => {
+        const val = getVal(r);
+        cum += val;
+        const pct = total ? (cum/total)*100 : 0;
+
+        // เขียนกลับไปยัง object ตัวจริงใน data
+        const orig = data.find(x => x.Material === r.Material && x.Plant === r.Plant);
+        if (orig) {
+            orig.CumPercent = pct;
+            orig.ABCValue   = pct <= 70 ? "A" : pct <= 90 ? "B" : "C";
         }
     });
 }
+
 
 function updateAllCards(baseData, filteredData) {
     const abc = { A:0, B:0, C:0 }, cntABC = { A:0, B:0, C:0 };
@@ -1881,19 +1853,27 @@ function renderTable(){
     const end=start+rowsPerPage;
     const pageData=filteredData.slice(start,end);
     if(pageData.length===0){
-        container.innerHTML=`<tr><td colspan="28" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
+        container.innerHTML=`<tr><td colspan="30" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
         return;
     }
     pageData.forEach(r=>{
-        const orderQty=Math.round(r.RecommendedOrder);
-        const orderClass=orderQty===0?"order-0":orderQty<=10?"order-1-10":orderQty<=50?"order-11-50":orderQty<=200?"order-51-200":"order-200";
+        const orderQty = Math.round(r.RecommendedOrder || 0);
+const actual   = Math.round(r.ActualOrder || 0);
+
+let orderClass;
+if (actual < orderQty) {
+    orderClass = "order-less";   // แดง
+} else if (actual > orderQty) {
+    orderClass = "order-more";   // น้ำเงิน
+} else {
+    orderClass = "order-equal";  // เขียว
+}
+
         const statusClass=getStatusClass(r.Status);
         const displayStatus=r.Status&&r.Status.trim()!==''?r.Status:"-";
         const ownerDisplay=r.OwnerName||(r.OwnerId||"-");
-
-        const navanakornHtml = `
-            <span class="nava-orange">${formatNumber(r.Navanakorn || 0)}</span>
-        `;
+        const navClass = (Number(r.Navanakorn || 0) === 0) ? "nava-red" : "nava-orange";
+        const navanakornHtml = `<span class="${navClass}">${formatNumber(r.Navanakorn || 0)}</span>`;
 
         let stockClass = "stock-green";
         if (r.Unrestricted == 0 && r.Moving === "Fast") {
@@ -1904,37 +1884,80 @@ function renderTable(){
         `;
 
         const row=document.createElement("tr");
-        row.innerHTML=`
-            <td></td>
-            <td>${r.Plant}</td>
-            <td>${r.Material}</td>
-            <td>${r.Description}</td>
-            <td>${r.StorageBin}</td>
-            <td>${r.Unit}</td>
-            <td>${navanakornHtml}</td>
-            <td>${unrestrictedHtml}</td>
-            <td><span class="value">${formatCurrency(r.Value)}</span></td>
-            <td>${formatNumber(r.Qty6Month)}</td>
-            <td>${formatNumber(r.Qty4Month)}</td>
-            <td>${r.AvgMonthly.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
-            <td>${formatNumber(r.ThirtyDay)}</td>
-            <td>${r.Mean.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
-            <td>${formatNumber(r.SafetyStock)}</td>
-            <td>${formatNumber(r.ROP)}</td>
-            <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
-            <td><span class="${orderClass}">${formatNumber(orderQty)}</span></td>
-            <td>${r.Note}</td>
-            <td>${formatNumber(r.MultiplyUnit)}</td>
-            <td>${r.Product}</td>
-            <td><strong>${r.ABCValue}</strong></td>
-            <td><span class="moving-${r.Moving.toLowerCase()}">${r.Moving}</span></td>
-            <td><span class="return-qty">${formatNumber(r.ReturnQty)}</span></td>
-            <td>${r.CumPercent.toFixed(1)}%</td>
-            <td class="col-location">${r.Location||''}</td>
-            <td class="col-shelf">${r.Shelf||''}</td>
-            <td class="responsible-cell"><span class="responsible-user">${ownerDisplay}</span></td>
-            <td><span class="${statusClass}">${displayStatus}</span></td>
-        `;
+        row.innerHTML = `
+    <td></td>
+    <td>${r.Plant}</td>
+    <td>${r.Material}</td>
+    <td>${r.Description}</td>
+    <td>${r.StorageBin}</td>
+    <td>${r.Unit}</td>
+    <td>${navanakornHtml}</td>
+    <td>${unrestrictedHtml}</td>
+    <td><span class="value">${formatCurrency(r.Value)}</span></td>
+    <td>${formatNumber(r.Qty6Month)}</td>
+    <td>${formatNumber(r.Qty4Month)}</td>
+    <td>${r.AvgMonthly.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
+    <td>${formatNumber(r.ThirtyDay)}</td>
+    <td>${r.Mean.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
+    <td>${formatNumber(r.SafetyStock)}</td>
+    <td>${formatNumber(r.ROP)}</td>
+    <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
+   <td>
+    <span class="order-span ${orderClass}">
+        ${formatNumber(orderQty)}
+    </span>
+</td>
+
+
+    <!-- ★ คอลัม “สั่งจริง” -->
+   <td>
+    <input type="number"
+           class="actual-order-input"
+           min="0"
+           value="${(r.ActualOrder ?? r.RecommendedOrder) ?? ''}"
+           style="width:80px;padding:4px 6px;border-radius:6px;border:1px solid #ccd1ff;text-align:right;">
+</td>
+
+
+
+    <td>${r.Note}</td>
+    <td>${formatNumber(r.MultiplyUnit)}</td>
+    <td>${r.Product}</td>
+    <td><strong>${r.ABCValue}</strong></td>
+    <td><span class="moving-${r.Moving.toLowerCase()}">${r.Moving}</span></td>
+    <td><span class="return-qty">${formatNumber(r.ReturnQty)}</span></td>
+    <td>${r.CumPercent.toFixed(1)}%</td>
+    <td class="col-location">${r.Location||''}</td>
+    <td class="col-shelf">${r.Shelf||''}</td>
+    <td class="responsible-cell"><span class="responsible-user">${ownerDisplay}</span></td>
+    <td><span class="${statusClass}">${displayStatus}</span></td>
+`;
+const actualInput = row.querySelector('input.actual-order-input');
+if (actualInput) {
+    actualInput.addEventListener('input', (e) => {
+        const v = parseFloat(e.target.value);
+        const act = isNaN(v) ? 0 : v;
+        r.ActualOrder = act;
+        r._actualOrderTouched = true;       // ★ บอกว่า user เคยแก้แล้ว
+
+        // ถ้าคุณมี localStorage ตามคำตอบก่อนหน้า
+        if (typeof saveActualOrdersToLocalStorage === 'function') {
+            saveActualOrdersToLocalStorage();
+        }
+
+        // ★ อัปเดตสีของ "แนะนำสั่ง" ในแถวนี้ทันที
+        const rec = Math.round(r.RecommendedOrder || 0);
+        const span = row.querySelector('.order-span');
+        if (span) {
+            span.classList.remove('order-less','order-more','order-equal');
+            let cls;
+            if (act < rec)      cls = 'order-less';
+            else if (act > rec) cls = 'order-more';
+            else                cls = 'order-equal';
+            span.classList.add(cls);
+        }
+    });
+}
 
         // ★ ปุ่มตะกร้าในคอลัมน์แรก
         const cartCell = row.cells[0];
@@ -1974,27 +1997,69 @@ function renderPagination(){
     p.appendChild(createBtn(">",currentPage+1,currentPage===totalPages));
     p.appendChild(createBtn(">>",totalPages,currentPage===totalPages));
 }
+function getOrderStorageKey() {
+    // ถ้าอยากแยกตาม Plant
+    return 'abc_actual_orders_' + (selectedPlant || 'ALL');
+}
+
+function saveActualOrdersToLocalStorage() {
+  const map = {};
+  allData.forEach(r => {
+    if (r._actualOrderTouched) { // เคยแก้แล้ว
+      const key = `${r.Plant}-${r.Material}`;
+      map[key] = Number(r.ActualOrder || 0);
+    }
+  });
+  localStorage.setItem(getOrderStorageKey(), JSON.stringify(map));
+}
+
+
+function loadActualOrdersFromLocalStorage() {
+    const txt = localStorage.getItem(getOrderStorageKey());
+    if (!txt) return;
+
+    let map;
+    try {
+        map = JSON.parse(txt) || {};
+    } catch (e) {
+        console.error('loadActualOrders error', e);
+        return;
+    }
+    allData.forEach(r => {
+        const key = `${r.Plant}-${r.Material}`;
+        if (map[key] != null) {
+            r.ActualOrder = map[key];
+            r._actualOrderTouched = true;   // เคยแก้แล้ว → อย่าให้ default ทับ
+        }
+    });
+}
+
 
 function exportToCSV(){
     const headers=[
-        "Plant","Material","รายการอะไหล่","Storage bin",
-        "หน่วย","นวนคร","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน",
-        "เฉลี่ย/ด.","30Day","Mean","Safety","ROP","DOS","แนะนำสั่งซื้อ",
-        "หมายเหตุ","คูณหน่วย","Product","ABC","Moving",
-        "ส่งคืนได้ (ชิ้น)","% สะสม",
-        "Location","Shelf","ผู้รับคืน","Status"
-    ];
+    "Plant","Material","รายการอะไหล่","Storage bin",
+    "หน่วย","นวนคร","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน",
+    "เฉลี่ย/ด.","30Day","Mean","Safety","ROP","DOS","แนะนำสั่งซื้อ",
+    "สั่งจริง",             // ★ เพิ่ม
+    "หมายเหตุ","คูณหน่วย","Product","ABC","Moving",
+    "ส่งคืนได้ (ชิ้น)","% สะสม",
+    "Location","Shelf","ผู้รับคืน","Status"
+];
     let csv="\uFEFF"+headers.join(",")+"\n";
     filteredData.forEach(r=>{
         const row=[
-            r.Plant,r.Material,(r.Description||"").replace(/"/g,'""'),r.StorageBin,r.Unit,r.Navanakorn || 0,
-            r.Unrestricted,r.Value,r.Qty6Month,r.Qty4Month,
-            r.AvgDailyUse.toFixed(1),r.ThirtyDay,r.Mean.toFixed(1),Math.round(r.SafetyStock),Math.round(r.ROP),
-            r.DOS>9999?"มาก":r.DOS.toFixed(1),Math.round(r.RecommendedOrder),
-            r.Note,r.MultiplyUnit,r.Product,r.ABCValue,r.Moving,
-            r.ReturnQty,r.CumPercent.toFixed(2),
-            r.Location||"",r.Shelf||"",r.OwnerName||r.OwnerId||"",r.Status||""
-        ];
+    r.Plant,r.Material,(r.Description||"").replace(/"/g,'""'),r.StorageBin,r.Unit,r.Navanakorn || 0,
+    r.Unrestricted,r.Value,r.Qty6Month,r.Qty4Month,
+    r.AvgDailyUse.toFixed(1),r.ThirtyDay,r.Mean.toFixed(1),Math.round(r.SafetyStock),Math.round(r.ROP),
+    r.DOS>9999?"มาก":r.DOS.toFixed(1),Math.round(r.RecommendedOrder),
+
+    r.ActualOrder || 0,   // ★ คอลัมสั่งจริง
+
+    r.Note,r.MultiplyUnit,r.Product,r.ABCValue,r.Moving,
+    r.ReturnQty,r.CumPercent.toFixed(2),
+    r.Location||"",r.Shelf||"",r.OwnerName||r.OwnerId||"",r.Status||""
+];
+
         csv+=row.map(v=>`"${v}"`).join(",")+"\n";
     });
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
@@ -2024,6 +2089,7 @@ document.getElementById("responsibleFilter").addEventListener("change",applyFilt
 ["leadTimeDays","safetyDays","coverDays","searchInput"].forEach(id=>{
     document.getElementById(id).addEventListener("input",applyFiltersAndRender);
 });
+document.getElementById("orderDiffFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("exportBtn").onclick=exportToCSV;
 </script>
 </body>
