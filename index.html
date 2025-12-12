@@ -416,8 +416,15 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
   border-radius: 14px;
   padding: 12px 14px;
 }
-.help-card b { color: #1f2d3d; }
-
+.help-card b { color: #1f2d3d; 
+}
+.icon-btn.set-btn {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  box-shadow: 0 4px 10px rgba(39,174,96,0.45);
+}
+.icon-btn.set-btn:hover {
+  box-shadow: 0 6px 14px rgba(39,174,96,0.65);
+}
     </style>
 </head>
 <body>
@@ -547,19 +554,25 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
 </div>
 
             <!-- ★ ปุ่มตะกร้ารวม -->
-            <button class="icon-btn cart-main-btn" id="cartMainBtn" title="ตะกร้ารวม">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cartCountBadge">0</span>
-            </button>
-              <button class="icon-btn" id="cartClearBtn" title="ล้างตะกร้า">
-            <i class="fas fa-trash"></i>
-            </button>
-            <button class="export-btn" id="setActualBtn"title="Set">
-            <i class="fas fa-check"></i> 
-             </button>
-            <button class="export-btn" id="exportBtn"><i class="fas fa-file-export"></i> Export</button>
-        </div>
-    </div>
+           <button class="icon-btn cart-main-btn" id="cartMainBtn" title="ตะกร้ารวม">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cartCountBadge">0</span>
+</button>
+
+<button class="icon-btn" id="cartClearBtn" title="ล้างตะกร้า">
+    <i class="fas fa-trash"></i>
+</button>
+
+<!-- ✅ ปุ่ม Set (ทรงเดียวกับล้างตะกร้า) -->
+<button class="icon-btn set-btn" id="setActualBtn" title="Set = แนะนำสั่ง">
+    <i class="fas fa-check"></i>
+</button>
+
+
+<button class="export-btn" id="exportBtn">
+    <i class="fas fa-file-export"></i> Export
+</button>
+
 
     <div class="table-container" id="tableSection" style="display:none;">
         <table id="dataTable">
