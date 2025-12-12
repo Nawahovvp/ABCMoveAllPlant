@@ -309,6 +309,115 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
   .login-form { width: 260px; padding: 20px; }
   .page-btn { padding: 6px 10px; font-size: 12px; }
 }
+/* =========================
+   ✅ HELP MODAL
+   ========================= */
+.help-modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: 12px;
+}
+
+.help-content {
+  width: min(980px, 96vw);
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.help-header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.help-header h2 {
+  margin: 0;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.help-close-btn {
+  border: none;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 18px;
+}
+.help-close-btn:hover { background: rgba(255,255,255,0.28); }
+
+.help-body {
+  padding: 16px 18px 18px;
+  overflow: auto;
+  color: #2c3e50;
+}
+
+.help-body h3 {
+  margin: 14px 0 8px;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.help-body p, .help-body li {
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 6px 0;
+}
+
+.help-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3949ab;
+  font-weight: 700;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.help-code {
+  background: #0b1020;
+  color: #e6edf3;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  overflow: auto;
+  margin: 10px 0;
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 880px){
+  .help-grid { grid-template-columns: 1fr; }
+}
+.help-card {
+  background: #f8f9ff;
+  border: 1px solid #e6eaff;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.help-card b { color: #1f2d3d; }
+
     </style>
 </head>
 <body>
@@ -316,10 +425,17 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
     <h1>ABC Analysis & Smart Ordering System</h1>
     <button id="menuBtn" style="display: none;"><i class="fas fa-user-circle"></i></button>
     <div id="userMenu">
-        <p id="userID"></p>
-        <p id="userName"></p>
-        <button id="logoutBtn">Log out</button>
-    </div>
+  <p id="userID"></p>
+  <p id="userName"></p>
+
+  <!-- ✅ ปุ่ม Help -->
+  <button id="helpBtn" class="export-btn" style="width:100%;justify-content:center;margin:8px 0;background:linear-gradient(135deg,#3498db,#2980b9);">
+    <i class="fas fa-circle-info"></i> Help
+  </button>
+
+  <button id="logoutBtn">Log out</button>
+</div>
+
     <div class="loader" id="loader" style="display: none;"></div>
     <button id="backBtn"><i class="fas fa-arrow-left"></i></button>
 
@@ -585,6 +701,110 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
         <button id="loginBtn">เข้าสู่ระบบ</button>
         <div id="loginError"></div>
     </div>
+</div>
+<!-- =========================
+     ✅ HELP MODAL (อธิบายโปรแกรม)
+     ========================= -->
+<div id="helpModal" class="help-modal">
+  <div class="help-content">
+    <div class="help-header">
+      <h2><i class="fas fa-circle-info"></i> คู่มือระบบ ABC Analysis & Smart Ordering</h2>
+      <button class="help-close-btn" id="helpCloseBtn" title="ปิด"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div class="help-body">
+
+      <div class="help-grid">
+        <div class="help-card">
+          <h3><span class="help-pill">เป้าหมาย</span></h3>
+          <ul>
+            <li><b>จัดกลุ่มอะไหล่ (ABC)</b> จากมูลค่ารวม เพื่อรู้ว่าอะไรสำคัญมาก (A) สำคัญรอง (B) และทั่วไป (C)</li>
+            <li><b>วิเคราะห์การเคลื่อนไหว (Moving)</b> เพื่อแยก Fast/Medium/Slow/Dead</li>
+            <li><b>คำนวณ “แนะนำสั่ง”</b> เพื่อกันของขาด (Stockout) และลดของเกิน (Overstock)</li>
+            <li><b>ช่วยตัดสินใจ</b> ด้วย ROP, Safety Stock, DOS และตัวกรองต่าง ๆ</li>
+          </ul>
+        </div>
+
+        <div class="help-card">
+          <h3><span class="help-pill">ข้อมูลที่ใช้</span></h3>
+          <ul>
+            <li><b>Qty4Month</b> = ยอดเบิก 4 เดือน (ฐานหลัก 120 วัน)</li>
+            <li><b>ThirtyDay</b> = ยอดเบิก 30 วันล่าสุด (สะท้อนสถานการณ์ปัจจุบัน)</li>
+            <li><b>Unrestricted</b> = คงเหลือ</li>
+            <li><b>AvgVal</b> = ราคาเฉลี่ยต่อชิ้น (ถ้ามีจะใช้คำนวณ Value ให้แม่น)</li>
+            <li><b>MultiplyUnit</b> = Pack/หน่วยแพ็ค (ใช้ปัดจำนวนแนะนำสั่ง)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>ความหมายหัวคอลัมน์สำคัญ</h3>
+      <ul>
+        <li><b>AvgM</b> = เฉลี่ยต่อเดือนจาก 4 เดือน (Qty4Month ÷ 4)</li>
+        <li><b>30Day</b> = ยอดเบิก 30 วันล่าสุด</li>
+        <li><b>Mean</b> = “ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก” (ผสม 4M และ 30Day เพื่อความนิ่ง + ทันสมัย)</li>
+        <li><b>Safety</b> = Safety Stock (สำรองเพื่อกันผันผวน)</li>
+        <li><b>ROP</b> = Reorder Point (จุดสั่งซื้อ)</li>
+        <li><b>DOS</b> = Days of Supply (คงเหลือกินได้กี่วัน)</li>
+        <li><b>แนะนำสั่ง</b> = จำนวนที่ระบบแนะนำ (พร้อมปัดตาม Pack)</li>
+      </ul>
+
+      <h3>สูตรคำนวณหลัก (ใช้ใน “แนะนำสั่ง”)</h3>
+
+      <p><span class="help-pill">1) Avg ต่อวัน</span></p>
+      <div class="help-code">
+avg4mDaily  = Qty4Month / 120
+avg30dDaily = ThirtyDay / 30
+      </div>
+
+      <p><span class="help-pill">2) Weighted AvgDailyUse (ถ่วงน้ำหนัก)</span></p>
+      <p>ระบบ “ผสม” 4 เดือน (นิ่ง) + 30 วัน (สด) โดยน้ำหนักขึ้นกับ Moving และ ABC</p>
+      <div class="help-code">
+AvgDailyUse = (avg4mDaily * w4m) + (guarded30dDaily * w30)
+      </div>
+
+      <p><span class="help-pill">3) Outlier Guard (กัน 30Day พุ่งผิดปกติ)</span></p>
+      <div class="help-code">
+ถ้า avg30dDaily > avg4mDaily * limitMultiplier
+ให้ใช้ guarded30dDaily = avg4mDaily * limitMultiplier
+      </div>
+
+      <p><span class="help-pill">4) Safety Stock / ROP / DOS</span></p>
+      <div class="help-code">
+SafetyStock = AvgDailyUse * safetyDaysEffective
+ROP         = (AvgDailyUse * leadTime) + SafetyStock
+DOS         = Unrestricted / AvgDailyUse
+      </div>
+
+      <p><span class="help-pill">5) แนะนำสั่ง (RecommendedOrder)</span></p>
+      <p>ถ้า “คงเหลือ < ROP” → เติมให้ครอบคลุมจำนวนวัน “CoverDays”</p>
+      <div class="help-code">
+if (Unrestricted < ROP) {
+  needed    = AvgDailyUse * coverDays
+  recommend = needed - Unrestricted
+} else {
+  recommend = 0
+}
+
+ปัดตาม Pack:
+recommend = ceil(recommend / MultiplyUnit) * MultiplyUnit
+      </div>
+
+      <h3>แนวคิด “ฉลาดขึ้น” ที่อยู่ในฟังก์ชันของคุณ</h3>
+      <ul>
+        <li><b>Seasonal Mode</b>: ถ้า 30Day สูงกว่า 4M มาก → เพิ่มน้ำหนัก 30Day ชั่วคราว (แต่มีเพดาน)</li>
+        <li><b>Stockout Protection</b>: ถ้าคงเหลือ=0 และเป็น Fast/Medium → เพิ่ม safetyDays ชั่วคราวกันขาดช่วง</li>
+        <li><b>Moving</b>: ตีความความเร็วจาก AvgM เพื่อให้ระบบเลือกน้ำหนัก w4m/w30 ที่เหมาะสม</li>
+      </ul>
+
+      <h3>อ่านค่า “แนะนำสั่ง” ยังไงให้ใช้งานจริง</h3>
+      <ul>
+        <li>ถ้าคุณเพิ่ม Lead Time / Safety / Cover มากขึ้น → แนะนำสั่งจะสูงขึ้น (กันขาดมากขึ้น)</li>
+        <li>ถ้า MultiplyUnit (Pack) มาก → ระบบจะ “ปัดขึ้น” เพื่อให้สั่งได้จริงตามแพ็ค</li>
+        <li>ถ้ารายการเป็น Slow/Slowly และ Mean/30Day = 0 → ระบบอาจตัดให้แนะนำสั่ง = 0 เพื่อกันของค้าง</li>
+      </ul>
+
+    </div>
+  </div>
 </div>
 
 <!-- ★ Cart Modal -->
@@ -1202,6 +1422,7 @@ function logout(){
     document.getElementById('backBtn').style.display="none";
     showLogin();
 }
+
 function showUserMenu(){
     document.getElementById('menuBtn').style.display='block';
     document.getElementById('userID').textContent=`รหัส: ${loggedUser.IDUser}`;
@@ -1213,6 +1434,41 @@ document.getElementById('menuBtn').addEventListener('click',()=>{
 });
 document.getElementById('logoutBtn').addEventListener('click',logout);
 document.getElementById('loginBtn').addEventListener('click',login);
+
+// =========================
+// ✅ HELP MODAL CONTROL
+// =========================
+function openHelp(){
+  const m = document.getElementById('helpModal');
+  if(m) m.style.display = 'flex';
+
+  // ปิดเมนู userMenu ด้วย (กันซ้อน)
+  const menu = document.getElementById('userMenu');
+  if(menu) menu.style.display = 'none';
+}
+function closeHelp(){
+  const m = document.getElementById('helpModal');
+  if(m) m.style.display = 'none';
+}
+
+const helpBtn = document.getElementById('helpBtn');
+if (helpBtn) helpBtn.addEventListener('click', openHelp);
+
+const helpCloseBtn = document.getElementById('helpCloseBtn');
+if (helpCloseBtn) helpCloseBtn.addEventListener('click', closeHelp);
+
+// คลิกพื้นที่ดำเพื่อปิด
+const helpModal = document.getElementById('helpModal');
+if (helpModal) {
+  helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) closeHelp();
+  });
+}
+
+// กด ESC เพื่อปิด
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeHelp();
+});
 
 async function init(){
     await loadUsers();
@@ -1533,54 +1789,193 @@ function calcABCValue(){
     });
 }
 
-function recalculateStockFields(data,params){
-    data.forEach(r=>{
-        const d=r.AvgDailyUse||0;
-        const leadTime=params.leadTime||5;
-        const safetyDays=params.safety||3;
-        const coverDays=params.cover||40;
-        const safetyStock=d*safetyDays;
-        const rop=(d*leadTime)+safetyStock;
-        const dos=d>0?r.Unrestricted/d:9999;
-        r.SafetyStock=Math.round(safetyStock);
-        r.ROP=Math.round(rop);
-        r.DOS=dos>9999?9999:parseFloat(dos.toFixed(1));
-        let recommend=0;
-        if(r.Unrestricted<rop){
-            const needed=d*coverDays;
-            recommend=needed-r.Unrestricted;
-            if(recommend<0)recommend=0;
-        }
-        const mul=r.MultiplyUnit||1;
-        if(mul>0)recommend=Math.ceil(recommend/mul)*mul;
-        r.RecommendedOrder=Math.round(recommend);
-        if (!r._actualOrderTouched) {
-    // ถ้ายังไม่เคยให้ user แก้ และยังไม่มีค่า => set ตามแนะนำ
-    if (r.ActualOrder == null || isNaN(r.ActualOrder)) {
-        r.ActualOrder = r.RecommendedOrder;
+function recalculateStockFields(data, params){
+  data.forEach(r => {
+
+    // =========================
+    // 1) ค่าพื้นฐาน + แปลงเป็นตัวเลข
+    // =========================
+    const leadTime   = Number(params?.leadTime ?? 5);
+    const safetyDays = Number(params?.safety   ?? 3);
+    const coverDays  = Number(params?.cover    ?? 40);
+
+    const qty4m  = Number(r.Qty4Month  || 0);
+    const qty6m  = Number(r.Qty6Month  || 0); // เผื่ออยากใช้ต่อ
+    const qty30d = Number(r.ThirtyDay  || 0);
+
+    const unrestricted = Number(r.Unrestricted || 0);
+    const mul = Number(r.MultiplyUnit || 1);
+
+    // avg ต่อวันจากแต่ละช่วงเวลา
+    const avg4mDaily  = qty4m  / 120;  // 4 เดือน = 120 วัน
+    const avg30dDaily = qty30d / 30;   // 30 วัน = 30 วัน
+
+    // avg ต่อเดือนจาก 4 เดือน (ใช้จัด Moving)
+    const avgMonthlyFrom4m = qty4m / 4;
+
+    // =========================
+    // 2) Moving Classification (ของเดิม แต่ชัดเจน)
+    // =========================
+    if (avgMonthlyFrom4m === 0)            r.Moving = "Dead";
+    else if (avgMonthlyFrom4m < 0.7)       r.Moving = "Slowly";
+    else if (avgMonthlyFrom4m < 12)        r.Moving = "Slow";
+    else if (avgMonthlyFrom4m < 30)        r.Moving = "Medium";
+    else                                   r.Moving = "Fast";
+
+    // เก็บไว้ให้ตารางใช้เหมือนเดิม
+    r.AvgMonthly = avgMonthlyFrom4m;
+
+    // =========================
+    // 3) Weighted Weight (ฉลาดขึ้น)
+    // - Fast ฟัง 30Day มากขึ้น
+    // - Slow/Dead ฟัง 4M มากขึ้น
+    // - ABC A ไวขึ้น, C ช้าลง
+    // =========================
+    let w4m = 0.70, w30 = 0.30;
+
+    if (r.Moving === "Fast")   { w4m = 0.50; w30 = 0.50; }
+    if (r.Moving === "Medium") { w4m = 0.60; w30 = 0.40; }
+    if (r.Moving === "Slow")   { w4m = 0.80; w30 = 0.20; }
+    if (r.Moving === "Slowly" || r.Moving === "Dead") { w4m = 0.90; w30 = 0.10; }
+
+    // ปรับตาม ABC
+    if (r.ABCValue === "A") { w4m -= 0.05; w30 += 0.05; }
+    if (r.ABCValue === "C") { w4m += 0.05; w30 -= 0.05; }
+
+    // clamp + normalize
+    w4m = Math.max(0.05, Math.min(0.95, w4m));
+    w30 = 1 - w4m;
+
+    // =========================
+    // 4) Outlier Guard (กัน 30Day พุ่ง)
+    // ถ้า 30Day ต่อวัน > 4M ต่อวัน * limitMultiplier
+    // ให้จำกัดไว้
+    // =========================
+    const limitMultiplier = 3; // ปรับได้ 2-4 ตามใจ
+    let guarded30dDaily = avg30dDaily;
+
+    if (avg4mDaily > 0 && avg30dDaily > avg4mDaily * limitMultiplier) {
+      guarded30dDaily = avg4mDaily * limitMultiplier;
     }
-}
-        
-        const avgMonthly=r.Qty4Month/4;
-        if(avgMonthly===0)r.Moving="Dead";
-        else if(avgMonthly<0.7)r.Moving="Slowly";
-        else if(avgMonthly<12)r.Moving="Slow";
-        else if(avgMonthly<30)r.Moving="Medium";
-        else r.Moving="Fast";
 
-        r.Mean=(r.ThirtyDay>r.AvgMonthly)?r.ThirtyDay:r.AvgMonthly;
+    // =========================
+    // 5) Seasonal Mode (เอาหมด)
+    // แนวคิด: ถ้า 30Day "สูงกว่า" 4M มาก (แปลว่าช่วงนี้กำลังพีค)
+    // ให้เพิ่มน้ำหนัก 30Day แบบชั่วคราว แต่ไม่ให้เกินเพดาน
+    // =========================
+    const seasonalTrigger = 1.8; // ถ้า 30Day > 4M * 1.8 ถือว่าพีค
+    const seasonalBoostMax = 0.20; // เพิ่มน้ำหนัก 30Day สูงสุด +0.20
 
-        if(r.Mean===0&&(r.Moving==="Slow"||r.Moving==="Slowly"))r.RecommendedOrder=0;
-        if(r.ThirtyDay===0&&(r.Moving==="Slow"||r.Moving==="Slowly"))r.RecommendedOrder=0;
-        if(r.ThirtyDay>=r.Qty4Month&&r.Moving==="Slowly")r.RecommendedOrder=0;
+    if (avg4mDaily > 0) {
+      const ratio = avg30dDaily / avg4mDaily;
+      if (ratio >= seasonalTrigger) {
+        // เพิ่ม w30 ตามระดับความพีค แต่ไม่เกิน seasonalBoostMax
+        const boost = Math.min(seasonalBoostMax, (ratio - seasonalTrigger) * 0.10);
+        w30 = Math.min(0.95, w30 + boost);
+        w4m = 1 - w30;
+      }
+    }
 
-        const keepQty=calculateKeepQty(r);
-        const returnQty=Math.max(0,r.Unrestricted-keepQty);
-        const unitPrice=r.Unrestricted>0?r.Value/r.Unrestricted:0;
-        const returnValue=returnQty*unitPrice;
-        r.ReturnQty=Math.round(returnQty);
-        r.ReturnValue=returnValue;
-    });
+    // =========================
+    // 6) AvgDailyUse (ตัวหลักในการคำนวณสต๊อก)
+    // =========================
+    let avgDailyUse = (avg4mDaily * w4m) + (guarded30dDaily * w30);
+    if (!isFinite(avgDailyUse) || avgDailyUse < 0) avgDailyUse = 0;
+    r.AvgDailyUse = avgDailyUse;
+
+    // =========================
+    // 7) Mean (ฉลาดขึ้น)
+    // เดิม: max(ThirtyDay, AvgMonthly)
+    // ใหม่: Mean รายเดือน = (AvgMonthly 4M * w4m) + (30Day(ถือเป็น1เดือน) * w30)
+    // =========================
+    const avgMonthlyFrom30d = qty30d; // 30 วัน = 1 เดือน
+    let meanMonthly = (avgMonthlyFrom4m * w4m) + (avgMonthlyFrom30d * w30);
+
+    // guard Mean เหมือนกัน
+    if (avgMonthlyFrom4m > 0 && avgMonthlyFrom30d > avgMonthlyFrom4m * limitMultiplier) {
+      meanMonthly = (avgMonthlyFrom4m * w4m) + ((avgMonthlyFrom4m * limitMultiplier) * w30);
+    }
+
+    if (!isFinite(meanMonthly) || meanMonthly < 0) meanMonthly = 0;
+    r.Mean = meanMonthly;
+
+    // =========================
+    // 8) Stockout Protection (เอาหมด)
+    // ถ้า Fast/Medium แต่ของหมด → เพิ่ม SafetyDays ชั่วคราว
+    // (เพื่อกันขาดช่วง lead time)
+    // =========================
+    let safetyDaysEffective = safetyDays;
+
+    if (unrestricted === 0 && (r.Moving === "Fast" || r.Moving === "Medium")) {
+      // เพิ่ม safety อีก 30% ของ coverDays (แต่ไม่ต่ำกว่า +3 วัน)
+      const add = Math.max(3, Math.round(coverDays * 0.30));
+      safetyDaysEffective = safetyDays + add;
+
+      // ถ้าเป็น ABC A เพิ่มอีกนิด
+      if (r.ABCValue === "A") safetyDaysEffective += 2;
+    }
+
+    // กัน safetyDaysEffective บาน
+    safetyDaysEffective = Math.min(365, Math.max(0, safetyDaysEffective));
+
+    // =========================
+    // 9) SafetyStock / ROP / DOS
+    // ใช้ AvgDailyUse ใหม่ + safetyDaysEffective
+    // =========================
+    const d = r.AvgDailyUse || 0;
+
+    const safetyStock = d * safetyDaysEffective;
+    const rop = (d * leadTime) + safetyStock;
+
+    const dos = d > 0 ? (unrestricted / d) : 9999;
+
+    r.SafetyStock = Math.round(safetyStock);
+    r.ROP         = Math.round(rop);
+    r.DOS         = dos > 9999 ? 9999 : Number(dos.toFixed(1));
+
+    // =========================
+    // 10) RecommendedOrder
+    // ถ้าคงเหลือ < ROP → เติมให้ครอบคลุม coverDays
+    // =========================
+    let recommend = 0;
+
+    if (unrestricted < rop) {
+      const needed = d * coverDays;           // ต้องมีให้ครอบคลุม coverDays
+      recommend = needed - unrestricted;      // ขาดเท่าไรเติมเท่านั้น
+      if (recommend < 0) recommend = 0;
+    }
+
+    // ปัดตามแพ็ค
+    if (mul > 0) recommend = Math.ceil(recommend / mul) * mul;
+    r.RecommendedOrder = Math.round(recommend);
+
+    // =========================
+    // 11) สั่งจริง (ไม่ทับถ้า user เคยแก้)
+    // =========================
+    if (!r._actualOrderTouched) {
+      if (r.ActualOrder == null || isNaN(r.ActualOrder)) {
+        r.ActualOrder = r.RecommendedOrder;
+      }
+    }
+
+    // =========================
+    // 12) กฎตัดสั่งเดิมของคุณ (คงไว้ แต่ใช้ Mean ใหม่ที่นิ่งกว่า)
+    // =========================
+    if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
+    if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
+    if (qty30d >= qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
+
+    // =========================
+    // 13) ReturnQty / ReturnValue (เดิม)
+    // =========================
+    const keepQty = calculateKeepQty(r);
+    const returnQty = Math.max(0, unrestricted - keepQty);
+    const unitPrice = unrestricted > 0 ? (Number(r.Value || 0) / unrestricted) : 0;
+
+    r.ReturnQty   = Math.round(returnQty);
+    r.ReturnValue = returnQty * unitPrice;
+
+  });
 }
 
 function populateOwnerFilter(dataList){
