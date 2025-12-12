@@ -447,38 +447,126 @@ th:nth-child(26), td:nth-child(26) { text-align: center; width: 140px; }
         <table id="dataTable">
             <thead>
             <tr id="tableHeader">
-                <!-- ★ คอลัมน์ตะกร้าใหม่ -->
-                <th style="width:50px;">Cart</th>
-                <th data-sort="Plant">Plant <i class="fas fa-sort sort-icon"></i></th>
-                <th data-sort="Material">Material <i class="fas fa-sort sort-icon"></i></th>
-                <th>รายการอะไหล่</th>
-                <th>Storage bin</th>
-                <th data-sort="Unit">หน่วย</th>
-                <th data-sort="Navanakorn">นวนคร</th>
-                <th data-sort="Unrestricted">คงเหลือ <i class="fas fa-sort sort-icon"></i></th>
-                <th data-sort="Value">มูลค่า <i class="fas fa-sort sort-icon"></i></th>
-                <th data-sort="Qty6Month">6M</th>
-                <th data-sort="Qty4Month">4M</th>
-                <th data-sort="AvgMonthly">AvgM</th>
-                <th data-sort="ThirtyDay">30Day</th>
-                <th data-sort="Mean">Mean</th>
-                <th data-sort="SafetyStock">Safety</th>
-                <th data-sort="ROP">ROP <i class="fas fa-sort sort-icon"></i></th>
-                <th data-sort="DOS">DOS</th>
-                <th data-sort="RecommendedOrder">แนะนำสั่ง <i class="fas fa-sort sort-icon"></i></th>
-                <th>สั่งจริง</th> <!-- ★ เพิ่มคอลัมนี้ -->
-                <th>หมายเหตุ</th>
-                <th data-sort="MultiplyUnit">Package</th>
-                <th data-sort="Product">Product</th>
-                <th data-sort="ABCValue">ABC</th>
-                <th data-sort="Moving">Moving</th>
-                <th data-sort="ReturnQty">จำนวนส่งคืน</th>
-                <th data-sort="CumPercent">%สะสม <i class="fas fa-sort sort-icon"></i></th>
-                <th class="col-location">Location</th>
-                <th class="col-shelf">Shelf</th>
-                <th>ผู้รับคืน</th>
-                <th data-sort="Status">Status</th>
-            </tr>
+  <th style="width:50px;" title="เพิ่มรายการเข้า “ตะกร้า” เพื่อพิมพ์/สรุปการเบิก">Cart</th>
+
+  <th data-sort="Plant" title="รหัสคลังสินค้า (Plant) ที่กำลังดูข้อมูล">
+    Plant <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th data-sort="Material" title="รหัสอะไหล่/วัสดุ (Material Code)">
+    Material <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th title="ชื่อ/รายละเอียดอะไหล่จาก SAP (Material description)">รายการอะไหล่</th>
+
+  <th title="ตำแหน่งจัดเก็บ (Storage bin) จากข้อมูลคลัง">Storage bin</th>
+
+  <th data-sort="Unit" title="หน่วยนับของวัสดุ (Base Unit of Measure เช่น Pc)">
+    หน่วย
+  </th>
+
+  <th data-sort="Navanakorn"
+      title="จำนวนคงเหลือของ Material เดียวกันในคลังนวนคร (Plant 0301) เพื่อดูว่าคลังกลางมีของไหม">
+    นวนคร
+  </th>
+
+  <th data-sort="Unrestricted"
+      title="คงเหลือใช้งานได้ (Unrestricted stock) ของคลังที่กำลังดู">
+    คงเหลือ <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th data-sort="Value"
+      title="มูลค่าสต๊อก: ถ้ามี AvgVal => คงเหลือ×AvgVal, ถ้าไม่มีใช้ Value Unrestricted จาก SAP">
+    มูลค่า <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th data-sort="Qty6Month"
+      title="ยอดเบิกย้อนหลัง 6 เดือน (จาก MoveAllsum). ถ้าไม่มีจะประมาณจาก 4M×1.5">
+    6M
+  </th>
+
+  <th data-sort="Qty4Month"
+      title="ยอดเบิกย้อนหลัง 4 เดือน (ฐานหลักคำนวณ Avg/Day, Avg/Month)">
+    4M
+  </th>
+
+  <th data-sort="AvgMonthly"
+      title="ค่าเฉลี่ยการเบิกต่อเดือน (AvgM) = Qty4Month ÷ 4">
+    AvgM
+  </th>
+
+  <th data-sort="ThirtyDay"
+      title="ยอดเบิกจริงใน 30 วันล่าสุด (ช่วยจับความต้องการล่าสุด)">
+    30Day
+  </th>
+
+  <th data-sort="Mean"
+      title="ค่าใช้ฐานเปรียบเทียบความต้องการ: Mean = max(30Day, AvgM) (เลือกค่าที่มากกว่าเพื่อกันของขาด)">
+    Mean
+  </th>
+
+  <th data-sort="SafetyStock"
+      title="Safety Stock = AvgDailyUse × SafetyDays (SafetyDays มาจากช่อง Safety)">
+    Safety
+  </th>
+
+  <th data-sort="ROP"
+      title="Reorder Point (ROP) = (AvgDailyUse × LeadTimeDays) + SafetyStock">
+    ROP <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th data-sort="DOS"
+      title="Days of Stock (DOS) = คงเหลือ ÷ AvgDailyUse (ถ้า AvgDailyUse=0 จะแสดง 'มาก')">
+    DOS
+  </th>
+
+  <th data-sort="RecommendedOrder"
+      title="จำนวนแนะนำสั่ง: ถ้าคงเหลือ < ROP => (AvgDailyUse×CoverDays) - คงเหลือ แล้วปัดตาม Pack (MultiplyUnit)">
+    แนะนำสั่ง <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th title="จำนวนสั่งจริงที่ผู้ใช้ปรับเอง (ระบบจะจำค่าไว้ในเครื่องด้วย LocalStorage)">สั่งจริง</th>
+
+  <th title="หมายเหตุเพิ่มเติมจากข้อมูล mainsap (ใช้ช่วยตัดสินใจ)">หมายเหตุ</th>
+
+  <th data-sort="MultiplyUnit"
+      title="Pack/Package: จำนวนต่อแพ็คสำหรับปัดการสั่ง (เช่น 10 = สั่งเป็น 10/20/30)">
+    Package
+  </th>
+
+  <th data-sort="Product" title="กลุ่ม/ประเภทสินค้า (Product Group) จาก mainsap">
+    Product
+  </th>
+
+  <th data-sort="ABCValue"
+      title="ABC ตามมูลค่าสะสม (Pareto): A≤70%, B≤90%, C>90% (คำนวณจาก Value/Order/Return ตามโหมด)">
+    ABC
+  </th>
+
+  <th data-sort="Moving"
+      title="ความเร็วการเคลื่อนไหวจาก AvgM: Dead=0, Slowly<0.7, Slow<12, Medium<30, Fast>=30">
+    Moving
+  </th>
+
+  <th data-sort="ReturnQty"
+      title="จำนวนส่งคืนได้ = max(0, คงเหลือ - KeepQty). KeepQty คำนวณจาก Moving + ABC ตามสูตรใน calculateKeepQty()">
+    จำนวนส่งคืน
+  </th>
+
+  <th data-sort="CumPercent"
+      title="เปอร์เซ็นต์มูลค่าสะสมของรายการนั้นในลำดับการจัด ABC (ใช้แบ่ง A/B/C)">
+    %สะสม <i class="fas fa-sort sort-icon"></i>
+  </th>
+
+  <th class="col-location" title="Location จากข้อมูลจัดเก็บ (ถ้ามี) หรือใช้ Storage bin แทน">Location</th>
+  <th class="col-shelf" title="Shelf = อักษร/รหัส 3 ตัวแรกของ Location (ใช้ map หาเจ้าของ)">Shelf</th>
+
+  <th title="ผู้รับคืน/ผู้ดูแล Shelf (map จาก Shelf → UserID → ชื่อ)">ผู้รับคืน</th>
+
+  <th data-sort="Status" title="สถานะวัสดุ/คำสั่ง (ดึงจากชีท Orders เช่น pending/approved)">
+    Status
+  </th>
+</tr>
             </thead>
             <tbody id="dataList"></tbody>
         </table>
