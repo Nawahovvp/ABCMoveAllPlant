@@ -1134,10 +1134,41 @@ td:nth-child(26) {
   box-shadow: 0 6px 14px rgba(39, 174, 96, 0.65);
 }
 
-.card.shortship {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
+/* สีพื้นหลังการ์ด Out of Stock */
+.card.out-of-stock {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
 }
 
-.card.shortship-wait {
-  background: linear-gradient(135deg, #f44336, #d32f2f);
+.card.out-of-stock-wait {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
+}
+
+/* ทำให้มูลค่าด้านล่างตัวเล็กลง (เหมือน Card Order) */
+.card-value.small {
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.9;
+    margin-top: -4px;
+}
+
+/* ปรับให้การ์ดสูงเท่ากันและจัดกึ่งกลางดี */
+.card.out-of-stock,
+.card.out-of-stock-wait {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    min-height: 100px;
+}
+
+.card.out-of-stock .card-title,
+.card.out-of-stock-wait .card-title {
+    font-size: 13px;
+    margin-bottom: 6px;
+    opacity: 0.95;
 }
