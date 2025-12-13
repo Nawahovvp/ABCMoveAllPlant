@@ -1268,3 +1268,105 @@ td:first-child .cart-btn i{
   font-size: 14px !important;
 }
 
+/* =========================================================
+   HELP MODAL – MANAGER PREMIUM (ADDON)
+   วางท้ายไฟล์ CSS เพื่อ override ของเดิม
+========================================================= */
+
+/* ทำให้ modal ดูลอย หรู และนุ่มขึ้น */
+.help-content{
+  background: linear-gradient(180deg,#ffffff,#f9fbff);
+  border: 1px solid rgba(102,126,234,.18);
+}
+
+/* Header ให้ดูเป็น Executive */
+.help-header{
+  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+}
+
+.help-header h2{
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+/* เส้นแบ่ง Section */
+.help-body h3{
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(102,126,234,.15);
+}
+
+.help-body h4{
+  padding-left: 8px;
+  border-left: 4px solid #667eea;
+}
+
+/* Card ด้านบนให้ดูเป็น KPI */
+.help-card{
+  background: linear-gradient(180deg,#ffffff,#f1f4ff);
+  box-shadow: 0 6px 18px rgba(102,126,234,.18);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.help-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px rgba(102,126,234,.28);
+}
+
+/* pill ดูเป็น tag ผู้บริหาร */
+.help-pill{
+  background: linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;
+  border:none;
+  box-shadow: 0 4px 10px rgba(102,126,234,.35);
+}
+
+/* list ให้โล่ง อ่านง่าย */
+.help-body ul{
+  padding-left: 18px;
+}
+
+.help-body ul li{
+  position: relative;
+  padding-left: 6px;
+}
+
+/* ไฮไลท์คำสำคัญ */
+.help-body b{
+  color:#2f3eb1;
+}
+
+/* กล่องสรุป / note สำหรับผู้จัดการ */
+.help-note{
+  background: linear-gradient(135deg,#eef2ff,#f7f9ff);
+  border-left: 6px solid #667eea;
+  font-size: 14px;
+}
+
+/* กล่องคำเตือนให้ดู serious */
+.help-warn{
+  background: linear-gradient(135deg,#fff0f0,#fff7f7);
+  border-left: 6px solid #e74c3c;
+}
+
+/* ทำ footer ให้เหมือน policy note */
+.help-footer{
+  background:#f8fafc;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* Scrollbar ใน Help Modal */
+.help-body::-webkit-scrollbar{
+  width: 8px;
+}
+.help-body::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg,#667eea,#764ba2);
+  border-radius: 999px;
+}
+
+/* Responsive: ผู้จัดการดูบน iPad */
+@media (max-width: 900px){
+  .help-body{
+    font-size: 13px;
+  }
+}
