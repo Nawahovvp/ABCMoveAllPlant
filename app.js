@@ -827,7 +827,7 @@ async function loadData() {
         document.getElementById("summarySection").style.display = "flex";
         document.getElementById("controlsSection").style.display = "flex";
         document.getElementById("tableSection").style.display = "block";
-        document.getElementById("pagination").style.display = "block";
+        document.getElementById("pagination").style.display = "flex";
         setDefaultAndCalculate();
     } catch (e) {
         loader.style.display = "none";
@@ -1250,7 +1250,7 @@ function updateAllCards(baseData, filteredData) {
     // อัปเดตการ์ด Shortship
     if (document.getElementById("valOutOfStock")) {
         document.getElementById("valOutOfStock").textContent = formatShortCurrency(shortshipValue);
-       document.getElementById("countOutOfStock").textContent = shortshipCount;
+        document.getElementById("countOutOfStock").textContent = shortshipCount;
     }
     if (document.getElementById("valOutOfStockWait")) {
         document.getElementById("valOutOfStockWait").textContent = formatShortCurrency(shortshipWaitValue);
@@ -1490,24 +1490,40 @@ function renderTable() {
     });
 }
 function renderPagination() {
-    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
-    const p = document.getElementById("pagination");
-    p.innerHTML = "";
-    const createBtn = (text, page, disabled = false) => {
-        const btn = document.createElement("button");
-        btn.className = "page-btn";
-        if (page === currentPage) btn.classList.add("active");
-        btn.textContent = text;
-        btn.disabled = disabled;
-        if (!disabled) btn.onclick = () => { currentPage = page; renderTable(); renderPagination(); };
-        return btn;
-    };
-    p.appendChild(createBtn("<<", 1, currentPage === 1));
-    p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
-    p.appendChild(createBtn(currentPage, currentPage, true));
-    p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
-    p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
+  const p = document.getElementById("pagination");
+  if (!p) return;              // ✅ กันพัง
+  p.style.display = "flex";     // ✅ บังคับให้โชว์
+
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+  p.innerHTML = "";
+
+  // ✅ ถ้ามีหน้าเดียว จะซ่อนก็ได้ (เลือกใช้)
+  // if (totalPages <= 1) { p.style.display = "none"; return; }
+
+  const createBtn = (text, page, disabled = false) => {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    if (page === currentPage) btn.classList.add("active");
+    btn.textContent = text;
+    btn.disabled = disabled;
+
+    if (!disabled) {
+      btn.onclick = () => {
+        currentPage = Math.min(totalPages, Math.max(1, page)); // ✅ กันหลุดช่วง
+        renderTable();
+        renderPagination();
+      };
+    }
+    return btn;
+  };
+
+  p.appendChild(createBtn("<<", 1, currentPage === 1));
+  p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
+  p.appendChild(createBtn(currentPage, currentPage, true));
+  p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
+  p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
 }
+
 function getOrderStorageKey() {
     // ถ้าอยากแยกตาม Plant
     return 'abc_actual_orders_' + (selectedPlant || 'ALL');
@@ -1629,14 +1645,14 @@ document.getElementById("cardOrderItems").onclick = () => { mode = "onlyOrder"; 
 document.getElementById("cardReturnValue").onclick = () => { mode = "returnable"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
 document.getElementById("cardOutOfStock").onclick = () => {
     mode = "out_of_stock";
-    abcFilter = ""; 
+    abcFilter = "";
     movingFilter = "";
     applyFiltersAndRender();
 };
 
 document.getElementById("cardOutOfStockWait").onclick = () => {
     mode = "out_of_stock_wait";
-    abcFilter = ""; 
+    abcFilter = "";
     movingFilter = "";
     applyFiltersAndRender();
 };
