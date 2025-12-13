@@ -344,6 +344,7 @@ th:hover {
 tbody tr {
   transition: background 0.2s;
   border-bottom: 1px solid #eee;
+ 
 }
 
 tbody tr:hover {
@@ -879,23 +880,29 @@ td:nth-child(26) {
 .cart-table th,
 .cart-table td {
   border: 1px solid #ddd;
-  padding: 6px 8px;
-  font-size: 13px;
+  padding: 4px 6px;      /* 🔻 เตี้ยลง */
+  font-size: 12px;       /* 🔻 เล็กลง */
+  line-height: 1;      /* 🔻 ชิดขึ้น */
+  vertical-align: middle;
 }
 
+/* หัวตาราง */
 .cart-table th {
   background: #2980b9;
   color: #ffffff;
   font-weight: 600;
   text-align: center;
+  padding: 6px 6px;      /* 🔻 หัวเตี้ยลง */
 }
 
 .cart-table input[type="number"] {
   width: 80px;
-  padding: 4px 6px;
+ padding: 2px 6px;
   border-radius: 6px;
   border: 1px solid #ccd1ff;
   text-align: right;
+   height: 26px;
+   font-size: 12px;
 }
 
 .cart-empty {
@@ -1230,3 +1237,34 @@ td:nth-child(26) {
   margin-bottom: 6px;
   opacity: 0.95;
 }
+/* ===== override ทำให้แถวตารางหลักเตี้ยลง (วางท้ายไฟล์) ===== */
+table tbody td{
+  padding: 4px 6px !important;
+  font-size: 12px !important;
+  line-height: 1.0 !important;
+}
+
+table tbody tr{
+  height: 24px !important;   /* เตี้ยลงอีก */
+}
+/* ===== ปุ่มตะกร้าในตารางหลักให้เล็กลง ===== */
+td:first-child .icon-btn,
+td:first-child button,
+td:first-child .cart-btn{
+  width: 26px !important;        /* 🔻 จาก 40 -> 26 */
+  height: 26px !important;
+  border-radius: 10px !important;
+  padding: 0 !important;
+  font-size: 14px !important;    /* ขนาดไอคอน */
+  line-height: 1 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+td:first-child .icon-btn i,
+td:first-child button i,
+td:first-child .cart-btn i{
+  font-size: 14px !important;
+}
+
