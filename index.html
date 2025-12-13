@@ -69,15 +69,18 @@
                 <div class="card-count" id="returnItemCount">0 รายการ</div>
             </div>
             <!-- วางใน <div class="summary-row" id="summarySection"> ต่อจาก cardDead -->
-            <div class="card shortship" id="cardShortship">
-                <div class="card-title">Shortship</div>
-                <div class="card-value" id="valShortship">0.00</div>
-                <div class="card-count" id="countShortship">0 รายการ</div>
+            <!-- Out of Stock -->
+            <div class="card out-of-stock" id="cardOutOfStock">
+                <div class="card-title">Out of Stock</div>
+                <div class="card-value" id="countOutOfStock">0</div> <!-- จำนวนรายการ ใช้ .card-value -->
+                <div class="card-value small" id="valOutOfStock">0.00</div> <!-- มูลค่า ตัวเล็กกว่า -->
             </div>
-            <div class="card shortship-wait" id="cardShortshipWait">
-                <div class="card-title">Shortship Wait</div>
-                <div class="card-value" id="valShortshipWait">0.00</div>
-                <div class="card-count" id="countShortshipWait">0 รายการ</div>
+
+            <!-- Out of Stock Wait -->
+            <div class="card out-of-stock-wait" id="cardOutOfStockWait">
+                <div class="card-title">Out of Stock Wait</div>
+                <div class="card-value" id="countOutOfStockWait">0</div> <!-- จำนวนรายการ ใช้ .card-value -->
+                <div class="card-value small" id="valOutOfStockWait">0.00</div> <!-- มูลค่า ตัวเล็กกว่า -->
             </div>
             <div class="card monthly-withdrawal" id="cardMonthlyWithdrawal">
                 <div class="card-title">เบิก/เดือน</div>
