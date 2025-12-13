@@ -25,6 +25,8 @@
         <div id="userMenu">
             <p id="userID"></p>
             <p id="userName"></p>
+            <p id="userPosition"></p>
+            <p id="userDepartment"></p>
 
             <!-- ✅ ปุ่ม Help -->
             <button id="helpBtn" class="export-btn"
@@ -53,43 +55,51 @@
 
         <!-- Cards -->
         <div class="summary-row" id="mainCardsSection" style="display:none;">
-            <div class="card total-stock" id="cardTotalStock" title="มูลค่ารวมสต็อกทั้งหมด + จำนวนรายการทั้งหมด (ตามโหมดที่เลือก)">
+            <div class="card total-stock" id="cardTotalStock"
+                title="มูลค่ารวมสต็อกทั้งหมด + จำนวนรายการทั้งหมด (ตามโหมดที่เลือก)">
                 <div class="card-title">มูลค่ารวม</div>
                 <div class="card-value" id="totalStockValue">0.00</div>
                 <div class="card-count" id="totalCount">0 รายการ</div>
             </div>
-            <div class="card order-items" id="cardOrderItems" title="จำนวนรายการที่ต้องสั่ง + มูลค่ารวมของการสั่ง (ตามโหมด Order)">
+            <div class="card order-items" id="cardOrderItems"
+                title="จำนวนรายการที่ต้องสั่ง + มูลค่ารวมของการสั่ง (ตามโหมด Order)">
                 <div class="card-title">Order</div>
                 <div class="card-value" id="orderItemCount">0</div>
                 <div class="card-value" id="orderTotalValue">0.00</div>
             </div>
-            <div class="card return-value" id="cardReturnValue" title="มูลค่ารวมของที่ส่งคืนได้ + จำนวนรายการ OverStock (ตามโหมด Return)">
+            <div class="card return-value" id="cardReturnValue"
+                title="มูลค่ารวมของที่ส่งคืนได้ + จำนวนรายการ OverStock (ตามโหมด Return)">
                 <div class="card-title">OverStock</div>
                 <div class="card-value" id="returnValue">0.00</div>
                 <div class="card-count" id="returnItemCount">0 รายการ</div>
             </div>
             <!-- Out of Stock -->
-            <div class="card out-of-stock" id="cardOutOfStock" title="รายการที่หมดในคลังนี้แต่ยังมีในนวนคร (จำนวนรายการ + มูลค่า)">
+            <div class="card out-of-stock" id="cardOutOfStock"
+                title="รายการที่หมดในคลังนี้แต่ยังมีในนวนคร (จำนวนรายการ + มูลค่า)">
                 <div class="card-title">Out of Stock</div>
                 <div class="card-value" id="countOutOfStock">0</div>
                 <div class="card-value small" id="valOutOfStock">0.00</div>
             </div>
 
             <!-- Out of Stock Wait -->
-            <div class="card out-of-stock-wait" id="cardOutOfStockWait" title="รายการที่หมดทั้งในคลังนี้และนวนคร (จำนวนรายการ + มูลค่า)">
+            <div class="card out-of-stock-wait" id="cardOutOfStockWait"
+                title="รายการที่หมดทั้งในคลังนี้และนวนคร (จำนวนรายการ + มูลค่า)">
                 <div class="card-title">Out of Stock Wait</div>
                 <div class="card-value" id="countOutOfStockWait">0</div>
                 <div class="card-value small" id="valOutOfStockWait">0.00</div>
             </div>
-            <div class="card monthly-withdrawal" id="cardMonthlyWithdrawal" title="มูลค่าการเบิกเฉลี่ยต่อเดือน (จากข้อมูล 4 เดือน)">
+            <div class="card monthly-withdrawal" id="cardMonthlyWithdrawal"
+                title="มูลค่าการเบิกเฉลี่ยต่อเดือน (จากข้อมูล 4 เดือน)">
                 <div class="card-title">เบิก/เดือน</div>
                 <div class="card-value" id="monthlyWithdrawalValue">0.00</div>
             </div>
-            <div class="card stock-days" id="cardStockDays" title="จำนวนวันที่สต็อกปัจจุบันเพียงพอ (Stock Days = คงเหลือ ÷ การใช้เฉลี่ยต่อวัน)">
+            <div class="card stock-days" id="cardStockDays"
+                title="จำนวนวันที่สต็อกปัจจุบันเพียงพอ (Stock Days = คงเหลือ ÷ การใช้เฉลี่ยต่อวัน)">
                 <div class="card-title">Stock Days</div>
                 <div class="card-value" id="stockDaysValue">0</div>
             </div>
-            <div class="card after-stock-days" id="cardAfterStockDays" title="จำนวนวันที่สต็อกเหลือหลังหักของส่งคืนได้ (After Return)">
+            <div class="card after-stock-days" id="cardAfterStockDays"
+                title="จำนวนวันที่สต็อกเหลือหลังหักของส่งคืนได้ (After Return)">
                 <div class="card-title">After Stock Days</div>
                 <div class="card-value" id="afterStockDaysValue">0</div>
             </div>
@@ -146,22 +156,26 @@
                         <option value="">ทุก Plant</option>
                     </select>
                 </div>
-                <button id="updateBtn" class="icon-btn" title="เปิด Google Sheet เพื่ออัปเดตข้อมูลคลัง" style="display:none;">
+                <button id="updateBtn" class="icon-btn" title="เปิด Google Sheet เพื่ออัปเดตข้อมูลคลัง"
+                    style="display:none;">
                     <i class="fas fa-database"></i>
                 </button>
                 <span id="lastUpdateLabel" style="font-size:12px;color:#555;margin-left:8px;"></span>
                 <a id="uploadBtn" class="export-btn" href="#" target="_blank"
                     style="display:none; flex: 0 1 auto; margin-left: 0;"><i class="fas fa-upload"></i> Upload</a>
                 <div class="control-group">
-                    <label title="ระยะเวลาที่ใช้ในการจัดส่ง (Lead Time)"><i class="fas fa-clock control-icon"></i> Lead Time:</label>
+                    <label title="ระยะเวลาที่ใช้ในการจัดส่ง (Lead Time)"><i class="fas fa-clock control-icon"></i> Lead
+                        Time:</label>
                     <input type="number" id="leadTimeDays" value="15"><span class="unit">วัน</span>
                 </div>
                 <div class="control-group">
-                    <label title="จำนวนวันที่สำรองเพื่อป้องกันความผันผวน (Safety Days)"><i class="fas fa-shield-alt control-icon"></i> Safety:</label>
+                    <label title="จำนวนวันที่สำรองเพื่อป้องกันความผันผวน (Safety Days)"><i
+                            class="fas fa-shield-alt control-icon"></i> Safety:</label>
                     <input type="number" id="safetyDays" value="5"><span class="unit">วัน</span>
                 </div>
                 <div class="control-group">
-                    <label title="จำนวนวันที่ต้องการให้สต็อกครอบคลุมหลังสั่ง (Cover Days)"><i class="fas fa-calendar-check control-icon"></i> ครอบคลุม:</label>
+                    <label title="จำนวนวันที่ต้องการให้สต็อกครอบคลุมหลังสั่ง (Cover Days)"><i
+                            class="fas fa-calendar-check control-icon"></i> ครอบคลุม:</label>
                     <input type="number" id="coverDays" value="35"><span class="unit">วัน</span>
                 </div>
             </div>
@@ -171,20 +185,23 @@
                     <input type="text" id="searchInput" placeholder="Material หรือ Description">
                 </div>
                 <div id="responsibleFilterContainer">
-                    <label title="กรองตามผู้รับคืน/เจ้าของ Shelf"><i class="fas fa-user-check control-icon"></i> ผู้รับคืน:</label>
+                    <label title="กรองตามผู้รับคืน/เจ้าของ Shelf"><i class="fas fa-user-check control-icon"></i>
+                        ผู้รับคืน:</label>
                     <select id="responsibleFilter">
                         <option value="">ทุกคน</option>
                     </select>
                 </div>
                 <div class="control-group">
-                    <label title="กรองตามสถานะวัสดุจากชีท Orders"><i class="fas fa-filter control-icon"></i> Filter:Status:</label>
+                    <label title="กรองตามสถานะวัสดุจากชีท Orders"><i class="fas fa-filter control-icon"></i>
+                        Filter:Status:</label>
                     <select id="statusFilter">
                         <option value="">ทุกสถานะ</option>
                         <option value="ไม่มีสถานะ">ไม่มีสถานะ</option>
                     </select>
                 </div>
                 <div class="control-group">
-                    <label title="กรองตามความแตกต่างระหว่างสั่งจริง vs แนะนำสั่ง หรือสถานะนวนคร"><i class="fas fa-balance-scale control-icon"></i> Option:</label>
+                    <label title="กรองตามความแตกต่างระหว่างสั่งจริง vs แนะนำสั่ง หรือสถานะนวนคร"><i
+                            class="fas fa-balance-scale control-icon"></i> Option:</label>
                     <select id="orderDiffFilter">
                         <option value="">ทั้งหมด</option>
                         <option value="less">สั่งจริง < แนะนำ</option>
@@ -197,7 +214,8 @@
                 </div>
 
                 <!-- ★ ปุ่มตะกร้ารวม -->
-                <button class="icon-btn cart-main-btn" id="cartMainBtn" title="เปิดตะกร้าอะไหล่ (รวมรายการเพื่อพิมพ์ Label)">
+                <button class="icon-btn cart-main-btn" id="cartMainBtn"
+                    title="เปิดตะกร้าอะไหล่ (รวมรายการเพื่อพิมพ์ Label)">
                     <i class="fas fa-shopping-cart"></i>
                     <span id="cartCountBadge">0</span>
                 </button>
@@ -207,7 +225,8 @@
                 </button>
 
                 <!-- ✅ ปุ่ม Set -->
-                <button class="icon-btn set-btn" id="setActualBtn" title="ตั้ง “สั่งจริง” = “แนะนำสั่ง” สำหรับรายการในหน้าปัจจุบัน">
+                <button class="icon-btn set-btn" id="setActualBtn"
+                    title="ตั้ง “สั่งจริง” = “แนะนำสั่ง” สำหรับรายการในหน้าปัจจุบัน">
                     <i class="fas fa-check"></i>
                 </button>
 
@@ -301,8 +320,7 @@
                                 title="จำนวนส่งคืนได้ = max(0, คงเหลือ - KeepQty). KeepQty คำนวณจาก Moving + ABC">
                                 จำนวนส่งคืน
                             </th>
-                            <th data-sort="CumPercent"
-                                title="เปอร์เซ็นต์มูลค่าสะสมของรายการนั้นในลำดับการจัด ABC">
+                            <th data-sort="CumPercent" title="เปอร์เซ็นต์มูลค่าสะสมของรายการนั้นในลำดับการจัด ABC">
                                 %สะสม <i class="fas fa-sort sort-icon"></i>
                             </th>
                             <th class="col-location" title="Location จากข้อมูลจัดเก็บ (ถ้ามี) หรือใช้ Storage bin แทน">
@@ -327,14 +345,14 @@
     <div id="loginModal" style="display:none;">
         <div class="login-form">
             <h2>Login</h2>
-            
+
             <form id="loginForm">
                 <input type="text" id="idUserInput" placeholder="IDUser" autocomplete="username">
                 <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
                 <label><input type="checkbox" id="rememberMe"> จดจำฉัน</label>
                 <button type="submit" id="loginBtn">เข้าสู่ระบบ</button>
             </form>
-            
+
             <div id="loginError"></div>
         </div>
     </div>
@@ -375,7 +393,8 @@
                 <ul>
                     <li><b>AvgM (AvgMonthly)</b> → เฉลี่ยต่อเดือนจาก 4 เดือน (Qty4Month ÷ 4) – ใช้จัด Moving</li>
                     <li><b>30Day</b> → ยอดเบิก 30 วันล่าสุด</li>
-                    <li><b>Mean</b> → ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก (ผสม AvgM จาก 4M + 30Day) – ใช้เป็นฐานคำนวณสต็อก</li>
+                    <li><b>Mean</b> → ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก (ผสม AvgM จาก 4M + 30Day) – ใช้เป็นฐานคำนวณสต็อก
+                    </li>
                     <li><b>Safety</b> → Safety Stock (สำรองกันผันผวน)</li>
                     <li><b>ROP</b> → Reorder Point (จุดที่ควรสั่งซื้อ)</li>
                     <li><b>DOS</b> → Days of Supply (คงเหลือเพียงพออีกกี่วัน)</li>
@@ -393,7 +412,8 @@
                 </ul>
 
                 <h3>สูตรคำนวณ Mean (ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก) – ละเอียด</h3>
-                <p>Mean คือค่าเฉลี่ยที่ผสมข้อมูล 4 เดือน (นิ่ง) + 30 วันล่าสุด (สด) เพื่อให้ทั้งน่าเชื่อถือและทันสมัย</p>
+                <p>Mean คือค่าเฉลี่ยที่ผสมข้อมูล 4 เดือน (นิ่ง) + 30 วันล่าสุด (สด) เพื่อให้ทั้งน่าเชื่อถือและทันสมัย
+                </p>
                 <ol>
                     <li><b>คำนวณค่าเฉลี่ยพื้นฐาน</b><br>
                         • avgMonthlyFrom4m = Qty4Month ÷ 4<br>
@@ -413,18 +433,21 @@
                     <li><b>คำนวณ Mean สุดท้าย</b><br>
                         Mean = (avgMonthlyFrom4m × w4m) + (avgMonthlyFrom30d ที่ผ่าน guard × w30)</li>
                 </ol>
-                <p><small>ผลลัพธ์: Fast + ABC A จะได้ Mean ที่ตอบสนองต่อแนวโน้มล่าสุดเร็ว<br>Slow + ABC C จะได้ Mean ที่นิ่งและยึดข้อมูลเก่าเป็นหลัก</small></p>
+                <p><small>ผลลัพธ์: Fast + ABC A จะได้ Mean ที่ตอบสนองต่อแนวโน้มล่าสุดเร็ว<br>Slow + ABC C จะได้ Mean
+                        ที่นิ่งและยึดข้อมูลเก่าเป็นหลัก</small></p>
 
                 <h3>กฎการแนะนำสั่ง (RecommendedOrder) – ลำดับขั้นตอนจริงในโค้ด</h3>
                 <ol>
                     <li><b>คำนวณ AvgDailyUse</b> โดยถ่วงน้ำหนักระหว่างข้อมูล 4 เดือน + 30 วัน<br>
-                        <small>(Fast/ABC A จะให้น้ำหนัก 30Day มากกว่า, Slow/C จะให้น้ำหนัก 4M มากกว่า)</small></li>
+                        <small>(Fast/ABC A จะให้น้ำหนัก 30Day มากกว่า, Slow/C จะให้น้ำหนัก 4M มากกว่า)</small>
+                    </li>
                     <li><b>ป้องกัน Outlier</b> → ถ้า 30Day พุ่งสูงผิดปกติ จะจำกัดไม่ให้เกิน 4M × 3 เท่า</li>
                     <li><b>Seasonal Boost</b> → ถ้า 30Day สูงกว่า 4M มาก (ช่วงพีค) จะเพิ่มน้ำหนัก 30Day ชั่วคราว</li>
-                    <li><b>Stockout Protection</b> → ถ้าคงเหลือ = 0 และเป็น Fast/Medium จะเพิ่ม Safety Days ชั่วคราว</li>
+                    <li><b>Stockout Protection</b> → ถ้าคงเหลือ = 0 และเป็น Fast/Medium จะเพิ่ม Safety Days ชั่วคราว
+                    </li>
                     <li><b>คำนวณ ROP</b> = (AvgDailyUse × LeadTime 5 วัน) + SafetyStock</li>
                     <li><b>ถ้าคงเหลือ < ROP</b> → แนะนำสั่งให้ครอบคลุม CoverDays (40 วัน)<br>
-                        <small>จำนวน = (AvgDailyUse × 40) - คงเหลือ</small></li>
+                                <small>จำนวน = (AvgDailyUse × 40) - คงเหลือ</small></li>
                     <li><b>ถ้าคงเหลือ ≥ ROP</b> → แนะนำสั่ง = 0</li>
                     <li><b>ปัดจำนวนสั่ง</b> ตาม MultiplyUnit (ถ้ามี) เพื่อให้สั่งตามแพ็คจริง</li>
                     <li><b>กฎตัดสั่งพิเศษ (ใช้เฉพาะ Slow / Slowly เท่านั้น)</b>
@@ -433,7 +456,8 @@
                             <li>ถ้า 30Day = 0 → ไม่สั่ง</li>
                             <li>ถ้า 30Day ≥ Qty4Month และเป็น Slowly → ไม่สั่ง</li>
                         </ul>
-                        <small>หมายเหตุ: Fast / Medium / Dead จะยังสั่งตามปกติแม้ 30Day = 0 ถ้า Mean > 0</small></li>
+                        <small>หมายเหตุ: Fast / Medium / Dead จะยังสั่งตามปกติแม้ 30Day = 0 ถ้า Mean > 0</small>
+                    </li>
                 </ol>
 
                 <h3>เคล็ดลับการใช้งาน</h3>
@@ -445,21 +469,30 @@
                     <li>กด <b>Export CSV</b> เพื่อนำข้อมูลไปวิเคราะห์ต่อ</li>
                 </ul>
 
-                <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> คำเตือน: การรีเซ็ตข้อมูล “สั่งจริง” (ActualOrder)</h3>
-                <p>ข้อมูล “สั่งจริง” ที่คุณกรอกหรือแก้ไขเอง <b>จะถูกบันทึกถาวรในเบราว์เซอร์</b> และ <b>ไม่ถูกรีเซ็ตอัตโนมัติ</b> ในกรณีปกติ</p>
+                <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> คำเตือน: การรีเซ็ตข้อมูล
+                    “สั่งจริง” (ActualOrder)</h3>
+                <p>ข้อมูล “สั่งจริง” ที่คุณกรอกหรือแก้ไขเอง <b>จะถูกบันทึกถาวรในเบราว์เซอร์</b> และ
+                    <b>ไม่ถูกรีเซ็ตอัตโนมัติ</b> ในกรณีปกติ</p>
                 <p>แต่ข้อมูลจะถูก <b>รีเซ็ต (ทับด้วยค่า “แนะนำสั่ง” ใหม่)</b> หากเกิดอย่างใดอย่างหนึ่งต่อไปนี้:</p>
                 <ul style="color:#e67e22; font-weight:bold;">
-                    <li>คุณ <b>รีเฟรชหน้าเว็บ</b> หรือ <b>โหลดข้อมูล Plant ใหม่</b>  
-                        <small style="color:#7f8c8d; font-weight:normal;">(เฉพาะรายการที่คุณ <u>ยังไม่เคยแก้ “สั่งจริง”</u> เท่านั้นที่จะถูกรีเซ็ต  
-                        รายการที่เคยแก้แล้วจะดึงค่าจากเบราว์เซอร์กลับมา)</small></li>
-                    <li>คุณ <b>กดปุ่ม “ตั้งตามแนะนำ”</b>  
-                        <small style="color:#7f8c8d; font-weight:normal;">(จะตั้ง “สั่งจริง” = “แนะนำสั่ง” เฉพาะรายการในหน้าปัจจุบัน และบันทึกค่านี้ถาวร)</small></li>
-                    <li>คุณ <b>ล้างข้อมูลเบราว์เซอร์</b> (Clear browsing data / localStorage)  
-                        <small style="color:#7f8c8d; font-weight:normal;">(ข้อมูล “สั่งจริง” ทั้งหมดจะหายไป ระบบจะเริ่มต้นใหม่ตาม “แนะนำสั่ง”)</small></li>
+                    <li>คุณ <b>รีเฟรชหน้าเว็บ</b> หรือ <b>โหลดข้อมูล Plant ใหม่</b>
+                        <small style="color:#7f8c8d; font-weight:normal;">(เฉพาะรายการที่คุณ <u>ยังไม่เคยแก้
+                                “สั่งจริง”</u> เท่านั้นที่จะถูกรีเซ็ต
+                            รายการที่เคยแก้แล้วจะดึงค่าจากเบราว์เซอร์กลับมา)</small>
+                    </li>
+                    <li>คุณ <b>กดปุ่ม “ตั้งตามแนะนำ”</b>
+                        <small style="color:#7f8c8d; font-weight:normal;">(จะตั้ง “สั่งจริง” = “แนะนำสั่ง”
+                            เฉพาะรายการในหน้าปัจจุบัน และบันทึกค่านี้ถาวร)</small>
+                    </li>
+                    <li>คุณ <b>ล้างข้อมูลเบราว์เซอร์</b> (Clear browsing data / localStorage)
+                        <small style="color:#7f8c8d; font-weight:normal;">(ข้อมูล “สั่งจริง” ทั้งหมดจะหายไป
+                            ระบบจะเริ่มต้นใหม่ตาม “แนะนำสั่ง”)</small>
+                    </li>
                 </ul>
                 <p><b>คำแนะนำ:</b><br>
-                   • ถ้าต้องการให้ค่าที่กรอก “ติดถาวร” → แก้ไขช่อง “สั่งจริง” อย่างน้อย 1 ครั้ง ระบบจะบันทึกอัตโนมัติ<br>
-                   • หากต้องการรีเซ็ตทั้งหมด → ล้างข้อมูลเบราว์เซอร์ หรือรอข้อมูลสต็อกอัปเดตครั้งใหญ่</p> 
+                    • ถ้าต้องการให้ค่าที่กรอก “ติดถาวร” → แก้ไขช่อง “สั่งจริง” อย่างน้อย 1 ครั้ง
+                    ระบบจะบันทึกอัตโนมัติ<br>
+                    • หากต้องการรีเซ็ตทั้งหมด → ล้างข้อมูลเบราว์เซอร์ หรือรอข้อมูลสต็อกอัปเดตครั้งใหญ่</p>
 
                 <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin-top:20px;">
                     อัปเดตตามโค้ดล่าสุด – เน้นความสมดุลระหว่าง “กันของขาด” และ “ไม่ให้ของเกิน”<br>
