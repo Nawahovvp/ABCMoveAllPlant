@@ -336,108 +336,96 @@
     </div>
 
     <!-- =========================
-     ✅ HELP MODAL (อธิบายโปรแกรม)
+    <!-- =========================
+     ✅ HELP MODAL (อธิบายโปรแกรม) – เวอร์ชันอัปเดตล่าสุด
      ========================= -->
-    <div id="helpModal" class="help-modal">
-        <div class="help-content">
-            <div class="help-header">
-                <h2><i class="fas fa-circle-info"></i> คู่มือระบบ ABC Analysis & Smart Ordering</h2>
-                <button class="help-close-btn" id="helpCloseBtn" title="ปิด"><i class="fas fa-xmark"></i></button>
-            </div>
-
-            <div class="help-body">
-
-                <div class="help-grid">
-                    <div class="help-card">
-                        <h3><span class="help-pill">เป้าหมาย</span></h3>
-                        <ul>
-                            <li><b>จัดกลุ่มอะไหล่ (ABC)</b> จากมูลค่ารวม เพื่อรู้ว่าอะไรสำคัญมาก (A) สำคัญรอง (B)
-                                และทั่วไป (C)</li>
-                            <li><b>วิเคราะห์การเคลื่อนไหว (Moving)</b> เพื่อแยก Fast/Medium/Slow/Dead</li>
-                            <li><b>คำนวณ “แนะนำสั่ง”</b> เพื่อกันของขาด (Stockout) และลดของเกิน (Overstock)</li>
-                            <li><b>ช่วยตัดสินใจ</b> ด้วย ROP, Safety Stock, DOS และตัวกรองต่าง ๆ</li>
-                        </ul>
-                    </div>
-
-                    <div class="help-card">
-                        <h3><span class="help-pill">ข้อมูลที่ใช้</span></h3>
-                        <ul>
-                            <li><b>Qty4Month</b> = ยอดเบิก 4 เดือน (ฐานหลัก 120 วัน)</li>
-                            <li><b>ThirtyDay</b> = ยอดเบิก 30 วันล่าสุด (สะท้อนสถานการณ์ปัจจุบัน)</li>
-                            <li><b>Unrestricted</b> = คงเหลือ</li>
-                            <li><b>AvgVal</b> = ราคาเฉลี่ยต่อชิ้น (ถ้ามีจะใช้คำนวณ Value ให้แม่น)</li>
-                            <li><b>MultiplyUnit</b> = Pack/หน่วยแพ็ค (ใช้ปัดจำนวนแนะนำสั่ง)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <h3>ความหมายหัวคอลัมน์สำคัญ</h3>
-                <ul>
-                    <li><b>AvgM</b> = เฉลี่ยต่อเดือนจาก 4 เดือน (Qty4Month ÷ 4)</li>
-                    <li><b>30Day</b> = ยอดเบิก 30 วันล่าสุด</li>
-                    <li><b>Mean</b> = “ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก” (ผสม 4M และ 30Day เพื่อความนิ่ง + ทันสมัย)</li>
-                    <li><b>Safety</b> = Safety Stock (สำรองเพื่อกันผันผวน)</li>
-                    <li><b>ROP</b> = Reorder Point (จุดสั่งซื้อ)</li>
-                    <li><b>DOS</b> = Days of Supply (คงเหลือกินได้กี่วัน)</li>
-                    <li><b>แนะนำสั่ง</b> = จำนวนที่ระบบแนะนำ (พร้อมปัดตาม Pack)</li>
-                </ul>
-
-                <h3>สูตรคำนวณหลัก (ใช้ใน “แนะนำสั่ง”)</h3>
-
-                <p><span class="help-pill">1) Avg ต่อวัน</span></p>
-                <div class="help-code">
-                    avg4mDaily = Qty4Month / 120
-                    avg30dDaily = ThirtyDay / 30
-                </div>
-
-                <p><span class="help-pill">2) Weighted AvgDailyUse (ถ่วงน้ำหนัก)</span></p>
-                <p>ระบบ “ผสม” 4 เดือน (นิ่ง) + 30 วัน (สด) โดยน้ำหนักขึ้นกับ Moving และ ABC</p>
-                <div class="help-code">
-                    AvgDailyUse = (avg4mDaily * w4m) + (guarded30dDaily * w30)
-                </div>
-
-                <p><span class="help-pill">3) Outlier Guard (กัน 30Day พุ่งผิดปกติ)</span></p>
-                <div class="help-code">
-                    ถ้า avg30dDaily > avg4mDaily * limitMultiplier
-                    ให้ใช้ guarded30dDaily = avg4mDaily * limitMultiplier
-                </div>
-
-                <p><span class="help-pill">4) Safety Stock / ROP / DOS</span></p>
-                <div class="help-code">
-                    SafetyStock = AvgDailyUse * safetyDaysEffective
-                    ROP = (AvgDailyUse * leadTime) + SafetyStock
-                    DOS = Unrestricted / AvgDailyUse
-                </div>
-
-                <p><span class="help-pill">5) แนะนำสั่ง (RecommendedOrder)</span></p>
-                <p>ถ้า “คงเหลือ < ROP” → เติมให้ครอบคลุมจำนวนวัน “CoverDays”</p>
-                        <div class="help-code">
-                            if (Unrestricted < ROP) { needed=AvgDailyUse * coverDays recommend=needed - Unrestricted }
-                                else { recommend=0 } ปัดตาม Pack: recommend=ceil(recommend / MultiplyUnit) *
-                                MultiplyUnit </div>
-
-                                <h3>แนวคิด “ฉลาดขึ้น” ที่อยู่ในฟังก์ชันของคุณ</h3>
-                                <ul>
-                                    <li><b>Seasonal Mode</b>: ถ้า 30Day สูงกว่า 4M มาก → เพิ่มน้ำหนัก 30Day ชั่วคราว
-                                        (แต่มีเพดาน)</li>
-                                    <li><b>Stockout Protection</b>: ถ้าคงเหลือ=0 และเป็น Fast/Medium → เพิ่ม safetyDays
-                                        ชั่วคราวกันขาดช่วง</li>
-                                    <li><b>Moving</b>: ตีความความเร็วจาก AvgM เพื่อให้ระบบเลือกน้ำหนัก w4m/w30
-                                        ที่เหมาะสม</li>
-                                </ul>
-
-                                <h3>อ่านค่า “แนะนำสั่ง” ยังไงให้ใช้งานจริง</h3>
-                                <ul>
-                                    <li>ถ้าคุณเพิ่ม Lead Time / Safety / Cover มากขึ้น → แนะนำสั่งจะสูงขึ้น
-                                        (กันขาดมากขึ้น)</li>
-                                    <li>ถ้า MultiplyUnit (Pack) มาก → ระบบจะ “ปัดขึ้น” เพื่อให้สั่งได้จริงตามแพ็ค</li>
-                                    <li>ถ้ารายการเป็น Slow/Slowly และ Mean/30Day = 0 → ระบบอาจตัดให้แนะนำสั่ง = 0
-                                        เพื่อกันของค้าง</li>
-                                </ul>
-
-                        </div>
-            </div>
+<div id="helpModal" class="help-modal">
+    <div class="help-content">
+        <div class="help-header">
+            <h2><i class="fas fa-circle-info"></i> คู่มือระบบ ABC Analysis & Smart Ordering</h2>
+            <button class="help-close-btn" id="helpCloseBtn" title="ปิด"><i class="fas fa-xmark"></i></button>
         </div>
+        <div class="help-body">
+            <div class="help-grid">
+                <div class="help-card">
+                    <h3><span class="help-pill">เป้าหมายของระบบ</span></h3>
+                    <ul>
+                        <li>จัดกลุ่มอะไหล่ตามมูลค่า <b>ABC</b> (A=สำคัญมาก, B=รองลงมา, C=ทั่วไป)</li>
+                        <li>วิเคราะห์ความเร็วการเคลื่อนไหว <b>Moving</b> (Fast/Medium/Slow/Slowly/Dead)</li>
+                        <li>คำนวณ <b>“แนะนำสั่ง”</b> อัตโนมัติ เพื่อป้องกันของขาดและลดของเกิน</li>
+                        <li>ช่วยตัดสินใจด้วย ROP, Safety Stock, DOS และตัวกรองต่าง ๆ</li>
+                    </ul>
+                </div>
+                <div class="help-card">
+                    <h3><span class="help-pill">ข้อมูลหลักที่ใช้คำนวณ</span></h3>
+                    <ul>
+                        <li><b>Qty4Month</b> → ยอดเบิก 4 เดือน (120 วัน) – ข้อมูลนิ่ง</li>
+                        <li><b>ThirtyDay (30Day)</b> → ยอดเบิก 30 วันล่าสุด – ข้อมูลสด</li>
+                        <li><b>Unrestricted</b> → คงเหลือปัจจุบัน</li>
+                        <li><b>AvgVal</b> → ราคาเฉลี่ยต่อชิ้น (คำนวณมูลค่าให้แม่นยำ)</li>
+                        <li><b>MultiplyUnit</b> → ขนาดแพ็ค (ใช้ปัดจำนวนสั่ง)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>ความหมายคอลัมน์สำคัญ</h3>
+            <ul>
+                <li><b>AvgM (AvgMonthly)</b> → เฉลี่ยต่อเดือนจาก 4 เดือน (ใช้จัด Moving)</li>
+                <li><b>30Day</b> → ยอดเบิก 30 วันล่าสุด</li>
+                <li><b>Mean</b> → ค่าเฉลี่ยรายเดือนแบบถ่วงน้ำหนัก (ผสม 4M + 30Day)</li>
+                <li><b>Safety</b> → Safety Stock (สำรองกันผันผวน)</li>
+                <li><b>ROP</b> → Reorder Point (จุดที่ควรสั่งซื้อ)</li>
+                <li><b>DOS</b> → Days of Supply (คงเหลือเพียงพออีกกี่วัน)</li>
+                <li><b>แนะนำสั่ง</b> → จำนวนที่ระบบแนะนำ (ปัดตามแพ็คแล้ว)</li>
+                <li><b>สั่งจริง</b> → จำนวนที่คุณแก้ไขเอง (ระบบจะจำค่าที่แก้)</li>
+            </ul>
+
+            <h3>การจัดกลุ่ม Moving (จาก AvgMonthly)</h3>
+            <ul>
+                <li><b>Dead</b>: 0</li>
+                <li><b>Slowly</b>: น้อยกว่า 0.7 ชิ้น/เดือน</li>
+                <li><b>Slow</b>: 0.7 – น้อยกว่า 12 ชิ้น/เดือน</li>
+                <li><b>Medium</b>: 12 – น้อยกว่า 30 ชิ้น/เดือน</li>
+                <li><b>Fast</b>: 30 ชิ้น/เดือนขึ้นไป</li>
+            </ul>
+
+            <h3>กฎการแนะนำสั่ง (RecommendedOrder) – ลำดับขั้นตอนจริงในโค้ด</h3>
+            <ol>
+                <li><b>คำนวณ AvgDailyUse</b> โดยถ่วงน้ำหนักระหว่างข้อมูล 4 เดือน + 30 วัน<br>
+                    <small>(Fast/ABC A จะให้น้ำหนัก 30Day มากกว่า, Slow/C จะให้น้ำหนัก 4M มากกว่า)</small></li>
+                <li><b>ป้องกัน Outlier</b> → ถ้า 30Day พุ่งสูงผิดปกติ จะจำกัดไม่ให้เกิน 4M × 3 เท่า</li>
+                <li><b>Seasonal Boost</b> → ถ้า 30Day สูงกว่า 4M มาก (ช่วงพีค) จะเพิ่มน้ำหนัก 30Day ชั่วคราว</li>
+                <li><b>Stockout Protection</b> → ถ้าคงเหลือ = 0 และเป็น Fast/Medium จะเพิ่ม Safety Days ชั่วคราว</li>
+                <li><b>คำนวณ ROP</b> = (AvgDailyUse × LeadTime 5 วัน) + SafetyStock</li>
+                <li><b>ถ้าคงเหลือ < ROP</b> → แนะนำสั่งให้ครอบคลุม CoverDays (40 วัน)<br>
+                    <small>จำนวน = (AvgDailyUse × 40) - คงเหลือ</small></li>
+                <li><b>ถ้าคงเหลือ ≥ ROP</b> → แนะนำสั่ง = 0</li>
+                <li><b>ปัดจำนวนสั่ง</b> ตาม MultiplyUnit (ถ้ามี) เพื่อให้สั่งตามแพ็คจริง</li>
+                <li><b>กฎตัดสั่งพิเศษ (ใช้เฉพาะ Slow / Slowly เท่านั้น)</b>
+                    <ul>
+                        <li>ถ้า Mean = 0 → ไม่สั่ง</li>
+                        <li>ถ้า 30Day = 0 → ไม่สั่ง</li>
+                        <li>ถ้า 30Day ≥ Qty4Month และเป็น Slowly → ไม่สั่ง</li>
+                    </ul>
+                    <small>หมายเหตุ: Fast / Medium / Dead จะยังสั่งตามปกติแม้ 30Day = 0 ถ้า Mean > 0</small></li>
+            </ol>
+
+            <h3>เคล็ดลับการใช้งาน</h3>
+            <ul>
+                <li>ปรับค่า <b>LeadTime / Safety Days / Cover Days</b> เพื่อควบคุมความเข้มงวดของการสั่ง</li>
+                <li>ใช้ปุ่ม <b>“ตั้งตามแนะนำ”</b> เพื่อนำค่าแนะนำไปใส่ “สั่งจริง” ในหน้าปัจจุบัน</li>
+                <li>กรองด้วย <b>Moving / ABC / ผู้รับคืน / Status</b> เพื่อดูกลุ่มที่ต้องการ</li>
+                <li>ใช้ <b>ตะกร้า</b> เพิ่มรายการแล้วพิมพ์ Label ให้ช่างได้ทันที</li>
+                <li>กด <b>Export CSV</b> เพื่อนำข้อมูลไปวิเคราะห์ต่อ</li>
+            </ul>
+
+            <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin-top:20px;">
+                อัปเดตตามโค้ดล่าสุด – เน้นความสมดุลระหว่าง “กันของขาด” และ “ไม่ให้ของเกิน”<br>
+                ปรับแต่งเพิ่มเติมได้ตามความต้องการของ Plant
+            </p>
+        </div>
+    </div>
+</div>
 
         <!-- ★ Cart Modal -->
         <div id="cartModal" class="cart-modal">
