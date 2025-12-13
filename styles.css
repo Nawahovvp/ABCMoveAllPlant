@@ -275,18 +275,17 @@ input[type=text]:focus {
 
 /* ให้กล่องตารางเป็น sticky + scroll ข้างในเอง */
 .table-container {
-  position: sticky;
-  top: 0;
-  /* ติดขอบบน viewport หลังจากเลื่อนมาถึง */
+  /* ❌ ลบ sticky ออก */
+  position: relative;   /* หรือเอาออกก็ได้ */
+  top: auto;
+
   z-index: 20;
-  max-height: calc(100vh - 0px);
-  /* สูงไม่เกินหน้าจอ */
-  overflow: auto;
-  /* inner scrollbar อยู่ตรงนี้ */
+  max-height: none;     /* ❌ ไม่ต้องล็อคสูงเต็มจอ */
+  overflow: auto;       /* จะมี scroll ได้ตามพื้นที่ */
   padding: 0 16px;
   background: #fff;
-  /* กันโปร่งทะลุ */
 }
+
 
 /* ตาราง */
 table {
