@@ -276,12 +276,15 @@ input[type=text]:focus {
 /* ให้กล่องตารางเป็น sticky + scroll ข้างในเอง */
 .table-container {
   /* ❌ ลบ sticky ออก */
-  position: relative;   /* หรือเอาออกก็ได้ */
+  position: relative;
+  /* หรือเอาออกก็ได้ */
   top: auto;
 
   z-index: 20;
-  max-height: none;     /* ❌ ไม่ต้องล็อคสูงเต็มจอ */
-  overflow: auto;       /* จะมี scroll ได้ตามพื้นที่ */
+  max-height: none;
+  /* ❌ ไม่ต้องล็อคสูงเต็มจอ */
+  overflow: auto;
+  /* จะมี scroll ได้ตามพื้นที่ */
   padding: 0 16px;
   background: #fff;
 }
@@ -542,7 +545,7 @@ td {
 }
 
 #menuBtn {
-  position: absolute;
+  position: fixed;
   top: 20px;
   right: 20px;
   background: none;
@@ -553,7 +556,7 @@ td {
 }
 
 #userMenu {
-  position: absolute;
+  position: fixed;
   top: 50px;
   right: 20px;
   background: white;
@@ -906,11 +909,15 @@ td:nth-child(26) {
   }
 
   .summary-row {
+    position: relative;
+    z-index: 1;
     padding: 10px;
     gap: 8px;
   }
 
   .card {
+    position: relative;
+    z-index: 1;
     max-width: none;
     flex: 1 1 calc(50% - 10px);
   }
@@ -1135,39 +1142,39 @@ td:nth-child(26) {
 
 /* สีพื้นหลังการ์ด Out of Stock */
 .card.out-of-stock {
-    background: linear-gradient(135deg, #ff9800, #f57c00);
-    color: white;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: white;
 }
 
 .card.out-of-stock-wait {
-    background: linear-gradient(135deg, #f44336, #d32f2f);
-    color: white;
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  color: white;
 }
 
 /* ทำให้มูลค่าด้านล่างตัวเล็กลง (เหมือน Card Order) */
 .card-value.small {
-    font-size: 14px;
-    font-weight: 700;
-    opacity: 0.9;
-    margin-top: -4px;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-top: -4px;
 }
 
 /* ปรับให้การ์ดสูงเท่ากันและจัดกึ่งกลางดี */
 .card.out-of-stock,
 .card.out-of-stock-wait {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 12px 8px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-height: 100px;
 }
 
 .card.out-of-stock .card-title,
 .card.out-of-stock-wait .card-title {
-    font-size: 13px;
-    margin-bottom: 6px;
-    opacity: 0.95;
+  font-size: 13px;
+  margin-bottom: 6px;
+  opacity: 0.95;
 }
