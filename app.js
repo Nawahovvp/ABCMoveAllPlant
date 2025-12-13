@@ -2,7 +2,7 @@ let sortKey = "CumPercent", sortDir = "asc";
 let allData = [], filteredData = [];
 let mode = "all", abcFilter = "", movingFilter = "";
 let currentPage = 1;
-const rowsPerPage = 25;
+const rowsPerPage = 20;
 let users = [];
 let loggedUser = null;
 let inventoryUrl;
