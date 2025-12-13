@@ -991,7 +991,11 @@ function recalculateStockFields(data, params) {
         // =========================
         if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
         if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
-        if (qty30d >= qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
+        if (qty30d > qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
+        if (r.Moving === "Slowly" && qty30d === 1 && qty4m === 1) {r.RecommendedOrder = 0;
+            
+        }
+
         // =========================
         // 13) ReturnQty / ReturnValue (เดิม)
         // =========================
