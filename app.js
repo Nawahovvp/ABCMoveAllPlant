@@ -10,7 +10,7 @@ let selectedPlant = "";
 /* ★ ตะกร้า */
 let cartItems = [];
 const userSheetID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
-const userSheetName = 'UserPlant';
+const userSheetName = 'EmployeeWeb';
 const userUrl = `https://opensheet.elk.sh/${userSheetID}/${userSheetName}`;
 const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
 const mainsapUrl = 'https://opensheet.elk.sh/1CkfOIe2nDYBLs5aPGkPyZhOeqJkyS7UQ6tuMzxy-mfk/mainsap';
@@ -481,20 +481,37 @@ function checkLogin() {
 function showLogin() { document.getElementById('loginModal').style.display = 'flex'; }
 function hideLogin() { document.getElementById('loginModal').style.display = 'none'; }
 function login() {
-    const idUser = document.getElementById('idUserInput').value.trim();
-    const password = document.getElementById('passwordInput').value.trim();
-    const remember = document.getElementById('rememberMe').checked;
-    const user = users.find(u => u.IDUser === idUser);
-    if (user && password === idUser.slice(-4)) {
-        loggedUser = { IDUser: user.IDUser, Name: user.Name || 'ไม่ระบุ' };
-        if (remember) localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
-        else sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-        hideLogin(); showUserMenu();
-        document.getElementById('plantSelection').style.display = 'block';
-    } else {
-        document.getElementById('loginError').textContent = 'IDUser หรือ Password ไม่ถูกต้อง';
-    }
+  const idUser = document.getElementById('idUserInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+  const remember = document.getElementById('rememberMe').checked;
+
+  // ใช้ IDRec แทน
+  const user = users.find(u => (u.IDRec || '').toString().trim() === idUser);
+
+  // password = 4 ตัวท้ายของ IDRec
+  if (user && password === idUser.slice(-4)) {
+    loggedUser = {
+      IDUser: idUser,
+      Name: user.Name || 'ไม่ระบุ',
+      Team: user.Team || '',
+      Position: user.ตำแหน่ง || '-',
+      Department: user.หน่วยงาน || '-'
+    };
+
+    if (remember)
+      localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
+    else
+      sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+
+    hideLogin();
+    showUserMenu();
+    document.getElementById('plantSelection').style.display = 'block';
+  } else {
+    document.getElementById('loginError').textContent =
+      'User หรือ Password ไม่ถูกต้อง';
+  }
 }
+
 function logout() {
     localStorage.removeItem('rememberedUser');
     sessionStorage.removeItem('loggedUser');
@@ -516,6 +533,8 @@ function showUserMenu() {
     document.getElementById('menuBtn').style.display = 'block';
     document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
     document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
+    document.getElementById('userPosition').textContent = `ตำแหน่ง: ${loggedUser.Position}`;
+    document.getElementById('userDepartment').textContent =`หน่วยงาน: ${loggedUser.Department}`;
 }
 document.getElementById('menuBtn').addEventListener('click', () => {
     const menu = document.getElementById('userMenu');
@@ -993,7 +1012,7 @@ function recalculateStockFields(data, params) {
         if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
         if (qty30d > qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
         if (r.Moving === "Slowly" && qty30d === 1 && qty4m === 1) {r.RecommendedOrder = 0;
-            
+
         }
 
         // =========================
@@ -1677,3 +1696,18 @@ document.getElementById("responsibleFilter").addEventListener("change", applyFil
 document.getElementById("orderDiffFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("setActualBtn").addEventListener("click", setActualOrderFromRecommended);
 document.getElementById("exportBtn").onclick = exportToCSV;
+document.addEventListener('click', function (e) {
+  const menu = document.getElementById('userMenu');
+  const btn = document.getElementById('menuBtn');
+
+  if (!menu || !btn) return;
+
+  // ถ้าเมนูเปิดอยู่ และคลิกนอกเมนู + ปุ่ม
+  if (
+    menu.style.display === 'block' &&
+    !menu.contains(e.target) &&
+    !btn.contains(e.target)
+  ) {
+    menu.style.display = 'none';
+  }
+});
