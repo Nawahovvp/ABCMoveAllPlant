@@ -548,12 +548,37 @@ td {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: white;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+
+  color: #ffffff;
+  font-size: 20px;
   cursor: pointer;
+
+  display: none; /* คุมด้วย JS */
+  z-index: 9999;
+
+  transition: all 0.25s ease;
 }
+
+#menuBtn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+#menuBtn:active {
+  transform: translateY(0);
+}
+
 
 #userMenu {
   position: fixed;
@@ -626,16 +651,40 @@ td {
 }
 
 #backBtn {
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 20px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: white;
+
+  width: 40px;          /* 🔹 เท่าปุ่มเมนู */
+  height: 40px;         /* 🔹 เท่าปุ่มเมนู */
+  border-radius: 12px;  /* 🔹 โค้งใกล้เคียง */
+
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+
+  color: #ffffff;
+  font-size: 20px;      /* 🔹 ไอคอนพอดี */
   cursor: pointer;
+
   display: none;
+  z-index: 9999;
+
+  transition: all 0.25s ease;
 }
+
+#backBtn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+#backBtn:active {
+  transform: translateY(0);
+}
+
 
 /* Filter ผู้รับคืน */
 #responsibleFilterContainer {
