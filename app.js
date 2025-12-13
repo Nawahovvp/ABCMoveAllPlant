@@ -84,20 +84,20 @@ const plantNames = {
     '0368': 'SA-ร้อยเอ็ด',
     '0369': 'ระยอง'
 };
-const SHORTSHIP_MODE = "shortship";
-const SHORTSHIP_WAIT_MODE = "shortship_wait";
+const OUT_OF_STOCK_MODE = "out_of_stock";
+const OUT_OF_STOCK_WAIT_MODE = "out_of_stock_wait";
 //
-function toNumber(v){return parseFloat((v||"0").toString().replace(/,/g,''))||0;}
-function formatNumber(n){return Number(n).toLocaleString('th-TH');}
-function formatCurrency(n){return Number(n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function formatShortCurrency(n){
-    if(n>=1e9)return(n/1e9).toFixed(2)+" พันล้าน";
-    if(n>=1e6)return(n/1e6).toFixed(2)+" M";
-    if(n>=1e3)return(n/1e3).toFixed(2)+" K";
+function toNumber(v) { return parseFloat((v || "0").toString().replace(/,/g, '')) || 0; }
+function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
+function formatCurrency(n) { return Number(n).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function formatShortCurrency(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + " พันล้าน";
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + " M";
+    if (n >= 1e3) return (n / 1e3).toFixed(2) + " K";
     return n.toFixed(2);
 }
-function getOwnerName(userId){
-    switch(userId){
+function getOwnerName(userId) {
+    switch (userId) {
         case '7556706': return 'ทศพล (แจ๊ค)';
         case '7512395': return 'ประวิทย์ (เอฟ)';
         case '7513338': return 'อติคุณ ()';
@@ -111,34 +111,34 @@ function getOwnerName(userId){
         case '7513032': return 'วิศรุต (แบงค์)';
         case '7832535': return 'ปรานต์ตะวัน ()';
         case '7834952': return 'นพดล ()';
-        default: return userId||'';
+        default: return userId || '';
     }
 }
-function calculateKeepQty(r){
-    const avg=r.AvgMonthly;
-    if(r.Moving==="Dead"||r.Moving==="Slowly")return 1;
-    if(r.Moving==="Slow"&&r.ABCValue==="C")return Math.max(1,Math.round(avg*60));
-    if(r.Moving==="Slow"&&r.ABCValue==="B")return Math.max(1,Math.round(avg*60));
-    if(r.Moving==="Medium"&&r.ABCValue==="C")return Math.max(2,Math.round(avg*60));
-    if(r.Moving==="Slow"&&r.ABCValue==="A")return Math.max(3,Math.round(avg*60));
-    if(r.Moving==="Medium"&&r.ABCValue==="B")return Math.max(4,Math.round(avg*60));
-    if(r.Moving==="Fast"&&r.ABCValue==="C")return Math.max(5,Math.round(avg*60));
-    if(r.Moving==="Medium"&&r.ABCValue==="A")return Math.max(6,Math.round(avg*75));
-    if(r.Moving==="Fast"&&r.ABCValue==="B")return Math.max(8,Math.round(avg*90));
-    if(r.Moving==="Fast"&&r.ABCValue==="A")return Math.max(10,Math.round(avg*120));
-    return Math.max(1,Math.round(avg*40));
+function calculateKeepQty(r) {
+    const avg = r.AvgMonthly;
+    if (r.Moving === "Dead" || r.Moving === "Slowly") return 1;
+    if (r.Moving === "Slow" && r.ABCValue === "C") return Math.max(1, Math.round(avg * 60));
+    if (r.Moving === "Slow" && r.ABCValue === "B") return Math.max(1, Math.round(avg * 60));
+    if (r.Moving === "Medium" && r.ABCValue === "C") return Math.max(2, Math.round(avg * 60));
+    if (r.Moving === "Slow" && r.ABCValue === "A") return Math.max(3, Math.round(avg * 60));
+    if (r.Moving === "Medium" && r.ABCValue === "B") return Math.max(4, Math.round(avg * 60));
+    if (r.Moving === "Fast" && r.ABCValue === "C") return Math.max(5, Math.round(avg * 60));
+    if (r.Moving === "Medium" && r.ABCValue === "A") return Math.max(6, Math.round(avg * 75));
+    if (r.Moving === "Fast" && r.ABCValue === "B") return Math.max(8, Math.round(avg * 90));
+    if (r.Moving === "Fast" && r.ABCValue === "A") return Math.max(10, Math.round(avg * 120));
+    return Math.max(1, Math.round(avg * 40));
 }
 /* ★ ฟังก์ชันตะกร้า */
-function updateCartCount(){
+function updateCartCount() {
     const badge = document.getElementById('cartCountBadge');
-    if(!badge) return;
+    if (!badge) return;
     badge.textContent = cartItems.length;
 }
-function addToCart(item){
-   const exist = cartItems.find(x => x.Material === item.Material && x.StorageBin === item.StorageBin);
-    if(exist){
+function addToCart(item) {
+    const exist = cartItems.find(x => x.Material === item.Material && x.StorageBin === item.StorageBin);
+    if (exist) {
         exist.Qty = (exist.Qty || 1) + 1;
-    }else{
+    } else {
         cartItems.push({
             Material: item.Material,
             Description: item.Description,
@@ -150,31 +150,31 @@ function addToCart(item){
     updateCartCount();
 }
 /* ★ หา Employee ตามรหัสที่กรอก */
-function updateEmployeeInfo(){
+function updateEmployeeInfo() {
     const codeInput = document.getElementById('employeeCode');
     const nameLabel = document.getElementById('employeeNameLabel');
     const teamLabel = document.getElementById('employeeTeamLabel');
-    if(!codeInput || !nameLabel || !teamLabel) return;
+    if (!codeInput || !nameLabel || !teamLabel) return;
     const id = (codeInput.value || '').trim();
-    if(!id){
+    if (!id) {
         nameLabel.textContent = '';
         teamLabel.textContent = '';
         return;
     }
     // หา row ที่ IDRec ตรงกับรหัสพนักงาน
     const emp = employees.find(e => (e.IDRec || '').toString().trim() === id);
-    if(emp){
+    if (emp) {
         nameLabel.textContent = `ชื่อ: ${emp.Name || '-'}`;
         teamLabel.textContent = `ทีม: ${emp.Team || '-'}`;
-    }else{
+    } else {
         nameLabel.textContent = 'ไม่พบรหัสพนักงานนี้';
         teamLabel.textContent = '';
     }
 }
-function renderCartTable(){
+function renderCartTable() {
     const tbody = document.getElementById('cartTableBody');
     tbody.innerHTML = "";
-    if(cartItems.length === 0){
+    if (cartItems.length === 0) {
         const tr = document.createElement('tr');
         const td = document.createElement('td');
         td.colSpan = 6;
@@ -187,7 +187,7 @@ function renderCartTable(){
     cartItems.forEach((item, idx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${idx+1}</td>
+            <td>${idx + 1}</td>
             <td>${item.Material}</td>
             <td>${item.Description}</td>
             <td>${item.StorageBin}</td>
@@ -215,20 +215,20 @@ function renderCartTable(){
         tbody.appendChild(tr);
     });
 }
-function openCartModal(){
+function openCartModal() {
     renderCartTable();
     updateEmployeeInfo(); // ★ อัปเดตชื่อ/ทีมตามรหัสที่มีอยู่
     document.getElementById('cartModal').style.display = 'flex';
 }
-function closeCartModal(){
+function closeCartModal() {
     document.getElementById('cartModal').style.display = 'none';
 }
-function clearCart(){
+function clearCart() {
     cartItems = [];
     updateCartCount();
     // ถ้าเปิด modal อยู่ ให้รีเฟรชตารางในตะกร้าด้วย
     const cartModal = document.getElementById('cartModal');
-    if(cartModal && cartModal.style.display === 'flex'){
+    if (cartModal && cartModal.style.display === 'flex') {
         renderCartTable();
     }
 }
@@ -441,101 +441,101 @@ function printCart() {
     win.document.close();
 }
 /* =================== เดิม =================== */
-async function loadUsers(){
-    try{
-        const res=await fetch(userUrl);
-        users=await res.json();
-    }catch(e){
+async function loadUsers() {
+    try {
+        const res = await fetch(userUrl);
+        users = await res.json();
+    } catch (e) {
         console.error(e);
         alert("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
     }
 }
 /* ★ โหลดข้อมูล Employee */
-async function loadEmployees(){
-    try{
+async function loadEmployees() {
+    try {
         const res = await fetch(employeeUrl);
         employees = await res.json();
         // console.log('employees', employees);
-    }catch(e){
+    } catch (e) {
         console.error(e);
         // ถ้าโหลดไม่ได้ ไม่ต้อง alert เพื่อไม่ให้รบกวนการใช้งานหลัก
     }
 }
-function checkLogin(){
-    const remembered=localStorage.getItem('rememberedUser');
-    if(remembered){
-        loggedUser=JSON.parse(remembered);
+function checkLogin() {
+    const remembered = localStorage.getItem('rememberedUser');
+    if (remembered) {
+        loggedUser = JSON.parse(remembered);
         showUserMenu();
-        document.getElementById('plantSelection').style.display='block';
+        document.getElementById('plantSelection').style.display = 'block';
         return true;
     }
-    const sessionUser=sessionStorage.getItem('loggedUser');
-    if(sessionUser){
-        loggedUser=JSON.parse(sessionUser);
+    const sessionUser = sessionStorage.getItem('loggedUser');
+    if (sessionUser) {
+        loggedUser = JSON.parse(sessionUser);
         showUserMenu();
-        document.getElementById('plantSelection').style.display='block';
+        document.getElementById('plantSelection').style.display = 'block';
         return true;
     }
     return false;
 }
-function showLogin(){document.getElementById('loginModal').style.display='flex';}
-function hideLogin(){document.getElementById('loginModal').style.display='none';}
-function login(){
-    const idUser=document.getElementById('idUserInput').value.trim();
-    const password=document.getElementById('passwordInput').value.trim();
-    const remember=document.getElementById('rememberMe').checked;
-    const user=users.find(u=>u.IDUser===idUser);
-    if(user&&password===idUser.slice(-4)){
-        loggedUser={IDUser:user.IDUser,Name:user.Name||'ไม่ระบุ'};
-        if(remember)localStorage.setItem('rememberedUser',JSON.stringify(loggedUser));
-        else sessionStorage.setItem('loggedUser',JSON.stringify(loggedUser));
-        hideLogin();showUserMenu();
-        document.getElementById('plantSelection').style.display='block';
-    }else{
-        document.getElementById('loginError').textContent='IDUser หรือ Password ไม่ถูกต้อง';
+function showLogin() { document.getElementById('loginModal').style.display = 'flex'; }
+function hideLogin() { document.getElementById('loginModal').style.display = 'none'; }
+function login() {
+    const idUser = document.getElementById('idUserInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const remember = document.getElementById('rememberMe').checked;
+    const user = users.find(u => u.IDUser === idUser);
+    if (user && password === idUser.slice(-4)) {
+        loggedUser = { IDUser: user.IDUser, Name: user.Name || 'ไม่ระบุ' };
+        if (remember) localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
+        else sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+        hideLogin(); showUserMenu();
+        document.getElementById('plantSelection').style.display = 'block';
+    } else {
+        document.getElementById('loginError').textContent = 'IDUser หรือ Password ไม่ถูกต้อง';
     }
 }
-function logout(){
+function logout() {
     localStorage.removeItem('rememberedUser');
     sessionStorage.removeItem('loggedUser');
-    loggedUser=null;
+    loggedUser = null;
     cartItems = []; // ★ เคลียร์ตะกร้าเมื่อ logout
     updateCartCount();
-    document.getElementById('userMenu').style.display='none';
-    document.getElementById('menuBtn').style.display='none';
-    document.getElementById("mainCardsSection").style.display="none";
-    document.getElementById("summarySection").style.display="none";
-    document.getElementById("controlsSection").style.display="none";
-    document.getElementById("tableSection").style.display="none";
-    document.getElementById("pagination").style.display="none";
-    document.getElementById('plantSelection').style.display="none";
-    document.getElementById('backBtn').style.display="none";
+    document.getElementById('userMenu').style.display = 'none';
+    document.getElementById('menuBtn').style.display = 'none';
+    document.getElementById("mainCardsSection").style.display = "none";
+    document.getElementById("summarySection").style.display = "none";
+    document.getElementById("controlsSection").style.display = "none";
+    document.getElementById("tableSection").style.display = "none";
+    document.getElementById("pagination").style.display = "none";
+    document.getElementById('plantSelection').style.display = "none";
+    document.getElementById('backBtn').style.display = "none";
     showLogin();
 }
-function showUserMenu(){
-    document.getElementById('menuBtn').style.display='block';
-    document.getElementById('userID').textContent=`รหัส: ${loggedUser.IDUser}`;
-    document.getElementById('userName').textContent=`ชื่อ: ${loggedUser.Name}`;
+function showUserMenu() {
+    document.getElementById('menuBtn').style.display = 'block';
+    document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
+    document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
 }
-document.getElementById('menuBtn').addEventListener('click',()=>{
-    const menu=document.getElementById('userMenu');
-    menu.style.display=menu.style.display==='block'?'none':'block';
+document.getElementById('menuBtn').addEventListener('click', () => {
+    const menu = document.getElementById('userMenu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 });
-document.getElementById('logoutBtn').addEventListener('click',logout);
-document.getElementById('loginBtn').addEventListener('click',login);
+document.getElementById('logoutBtn').addEventListener('click', logout);
+document.getElementById('loginBtn').addEventListener('click', login);
 // =========================
 // ✅ HELP MODAL CONTROL
 // =========================
-function openHelp(){
-  const m = document.getElementById('helpModal');
-  if(m) m.style.display = 'flex';
-  // ปิดเมนู userMenu ด้วย (กันซ้อน)
-  const menu = document.getElementById('userMenu');
-  if(menu) menu.style.display = 'none';
+function openHelp() {
+    const m = document.getElementById('helpModal');
+    if (m) m.style.display = 'flex';
+    // ปิดเมนู userMenu ด้วย (กันซ้อน)
+    const menu = document.getElementById('userMenu');
+    if (menu) menu.style.display = 'none';
 }
-function closeHelp(){
-  const m = document.getElementById('helpModal');
-  if(m) m.style.display = 'none';
+function closeHelp() {
+    const m = document.getElementById('helpModal');
+    if (m) m.style.display = 'none';
 }
 const helpBtn = document.getElementById('helpBtn');
 if (helpBtn) helpBtn.addEventListener('click', openHelp);
@@ -544,72 +544,72 @@ if (helpCloseBtn) helpCloseBtn.addEventListener('click', closeHelp);
 // คลิกพื้นที่ดำเพื่อปิด
 const helpModal = document.getElementById('helpModal');
 if (helpModal) {
-  helpModal.addEventListener('click', (e) => {
-    if (e.target === helpModal) closeHelp();
-  });
+    helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) closeHelp();
+    });
 }
 // กด ESC เพื่อปิด
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeHelp();
+    if (e.key === 'Escape') closeHelp();
 });
-async function init(){
+async function init() {
     await loadUsers();
     await loadEmployees(); // ★ โหลดพนักงานเพิ่ม
-    if(!checkLogin())showLogin();
-    const plantSelect=document.getElementById('plantSelect');
-    Object.keys(inventoryUrls).sort().forEach(p=>{
-        const name=plantNames[p]||p;
-        plantSelect.add(new Option(`${p} - ${name}`,p));
+    if (!checkLogin()) showLogin();
+    const plantSelect = document.getElementById('plantSelect');
+    Object.keys(inventoryUrls).sort().forEach(p => {
+        const name = plantNames[p] || p;
+        plantSelect.add(new Option(`${p} - ${name}`, p));
     });
     /* ★ ผูก event ตะกร้ารวม */
-       document.getElementById('cartMainBtn').addEventListener('click', openCartModal);
+    document.getElementById('cartMainBtn').addEventListener('click', openCartModal);
     document.getElementById('cartCloseBtn').addEventListener('click', closeCartModal);
     document.getElementById('cartPrintBtn').addEventListener('click', printCart);
     document.getElementById('cartClearBtn').addEventListener('click', clearCart); // ★
-      const empCodeInput = document.getElementById('employeeCode');
-    if(empCodeInput){
+    const empCodeInput = document.getElementById('employeeCode');
+    if (empCodeInput) {
         empCodeInput.addEventListener('input', updateEmployeeInfo);
         empCodeInput.addEventListener('blur', updateEmployeeInfo);
     }
 }
 init();
-document.getElementById('viewBtn').addEventListener('click',()=>{
-    selectedPlant=document.getElementById('plantSelect').value;
-    if(!selectedPlant){alert('กรุณาเลือก Plant');return;}
-    inventoryUrl=inventoryUrls[selectedPlant];
-    if(!inventoryUrl){alert('ไม่มีข้อมูลสำหรับ Plant นี้');return;}
-    document.getElementById('plantSelection').style.display='none';
-    document.getElementById('backBtn').style.display='block';
+document.getElementById('viewBtn').addEventListener('click', () => {
+    selectedPlant = document.getElementById('plantSelect').value;
+    if (!selectedPlant) { alert('กรุณาเลือก Plant'); return; }
+    inventoryUrl = inventoryUrls[selectedPlant];
+    if (!inventoryUrl) { alert('ไม่มีข้อมูลสำหรับ Plant นี้'); return; }
+    document.getElementById('plantSelection').style.display = 'none';
+    document.getElementById('backBtn').style.display = 'block';
     loadData();
 });
-document.getElementById('backBtn').addEventListener('click',()=>{
-    document.getElementById('mainCardsSection').style.display='none';
-    document.getElementById('summarySection').style.display='none';
-    document.getElementById('controlsSection').style.display='none';
-    document.getElementById('tableSection').style.display='none';
-    document.getElementById('pagination').style.display='none';
-    document.getElementById('backBtn').style.display='none';
-    document.getElementById('plantSelection').style.display='block';
-    allData=[];filteredData=[];mode="all";abcFilter="";movingFilter="";currentPage=1;
-    document.getElementById("searchInput").value="";
-    document.getElementById("statusFilter").value="";
-    document.getElementById("responsibleFilter").value="";
-    document.getElementById("plantFilter").disabled=false;
+document.getElementById('backBtn').addEventListener('click', () => {
+    document.getElementById('mainCardsSection').style.display = 'none';
+    document.getElementById('summarySection').style.display = 'none';
+    document.getElementById('controlsSection').style.display = 'none';
+    document.getElementById('tableSection').style.display = 'none';
+    document.getElementById('pagination').style.display = 'none';
+    document.getElementById('backBtn').style.display = 'none';
+    document.getElementById('plantSelection').style.display = 'block';
+    allData = []; filteredData = []; mode = "all"; abcFilter = ""; movingFilter = ""; currentPage = 1;
+    document.getElementById("searchInput").value = "";
+    document.getElementById("statusFilter").value = "";
+    document.getElementById("responsibleFilter").value = "";
+    document.getElementById("plantFilter").disabled = false;
 });
-async function loadData(){
-    const loader=document.getElementById("loader");
-    const summarySection=document.getElementById("summarySection");
-    const controlsSection=document.getElementById("controlsSection");
-    const tableSection=document.getElementById("tableSection");
-    loader.style.display="block";
-    summarySection.style.display="none";
-    controlsSection.style.display="none";
-    tableSection.style.display="none";
-    try{
+async function loadData() {
+    const loader = document.getElementById("loader");
+    const summarySection = document.getElementById("summarySection");
+    const controlsSection = document.getElementById("controlsSection");
+    const tableSection = document.getElementById("tableSection");
+    loader.style.display = "block";
+    summarySection.style.display = "none";
+    controlsSection.style.display = "none";
+    tableSection.style.display = "none";
+    try {
         const [
-            invRes,usageRes,mainsapRes,avgValRes,statusRes,
-            locationRes,shelfRes
-        ]=await Promise.all([
+            invRes, usageRes, mainsapRes, avgValRes, statusRes,
+            locationRes, shelfRes
+        ] = await Promise.all([
             fetch(inventoryUrl),
             fetch(usageUrl),
             fetch(mainsapUrl),
@@ -618,13 +618,13 @@ async function loadData(){
             fetch(locationUrl),
             fetch(shelfUrl)
         ]);
-        const inv=await invRes.json();
-        const usage=await usageRes.json();
-        const mainsap=await mainsapRes.json();
-        const avgValData=await avgValRes.json();
-        const statusData=await statusRes.json();
-        const locationData=await locationRes.json();
-        const shelfData=await shelfRes.json();
+        const inv = await invRes.json();
+        const usage = await usageRes.json();
+        const mainsap = await mainsapRes.json();
+        const avgValData = await avgValRes.json();
+        const statusData = await statusRes.json();
+        const locationData = await locationRes.json();
+        const shelfData = await shelfRes.json();
         const navanakornMap = new Map();
         locationData.forEach(r => {
             const mat = (r.Material || '').toString().trim();
@@ -633,155 +633,155 @@ async function loadData(){
                 navanakornMap.set(mat, navQty);
             }
         });
-        const statusMap=new Map();
-        statusData.forEach(r=>{
-            const plant=(r.Plant||'').toString().trim();
-            const material=(r.Material||'').toString().trim();
-            let status='';
-            const keys=Object.keys(r);
-            const statusKeys=keys.filter(k=>
-                k.toLowerCase().includes('statusmaterial')||
-                k.toLowerCase().includes('status material')||
+        const statusMap = new Map();
+        statusData.forEach(r => {
+            const plant = (r.Plant || '').toString().trim();
+            const material = (r.Material || '').toString().trim();
+            let status = '';
+            const keys = Object.keys(r);
+            const statusKeys = keys.filter(k =>
+                k.toLowerCase().includes('statusmaterial') ||
+                k.toLowerCase().includes('status material') ||
                 k.toLowerCase().includes('สถานะวัสดุ')
             );
-            if(statusKeys.length>0) status=(r[statusKeys[0]]||'').toString().trim();
-            else{
-                const alt=keys.filter(k=>k.toLowerCase().includes('status'));
-                if(alt.length>0)status=(r[alt[0]]||'').toString().trim();
+            if (statusKeys.length > 0) status = (r[statusKeys[0]] || '').toString().trim();
+            else {
+                const alt = keys.filter(k => k.toLowerCase().includes('status'));
+                if (alt.length > 0) status = (r[alt[0]] || '').toString().trim();
             }
-            if(plant&&material){
-                const key=`${plant}-${material}`;
-                if(status)statusMap.set(key,status);
+            if (plant && material) {
+                const key = `${plant}-${material}`;
+                if (status) statusMap.set(key, status);
             }
         });
-        const avgValMap=new Map();
-        avgValData.forEach(r=>{
-            const material=(r.Material||'').toString().trim();
-            const avgVal=toNumber(r.AvgVal||r.AvgVAL||r.avgval||0);
-            if(material)avgValMap.set(material,avgVal);
+        const avgValMap = new Map();
+        avgValData.forEach(r => {
+            const material = (r.Material || '').toString().trim();
+            const avgVal = toNumber(r.AvgVal || r.AvgVAL || r.avgval || 0);
+            if (material) avgValMap.set(material, avgVal);
         });
-        const usageMap=new Map();
-        usage.forEach(r=>{
-            const plant=(r.Plant||'').toString().trim();
-            const material=(r.Material||'').toString().trim();
-            if(!plant||!material)return;
-            const key=`${plant}-${material}`;
-            let qty4m=0,qty6m=0,thirtyDay=0;
-            const keys=Object.keys(r);
-            const k4=keys.filter(k=>k.toLowerCase().includes('4m')||k.toLowerCase().includes('4 month')||k.toLowerCase().includes('qtyissu'));
-            if(k4.length>0)qty4m=toNumber(r[k4[0]]||0);
-            const k6=keys.filter(k=>k.toLowerCase().includes('6m')||k.toLowerCase().includes('6 month'));
-            if(k6.length>0)qty6m=toNumber(r[k6[0]]||0);
-            const k30=keys.filter(k=>k.toLowerCase().includes('30day')||k.toLowerCase().includes('30 day')||k.toLowerCase().includes('30'));
-            if(k30.length>0)thirtyDay=toNumber(r[k30[0]]||0);
-            usageMap.set(key,{
-                Qty4Month:qty4m,
-                Qty6Month:qty6m||Math.round(qty4m*1.5),
-                ThirtyDay:thirtyDay
+        const usageMap = new Map();
+        usage.forEach(r => {
+            const plant = (r.Plant || '').toString().trim();
+            const material = (r.Material || '').toString().trim();
+            if (!plant || !material) return;
+            const key = `${plant}-${material}`;
+            let qty4m = 0, qty6m = 0, thirtyDay = 0;
+            const keys = Object.keys(r);
+            const k4 = keys.filter(k => k.toLowerCase().includes('4m') || k.toLowerCase().includes('4 month') || k.toLowerCase().includes('qtyissu'));
+            if (k4.length > 0) qty4m = toNumber(r[k4[0]] || 0);
+            const k6 = keys.filter(k => k.toLowerCase().includes('6m') || k.toLowerCase().includes('6 month'));
+            if (k6.length > 0) qty6m = toNumber(r[k6[0]] || 0);
+            const k30 = keys.filter(k => k.toLowerCase().includes('30day') || k.toLowerCase().includes('30 day') || k.toLowerCase().includes('30'));
+            if (k30.length > 0) thirtyDay = toNumber(r[k30[0]] || 0);
+            usageMap.set(key, {
+                Qty4Month: qty4m,
+                Qty6Month: qty6m || Math.round(qty4m * 1.5),
+                ThirtyDay: thirtyDay
             });
         });
-        const mainsapMap=new Map();
-        mainsap.forEach(r=>{
-            const mat=(r.Material||'').toString().trim();
-            if(!mat)return;
-            mainsapMap.set(mat,{
-                Note:r['หมายเหตุ']||'',
-                MultiplyUnit:r['คูณหน่วย']?toNumber(r['คูณหน่วย']):1,
-                Product:r.Product||''
+        const mainsapMap = new Map();
+        mainsap.forEach(r => {
+            const mat = (r.Material || '').toString().trim();
+            if (!mat) return;
+            mainsapMap.set(mat, {
+                Note: r['หมายเหตุ'] || '',
+                MultiplyUnit: r['คูณหน่วย'] ? toNumber(r['คูณหน่วย']) : 1,
+                Product: r.Product || ''
             });
         });
-        locationMap=new Map();
-        locationData.forEach(r=>{
-            const material=(r.Material||'').toString().trim();
-            if(!material)return;
-            const keys=Object.keys(r);
-            const storageKey=
-                keys.find(k=>k.toLowerCase().includes('storage')&&k.toLowerCase().includes('bin'))||
-                keys.find(k=>k.toLowerCase().includes('storagebin'))||
-                keys.find(k=>k.toLowerCase().includes('bin'));
-            if(!storageKey)return;
-            const loc=(r[storageKey]||'').toString().trim();
-            if(loc)locationMap.set(material,loc);
+        locationMap = new Map();
+        locationData.forEach(r => {
+            const material = (r.Material || '').toString().trim();
+            if (!material) return;
+            const keys = Object.keys(r);
+            const storageKey =
+                keys.find(k => k.toLowerCase().includes('storage') && k.toLowerCase().includes('bin')) ||
+                keys.find(k => k.toLowerCase().includes('storagebin')) ||
+                keys.find(k => k.toLowerCase().includes('bin'));
+            if (!storageKey) return;
+            const loc = (r[storageKey] || '').toString().trim();
+            if (loc) locationMap.set(material, loc);
         });
-        shelfOwnerMap=new Map();
-        shelfData.forEach(r=>{
-            const shelf=(r.Shelf||'').toString().trim();
-            const userId=(r.UserID||r.UserId||r.userid||'').toString().trim();
-            if(shelf&&userId)shelfOwnerMap.set(shelf,userId);
+        shelfOwnerMap = new Map();
+        shelfData.forEach(r => {
+            const shelf = (r.Shelf || '').toString().trim();
+            const userId = (r.UserID || r.UserId || r.userid || '').toString().trim();
+            if (shelf && userId) shelfOwnerMap.set(shelf, userId);
         });
-        allData=[];
-        inv.forEach(r=>{
-            const plant=(r.Plant||'').toString().trim();
-            const material=(r.Material||'').toString().trim();
-            if(plant!==selectedPlant||!material)return;
-            const key=`${plant}-${material}`;
-            const usageInfo=usageMap.get(key)||{Qty4Month:0,Qty6Month:0,ThirtyDay:0};
-            const main=mainsapMap.get(material)||{Note:'',MultiplyUnit:1,Product:''};
-            const status=statusMap.get(key)||'';
-            const avgVal=avgValMap.get(material)||0;
-            const qty4m=usageInfo.Qty4Month;
-            const qty6m=usageInfo.Qty6Month;
-            const thirtyDay=usageInfo.ThirtyDay;
-            const unrestricted=toNumber(r.Unrestricted||r["Unrestricted stock"]||0);
-            const originalValue=toNumber(r["Value Unrestricted"]||r["Value unrestricted"]||0);
-            const description=r["Material description"]||'';
-            const keys=Object.keys(r);
-            let storageBin='';
-            const sk=
-                keys.find(k=>k.toLowerCase().includes('storage')&&k.toLowerCase().includes('bin'))||
-                keys.find(k=>k.toLowerCase().includes('storagebin'))||
-                keys.find(k=>k.toLowerCase().includes('bin'));
-            if(sk)storageBin=(r[sk]||'').toString().trim();
-            let unit=r["Base Unit of Measure"]||'';
-            if(!unit){
-                const uk=keys.find(k=>k.toLowerCase().includes('unit')||k.toLowerCase().includes('uom'));
-                if(uk)unit=(r[uk]||'').toString().trim();
+        allData = [];
+        inv.forEach(r => {
+            const plant = (r.Plant || '').toString().trim();
+            const material = (r.Material || '').toString().trim();
+            if (plant !== selectedPlant || !material) return;
+            const key = `${plant}-${material}`;
+            const usageInfo = usageMap.get(key) || { Qty4Month: 0, Qty6Month: 0, ThirtyDay: 0 };
+            const main = mainsapMap.get(material) || { Note: '', MultiplyUnit: 1, Product: '' };
+            const status = statusMap.get(key) || '';
+            const avgVal = avgValMap.get(material) || 0;
+            const qty4m = usageInfo.Qty4Month;
+            const qty6m = usageInfo.Qty6Month;
+            const thirtyDay = usageInfo.ThirtyDay;
+            const unrestricted = toNumber(r.Unrestricted || r["Unrestricted stock"] || 0);
+            const originalValue = toNumber(r["Value Unrestricted"] || r["Value unrestricted"] || 0);
+            const description = r["Material description"] || '';
+            const keys = Object.keys(r);
+            let storageBin = '';
+            const sk =
+                keys.find(k => k.toLowerCase().includes('storage') && k.toLowerCase().includes('bin')) ||
+                keys.find(k => k.toLowerCase().includes('storagebin')) ||
+                keys.find(k => k.toLowerCase().includes('bin'));
+            if (sk) storageBin = (r[sk] || '').toString().trim();
+            let unit = r["Base Unit of Measure"] || '';
+            if (!unit) {
+                const uk = keys.find(k => k.toLowerCase().includes('unit') || k.toLowerCase().includes('uom'));
+                if (uk) unit = (r[uk] || '').toString().trim();
             }
             const navanakornQty = navanakornMap.get(material) || 0;
-            let value=avgVal>0?unrestricted*avgVal:originalValue;
-            const location=locationMap.get(material)||storageBin||'';
-            const shelf=location?location.substring(0,3):'';
-            const ownerId=shelfOwnerMap.get(shelf)||'';
-            const ownerName=getOwnerName(ownerId);
-           allData.push({
-    Plant:plant,
-    Material:material,
-    Description:description,
-    StorageBin:storageBin,
-    Unit:unit,
-    Navanakorn: navanakornQty,
-    Unrestricted:unrestricted,
-    Value:value,
-    Qty6Month:qty6m,
-    Qty4Month:qty4m,
-    ThirtyDay:thirtyDay,
-    AvgDailyUse:qty4m/120||0,
-    AvgMonthly:qty4m/4,
-    SafetyStock:0,ROP:0,DOS:0,RecommendedOrder:0,Mean:0,
-    ABCValue:"",CumPercent:0,Moving:"",
-    ReturnQty:0,ReturnValue:0,
-    Note:main.Note,
-    MultiplyUnit:main.MultiplyUnit,
-    Product:main.Product,
-    AvgVal:avgVal,
-    OriginalValue:originalValue,
-    Status:status,
-    Location:location,
-    Shelf:shelf,
-    OwnerId:ownerId,
-    OwnerName:ownerName,
-    ActualOrder: null, // ✅ ให้เป็น null แทน 0
-    _actualOrderTouched: false // ยังไม่เคยแก้
-});
+            let value = avgVal > 0 ? unrestricted * avgVal : originalValue;
+            const location = locationMap.get(material) || storageBin || '';
+            const shelf = location ? location.substring(0, 3) : '';
+            const ownerId = shelfOwnerMap.get(shelf) || '';
+            const ownerName = getOwnerName(ownerId);
+            allData.push({
+                Plant: plant,
+                Material: material,
+                Description: description,
+                StorageBin: storageBin,
+                Unit: unit,
+                Navanakorn: navanakornQty,
+                Unrestricted: unrestricted,
+                Value: value,
+                Qty6Month: qty6m,
+                Qty4Month: qty4m,
+                ThirtyDay: thirtyDay,
+                AvgDailyUse: qty4m / 120 || 0,
+                AvgMonthly: qty4m / 4,
+                SafetyStock: 0, ROP: 0, DOS: 0, RecommendedOrder: 0, Mean: 0,
+                ABCValue: "", CumPercent: 0, Moving: "",
+                ReturnQty: 0, ReturnValue: 0,
+                Note: main.Note,
+                MultiplyUnit: main.MultiplyUnit,
+                Product: main.Product,
+                AvgVal: avgVal,
+                OriginalValue: originalValue,
+                Status: status,
+                Location: location,
+                Shelf: shelf,
+                OwnerId: ownerId,
+                OwnerName: ownerName,
+                ActualOrder: null, // ✅ ให้เป็น null แทน 0
+                _actualOrderTouched: false // ยังไม่เคยแก้
+            });
         });
-// หลังจากเติม allData เสร็จ
-loadActualOrdersFromLocalStorage();
-calcABCValue();
-        const plantFilter=document.getElementById("plantFilter");
-        plantFilter.innerHTML='';
-        const name=plantNames[selectedPlant]||selectedPlant;
-        plantFilter.add(new Option(`${selectedPlant} - ${name}`,selectedPlant));
-        plantFilter.disabled=true;
+        // หลังจากเติม allData เสร็จ
+        loadActualOrdersFromLocalStorage();
+        calcABCValue();
+        const plantFilter = document.getElementById("plantFilter");
+        plantFilter.innerHTML = '';
+        const name = plantNames[selectedPlant] || selectedPlant;
+        plantFilter.add(new Option(`${selectedPlant} - ${name}`, selectedPlant));
+        plantFilter.disabled = true;
         const updateBtn = document.getElementById("updateBtn");
         if (sheetIds[selectedPlant]) {
             updateBtn.style.display = "inline-flex";
@@ -822,252 +822,252 @@ calcABCValue();
         } else {
             lastLabel.textContent = "";
         }
-        loader.style.display="none";
-        document.getElementById("mainCardsSection").style.display="flex";
-        document.getElementById("summarySection").style.display="flex";
-        document.getElementById("controlsSection").style.display="flex";
-        document.getElementById("tableSection").style.display="block";
-        document.getElementById("pagination").style.display="block";
+        loader.style.display = "none";
+        document.getElementById("mainCardsSection").style.display = "flex";
+        document.getElementById("summarySection").style.display = "flex";
+        document.getElementById("controlsSection").style.display = "flex";
+        document.getElementById("tableSection").style.display = "block";
+        document.getElementById("pagination").style.display = "block";
         setDefaultAndCalculate();
-    }catch(e){
-        loader.style.display="none";
+    } catch (e) {
+        loader.style.display = "none";
         alert("โหลดข้อมูลไม่สำเร็จ กรุณารีเฟรช");
         console.error(e);
     }
 }
-function calcABCValue(){
-    const sorted=[...allData].sort((a,b)=>b.Value-a.Value);
-    const total=sorted.reduce((s,r)=>s+r.Value,0);
-    let cum=0;
-    sorted.forEach(r=>{
-        cum+=r.Value;
-        const pct=total?(cum/total)*100:0;
-        const orig=allData.find(x=>x.Material===r.Material&&x.Plant===r.Plant);
-        if(orig){
-            orig.CumPercent=pct;
-            orig.ABCValue=pct<=70?"A":pct<=90?"B":"C";
+function calcABCValue() {
+    const sorted = [...allData].sort((a, b) => b.Value - a.Value);
+    const total = sorted.reduce((s, r) => s + r.Value, 0);
+    let cum = 0;
+    sorted.forEach(r => {
+        cum += r.Value;
+        const pct = total ? (cum / total) * 100 : 0;
+        const orig = allData.find(x => x.Material === r.Material && x.Plant === r.Plant);
+        if (orig) {
+            orig.CumPercent = pct;
+            orig.ABCValue = pct <= 70 ? "A" : pct <= 90 ? "B" : "C";
         }
     });
 }
-function recalculateStockFields(data, params){
-  data.forEach(r => {
-    // =========================
-    // 1) ค่าพื้นฐาน + แปลงเป็นตัวเลข
-    // =========================
-    const leadTime = Number(params?.leadTime ?? 5);
-    const safetyDays = Number(params?.safety ?? 3);
-    const coverDays = Number(params?.cover ?? 40);
-    const qty4m = Number(r.Qty4Month || 0);
-    const qty6m = Number(r.Qty6Month || 0); // เผื่ออยากใช้ต่อ
-    const qty30d = Number(r.ThirtyDay || 0);
-    const unrestricted = Number(r.Unrestricted || 0);
-    const mul = Number(r.MultiplyUnit || 1);
-    // avg ต่อวันจากแต่ละช่วงเวลา
-    const avg4mDaily = qty4m / 120; // 4 เดือน = 120 วัน
-    const avg30dDaily = qty30d / 30; // 30 วัน = 30 วัน
-    // avg ต่อเดือนจาก 4 เดือน (ใช้จัด Moving)
-    const avgMonthlyFrom4m = qty4m / 4;
-    // =========================
-    // 2) Moving Classification (ของเดิม แต่ชัดเจน)
-    // =========================
-    if (avgMonthlyFrom4m === 0) r.Moving = "Dead";
-    else if (avgMonthlyFrom4m < 0.7) r.Moving = "Slowly";
-    else if (avgMonthlyFrom4m < 12) r.Moving = "Slow";
-    else if (avgMonthlyFrom4m < 30) r.Moving = "Medium";
-    else r.Moving = "Fast";
-    // เก็บไว้ให้ตารางใช้เหมือนเดิม
-    r.AvgMonthly = avgMonthlyFrom4m;
-    // =========================
-    // 3) Weighted Weight (ฉลาดขึ้น)
-    // - Fast ฟัง 30Day มากขึ้น
-    // - Slow/Dead ฟัง 4M มากขึ้น
-    // - ABC A ไวขึ้น, C ช้าลง
-    // =========================
-    let w4m = 0.70, w30 = 0.30;
-    if (r.Moving === "Fast") { w4m = 0.50; w30 = 0.50; }
-    if (r.Moving === "Medium") { w4m = 0.60; w30 = 0.40; }
-    if (r.Moving === "Slow") { w4m = 0.80; w30 = 0.20; }
-    if (r.Moving === "Slowly" || r.Moving === "Dead") { w4m = 0.90; w30 = 0.10; }
-    // ปรับตาม ABC
-    if (r.ABCValue === "A") { w4m -= 0.05; w30 += 0.05; }
-    if (r.ABCValue === "C") { w4m += 0.05; w30 -= 0.05; }
-    // clamp + normalize
-    w4m = Math.max(0.05, Math.min(0.95, w4m));
-    w30 = 1 - w4m;
-    // =========================
-    // 4) Outlier Guard (กัน 30Day พุ่ง)
-    // ถ้า 30Day ต่อวัน > 4M ต่อวัน * limitMultiplier
-    // ให้จำกัดไว้
-    // =========================
-    const limitMultiplier = 3; // ปรับได้ 2-4 ตามใจ
-    let guarded30dDaily = avg30dDaily;
-    if (avg4mDaily > 0 && avg30dDaily > avg4mDaily * limitMultiplier) {
-      guarded30dDaily = avg4mDaily * limitMultiplier;
-    }
-    // =========================
-    // 5) Seasonal Mode (เอาหมด)
-    // แนวคิด: ถ้า 30Day "สูงกว่า" 4M มาก (แปลว่าช่วงนี้กำลังพีค)
-    // ให้เพิ่มน้ำหนัก 30Day แบบชั่วคราว แต่ไม่ให้เกินเพดาน
-    // =========================
-    const seasonalTrigger = 1.8; // ถ้า 30Day > 4M * 1.8 ถือว่าพีค
-    const seasonalBoostMax = 0.20; // เพิ่มน้ำหนัก 30Day สูงสุด +0.20
-    if (avg4mDaily > 0) {
-      const ratio = avg30dDaily / avg4mDaily;
-      if (ratio >= seasonalTrigger) {
-        // เพิ่ม w30 ตามระดับความพีค แต่ไม่เกิน seasonalBoostMax
-        const boost = Math.min(seasonalBoostMax, (ratio - seasonalTrigger) * 0.10);
-        w30 = Math.min(0.95, w30 + boost);
-        w4m = 1 - w30;
-      }
-    }
-    // =========================
-    // 6) AvgDailyUse (ตัวหลักในการคำนวณสต๊อก)
-    // =========================
-    let avgDailyUse = (avg4mDaily * w4m) + (guarded30dDaily * w30);
-    if (!isFinite(avgDailyUse) || avgDailyUse < 0) avgDailyUse = 0;
-    r.AvgDailyUse = avgDailyUse;
-    // =========================
-    // 7) Mean (ฉลาดขึ้น)
-    // เดิม: max(ThirtyDay, AvgMonthly)
-    // ใหม่: Mean รายเดือน = (AvgMonthly 4M * w4m) + (30Day(ถือเป็น1เดือน) * w30)
-    // =========================
-    const avgMonthlyFrom30d = qty30d; // 30 วัน = 1 เดือน
-    let meanMonthly = (avgMonthlyFrom4m * w4m) + (avgMonthlyFrom30d * w30);
-    // guard Mean เหมือนกัน
-    if (avgMonthlyFrom4m > 0 && avgMonthlyFrom30d > avgMonthlyFrom4m * limitMultiplier) {
-      meanMonthly = (avgMonthlyFrom4m * w4m) + ((avgMonthlyFrom4m * limitMultiplier) * w30);
-    }
-    if (!isFinite(meanMonthly) || meanMonthly < 0) meanMonthly = 0;
-    r.Mean = meanMonthly;
-    // =========================
-    // 8) Stockout Protection (เอาหมด)
-    // ถ้า Fast/Medium แต่ของหมด → เพิ่ม SafetyDays ชั่วคราว
-    // (เพื่อกันขาดช่วง lead time)
-    // =========================
-    let safetyDaysEffective = safetyDays;
-    if (unrestricted === 0 && (r.Moving === "Fast" || r.Moving === "Medium")) {
-      // เพิ่ม safety อีก 30% ของ coverDays (แต่ไม่ต่ำกว่า +3 วัน)
-      const add = Math.max(3, Math.round(coverDays * 0.30));
-      safetyDaysEffective = safetyDays + add;
-      // ถ้าเป็น ABC A เพิ่มอีกนิด
-      if (r.ABCValue === "A") safetyDaysEffective += 2;
-    }
-    // กัน safetyDaysEffective บาน
-    safetyDaysEffective = Math.min(365, Math.max(0, safetyDaysEffective));
-    // =========================
-    // 9) SafetyStock / ROP / DOS
-    // ใช้ AvgDailyUse ใหม่ + safetyDaysEffective
-    // =========================
-    const d = r.AvgDailyUse || 0;
-    const safetyStock = d * safetyDaysEffective;
-    const rop = (d * leadTime) + safetyStock;
-    const dos = d > 0 ? (unrestricted / d) : 9999;
-    r.SafetyStock = Math.round(safetyStock);
-    r.ROP = Math.round(rop);
-    r.DOS = dos > 9999 ? 9999 : Number(dos.toFixed(1));
-    // =========================
-    // 10) RecommendedOrder
-    // ถ้าคงเหลือ < ROP → เติมให้ครอบคลุม coverDays
-    // =========================
-    let recommend = 0;
-    if (unrestricted < rop) {
-      const needed = d * coverDays; // ต้องมีให้ครอบคลุม coverDays
-      recommend = needed - unrestricted; // ขาดเท่าไรเติมเท่านั้น
-      if (recommend < 0) recommend = 0;
-    }
-    // ปัดตามแพ็ค
-    if (mul > 0) recommend = Math.ceil(recommend / mul) * mul;
-    r.RecommendedOrder = Math.round(recommend);
-    // =========================
-    // 11) สั่งจริง (ไม่ทับถ้า user เคยแก้)
-    // =========================
-    if (!r._actualOrderTouched) {
-      if (r.ActualOrder == null || isNaN(r.ActualOrder)) {
-        r.ActualOrder = r.RecommendedOrder;
-      }
-    }
-    // =========================
-    // 12) กฎตัดสั่งเดิมของคุณ (คงไว้ แต่ใช้ Mean ใหม่ที่นิ่งกว่า)
-    // =========================
-    if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
-    if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
-    if (qty30d >= qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
-    // =========================
-    // 13) ReturnQty / ReturnValue (เดิม)
-    // =========================
-    const keepQty = calculateKeepQty(r);
-    const returnQty = Math.max(0, unrestricted - keepQty);
-    const unitPrice = unrestricted > 0 ? (Number(r.Value || 0) / unrestricted) : 0;
-    r.ReturnQty = Math.round(returnQty);
-    r.ReturnValue = returnQty * unitPrice;
-  });
+function recalculateStockFields(data, params) {
+    data.forEach(r => {
+        // =========================
+        // 1) ค่าพื้นฐาน + แปลงเป็นตัวเลข
+        // =========================
+        const leadTime = Number(params?.leadTime ?? 5);
+        const safetyDays = Number(params?.safety ?? 3);
+        const coverDays = Number(params?.cover ?? 40);
+        const qty4m = Number(r.Qty4Month || 0);
+        const qty6m = Number(r.Qty6Month || 0); // เผื่ออยากใช้ต่อ
+        const qty30d = Number(r.ThirtyDay || 0);
+        const unrestricted = Number(r.Unrestricted || 0);
+        const mul = Number(r.MultiplyUnit || 1);
+        // avg ต่อวันจากแต่ละช่วงเวลา
+        const avg4mDaily = qty4m / 120; // 4 เดือน = 120 วัน
+        const avg30dDaily = qty30d / 30; // 30 วัน = 30 วัน
+        // avg ต่อเดือนจาก 4 เดือน (ใช้จัด Moving)
+        const avgMonthlyFrom4m = qty4m / 4;
+        // =========================
+        // 2) Moving Classification (ของเดิม แต่ชัดเจน)
+        // =========================
+        if (avgMonthlyFrom4m === 0) r.Moving = "Dead";
+        else if (avgMonthlyFrom4m < 0.7) r.Moving = "Slowly";
+        else if (avgMonthlyFrom4m < 12) r.Moving = "Slow";
+        else if (avgMonthlyFrom4m < 30) r.Moving = "Medium";
+        else r.Moving = "Fast";
+        // เก็บไว้ให้ตารางใช้เหมือนเดิม
+        r.AvgMonthly = avgMonthlyFrom4m;
+        // =========================
+        // 3) Weighted Weight (ฉลาดขึ้น)
+        // - Fast ฟัง 30Day มากขึ้น
+        // - Slow/Dead ฟัง 4M มากขึ้น
+        // - ABC A ไวขึ้น, C ช้าลง
+        // =========================
+        let w4m = 0.70, w30 = 0.30;
+        if (r.Moving === "Fast") { w4m = 0.50; w30 = 0.50; }
+        if (r.Moving === "Medium") { w4m = 0.60; w30 = 0.40; }
+        if (r.Moving === "Slow") { w4m = 0.80; w30 = 0.20; }
+        if (r.Moving === "Slowly" || r.Moving === "Dead") { w4m = 0.90; w30 = 0.10; }
+        // ปรับตาม ABC
+        if (r.ABCValue === "A") { w4m -= 0.05; w30 += 0.05; }
+        if (r.ABCValue === "C") { w4m += 0.05; w30 -= 0.05; }
+        // clamp + normalize
+        w4m = Math.max(0.05, Math.min(0.95, w4m));
+        w30 = 1 - w4m;
+        // =========================
+        // 4) Outlier Guard (กัน 30Day พุ่ง)
+        // ถ้า 30Day ต่อวัน > 4M ต่อวัน * limitMultiplier
+        // ให้จำกัดไว้
+        // =========================
+        const limitMultiplier = 3; // ปรับได้ 2-4 ตามใจ
+        let guarded30dDaily = avg30dDaily;
+        if (avg4mDaily > 0 && avg30dDaily > avg4mDaily * limitMultiplier) {
+            guarded30dDaily = avg4mDaily * limitMultiplier;
+        }
+        // =========================
+        // 5) Seasonal Mode (เอาหมด)
+        // แนวคิด: ถ้า 30Day "สูงกว่า" 4M มาก (แปลว่าช่วงนี้กำลังพีค)
+        // ให้เพิ่มน้ำหนัก 30Day แบบชั่วคราว แต่ไม่ให้เกินเพดาน
+        // =========================
+        const seasonalTrigger = 1.8; // ถ้า 30Day > 4M * 1.8 ถือว่าพีค
+        const seasonalBoostMax = 0.20; // เพิ่มน้ำหนัก 30Day สูงสุด +0.20
+        if (avg4mDaily > 0) {
+            const ratio = avg30dDaily / avg4mDaily;
+            if (ratio >= seasonalTrigger) {
+                // เพิ่ม w30 ตามระดับความพีค แต่ไม่เกิน seasonalBoostMax
+                const boost = Math.min(seasonalBoostMax, (ratio - seasonalTrigger) * 0.10);
+                w30 = Math.min(0.95, w30 + boost);
+                w4m = 1 - w30;
+            }
+        }
+        // =========================
+        // 6) AvgDailyUse (ตัวหลักในการคำนวณสต๊อก)
+        // =========================
+        let avgDailyUse = (avg4mDaily * w4m) + (guarded30dDaily * w30);
+        if (!isFinite(avgDailyUse) || avgDailyUse < 0) avgDailyUse = 0;
+        r.AvgDailyUse = avgDailyUse;
+        // =========================
+        // 7) Mean (ฉลาดขึ้น)
+        // เดิม: max(ThirtyDay, AvgMonthly)
+        // ใหม่: Mean รายเดือน = (AvgMonthly 4M * w4m) + (30Day(ถือเป็น1เดือน) * w30)
+        // =========================
+        const avgMonthlyFrom30d = qty30d; // 30 วัน = 1 เดือน
+        let meanMonthly = (avgMonthlyFrom4m * w4m) + (avgMonthlyFrom30d * w30);
+        // guard Mean เหมือนกัน
+        if (avgMonthlyFrom4m > 0 && avgMonthlyFrom30d > avgMonthlyFrom4m * limitMultiplier) {
+            meanMonthly = (avgMonthlyFrom4m * w4m) + ((avgMonthlyFrom4m * limitMultiplier) * w30);
+        }
+        if (!isFinite(meanMonthly) || meanMonthly < 0) meanMonthly = 0;
+        r.Mean = meanMonthly;
+        // =========================
+        // 8) Stockout Protection (เอาหมด)
+        // ถ้า Fast/Medium แต่ของหมด → เพิ่ม SafetyDays ชั่วคราว
+        // (เพื่อกันขาดช่วง lead time)
+        // =========================
+        let safetyDaysEffective = safetyDays;
+        if (unrestricted === 0 && (r.Moving === "Fast" || r.Moving === "Medium")) {
+            // เพิ่ม safety อีก 30% ของ coverDays (แต่ไม่ต่ำกว่า +3 วัน)
+            const add = Math.max(3, Math.round(coverDays * 0.30));
+            safetyDaysEffective = safetyDays + add;
+            // ถ้าเป็น ABC A เพิ่มอีกนิด
+            if (r.ABCValue === "A") safetyDaysEffective += 2;
+        }
+        // กัน safetyDaysEffective บาน
+        safetyDaysEffective = Math.min(365, Math.max(0, safetyDaysEffective));
+        // =========================
+        // 9) SafetyStock / ROP / DOS
+        // ใช้ AvgDailyUse ใหม่ + safetyDaysEffective
+        // =========================
+        const d = r.AvgDailyUse || 0;
+        const safetyStock = d * safetyDaysEffective;
+        const rop = (d * leadTime) + safetyStock;
+        const dos = d > 0 ? (unrestricted / d) : 9999;
+        r.SafetyStock = Math.round(safetyStock);
+        r.ROP = Math.round(rop);
+        r.DOS = dos > 9999 ? 9999 : Number(dos.toFixed(1));
+        // =========================
+        // 10) RecommendedOrder
+        // ถ้าคงเหลือ < ROP → เติมให้ครอบคลุม coverDays
+        // =========================
+        let recommend = 0;
+        if (unrestricted < rop) {
+            const needed = d * coverDays; // ต้องมีให้ครอบคลุม coverDays
+            recommend = needed - unrestricted; // ขาดเท่าไรเติมเท่านั้น
+            if (recommend < 0) recommend = 0;
+        }
+        // ปัดตามแพ็ค
+        if (mul > 0) recommend = Math.ceil(recommend / mul) * mul;
+        r.RecommendedOrder = Math.round(recommend);
+        // =========================
+        // 11) สั่งจริง (ไม่ทับถ้า user เคยแก้)
+        // =========================
+        if (!r._actualOrderTouched) {
+            if (r.ActualOrder == null || isNaN(r.ActualOrder)) {
+                r.ActualOrder = r.RecommendedOrder;
+            }
+        }
+        // =========================
+        // 12) กฎตัดสั่งเดิมของคุณ (คงไว้ แต่ใช้ Mean ใหม่ที่นิ่งกว่า)
+        // =========================
+        if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
+        if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
+        if (qty30d >= qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
+        // =========================
+        // 13) ReturnQty / ReturnValue (เดิม)
+        // =========================
+        const keepQty = calculateKeepQty(r);
+        const returnQty = Math.max(0, unrestricted - keepQty);
+        const unitPrice = unrestricted > 0 ? (Number(r.Value || 0) / unrestricted) : 0;
+        r.ReturnQty = Math.round(returnQty);
+        r.ReturnValue = returnQty * unitPrice;
+    });
 }
-function populateOwnerFilter(dataList){
-    const sel=document.getElementById("responsibleFilter");
-    const current=sel.value;
-    sel.innerHTML='<option value="">ทุกคน</option>';
-    const owners=new Map();
-    let hasEmpty=false;
-    (dataList||allData).forEach(r=>{
-        if(r.OwnerId){
-            if(!owners.has(r.OwnerId))owners.set(r.OwnerId,r.OwnerName||r.OwnerId);
-        }else{
-            hasEmpty=true;
+function populateOwnerFilter(dataList) {
+    const sel = document.getElementById("responsibleFilter");
+    const current = sel.value;
+    sel.innerHTML = '<option value="">ทุกคน</option>';
+    const owners = new Map();
+    let hasEmpty = false;
+    (dataList || allData).forEach(r => {
+        if (r.OwnerId) {
+            if (!owners.has(r.OwnerId)) owners.set(r.OwnerId, r.OwnerName || r.OwnerId);
+        } else {
+            hasEmpty = true;
         }
     });
-    if(hasEmpty){
-        const optEmpty=document.createElement("option");
-        optEmpty.value="__EMPTY__";
-        optEmpty.textContent="(ค่าว่าง)";
+    if (hasEmpty) {
+        const optEmpty = document.createElement("option");
+        optEmpty.value = "__EMPTY__";
+        optEmpty.textContent = "(ค่าว่าง)";
         sel.appendChild(optEmpty);
     }
     Array.from(owners.entries())
-        .sort((a,b)=>a[1].localeCompare(b[1],'th-TH'))
-        .forEach(([id,name])=>{
-            const opt=document.createElement("option");
-            opt.value=id;
-            opt.textContent=`${name} (${id})`;
+        .sort((a, b) => a[1].localeCompare(b[1], 'th-TH'))
+        .forEach(([id, name]) => {
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = `${name} (${id})`;
             sel.appendChild(opt);
         });
-    if(current && Array.from(sel.options).some(o=>o.value===current)){
-        sel.value=current;
-    }else{
-        sel.value="";
+    if (current && Array.from(sel.options).some(o => o.value === current)) {
+        sel.value = current;
+    } else {
+        sel.value = "";
     }
 }
-function populateStatusFilter(){
-    const statusFilter=document.getElementById("statusFilter");
-    const current=statusFilter.value;
-    statusFilter.innerHTML='<option value="">ทุกสถานะ</option><option value="ไม่มีสถานะ">ไม่มีสถานะ</option>';
-    const statusSet=new Set();
-    allData.forEach(r=>{
-        if(r.Status&&r.Status.trim()!=="")statusSet.add(r.Status.trim());
+function populateStatusFilter() {
+    const statusFilter = document.getElementById("statusFilter");
+    const current = statusFilter.value;
+    statusFilter.innerHTML = '<option value="">ทุกสถานะ</option><option value="ไม่มีสถานะ">ไม่มีสถานะ</option>';
+    const statusSet = new Set();
+    allData.forEach(r => {
+        if (r.Status && r.Status.trim() !== "") statusSet.add(r.Status.trim());
     });
-    Array.from(statusSet).sort().forEach(s=>{
-        const opt=document.createElement("option");
-        opt.value=s;opt.textContent=s;
+    Array.from(statusSet).sort().forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s; opt.textContent = s;
         statusFilter.appendChild(opt);
     });
-    if(current && Array.from(statusFilter.options).some(o=>o.value===current)){
-        statusFilter.value=current;
-    }else{
-        statusFilter.value="";
+    if (current && Array.from(statusFilter.options).some(o => o.value === current)) {
+        statusFilter.value = current;
+    } else {
+        statusFilter.value = "";
     }
 }
-function setDefaultAndCalculate(){
-    document.getElementById("statusFilter").value="";
-    document.getElementById("searchInput").value="";
-    document.getElementById("responsibleFilter").value="";
-    mode="all";abcFilter="";movingFilter="";
+function setDefaultAndCalculate() {
+    document.getElementById("statusFilter").value = "";
+    document.getElementById("searchInput").value = "";
+    document.getElementById("responsibleFilter").value = "";
+    mode = "all"; abcFilter = ""; movingFilter = "";
     populateStatusFilter();
     applyFiltersAndRender();
 }
-document.getElementById("tableHeader").addEventListener("click",e=>{
-    const col=e.target.closest("th[data-sort]");
-    if(!col)return;
-    const key=col.getAttribute("data-sort");
-    if(sortKey===key)sortDir=sortDir==="asc"?"desc":"asc";
-    else{sortKey=key;sortDir="desc";}
+document.getElementById("tableHeader").addEventListener("click", e => {
+    const col = e.target.closest("th[data-sort]");
+    if (!col) return;
+    const key = col.getAttribute("data-sort");
+    if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+    else { sortKey = key; sortDir = "desc"; }
     applyFiltersAndRender();
 });
 function applyFiltersAndRender() {
@@ -1110,17 +1110,17 @@ function applyFiltersAndRender() {
     // 6. โหมดพิเศษต่าง ๆ
     if (mode === "onlyOrder") {
         viewData = viewData.filter(r => Math.round(r.RecommendedOrder || 0) >= 1);
-    } 
+    }
     else if (mode === "returnable") {
         viewData = viewData.filter(r => (r.ReturnQty || 0) > 0);
-    } 
-    else if (mode === "shortship") {                    // โหมดใหม่: มีในนวนคร แต่คลังนี้หมด
-        viewData = viewData.filter(r => 
+    }
+    else if (mode === "out_of_stock") {
+        viewData = viewData.filter(r =>
             Number(r.Navanakorn || 0) > 0 && Number(r.Unrestricted || 0) === 0
         );
-    } 
-    else if (mode === "shortship_wait") {               // โหมดใหม่: ทั้งนวนครและคลังนี้หมด
-        viewData = viewData.filter(r => 
+    }
+    else if (mode === "out_of_stock_wait") {
+        viewData = viewData.filter(r =>
             Number(r.Navanakorn || 0) === 0 && Number(r.Unrestricted || 0) === 0
         );
     }
@@ -1195,7 +1195,7 @@ function applyFiltersAndRender() {
     renderPagination();
     updateAllCards(baseData, filteredData); // ส่ง baseData (ก่อนกรองโหมด) ไปคำนวณการ์ด Shortship
 }
-function calcABCForMode(data, modeType){
+function calcABCForMode(data, modeType) {
     let sorted = [...data];
     // ✅ เลือกตัวเลขที่จะใช้จัดอันดับ + รวมมูลค่า
     const getVal = (r) => {
@@ -1209,13 +1209,13 @@ function calcABCForMode(data, modeType){
         return (r.Value || 0);
     };
     // ✅ sort ตามค่าที่ใช้จริง
-    sorted.sort((a,b) => getVal(b) - getVal(a));
-    const total = sorted.reduce((s,r) => s + getVal(r), 0);
+    sorted.sort((a, b) => getVal(b) - getVal(a));
+    const total = sorted.reduce((s, r) => s + getVal(r), 0);
     let cum = 0;
     sorted.forEach(r => {
         const val = getVal(r);
         cum += val;
-        const pct = total ? (cum/total)*100 : 0;
+        const pct = total ? (cum / total) * 100 : 0;
         // เขียนกลับไปยัง object ตัวจริงใน data
         const orig = data.find(x => x.Material === r.Material && x.Plant === r.Plant);
         if (orig) {
@@ -1227,7 +1227,7 @@ function calcABCForMode(data, modeType){
 function updateAllCards(baseData, filteredData) {
     const abc = { A: 0, B: 0, C: 0 }, cntABC = { A: 0, B: 0, C: 0 };
     const mov = { Fast: 0, Medium: 0, Slow: 0, Slowly: 0, Dead: 0 },
-          cntMov = { Fast: 0, Medium: 0, Slow: 0, Slowly: 0, Dead: 0 };
+        cntMov = { Fast: 0, Medium: 0, Slow: 0, Slowly: 0, Dead: 0 };
 
     // === คำนวณ Shortship & Shortship Wait จาก baseData (ทั้งหมดก่อนกรอง) ===
     let shortshipValue = 0, shortshipCount = 0;
@@ -1248,13 +1248,13 @@ function updateAllCards(baseData, filteredData) {
     });
 
     // อัปเดตการ์ด Shortship
-    if (document.getElementById("valShortship")) {
-        document.getElementById("valShortship").textContent = formatShortCurrency(shortshipValue);
-        document.getElementById("countShortship").textContent = shortshipCount + " รายการ";
+    if (document.getElementById("valOutOfStock")) {
+        document.getElementById("valOutOfStock").textContent = formatShortCurrency(shortshipValue);
+       document.getElementById("countOutOfStock").textContent = shortshipCount;
     }
-    if (document.getElementById("valShortshipWait")) {
-        document.getElementById("valShortshipWait").textContent = formatShortCurrency(shortshipWaitValue);
-        document.getElementById("countShortshipWait").textContent = shortshipWaitCount + " รายการ";
+    if (document.getElementById("valOutOfStockWait")) {
+        document.getElementById("valOutOfStockWait").textContent = formatShortCurrency(shortshipWaitValue);
+        document.getElementById("countOutOfStockWait").textContent = shortshipWaitCount;
     }
 
     // === คำนวณ ABC / Moving จาก filteredData (ข้อมูลที่แสดงจริง) ===
@@ -1361,40 +1361,40 @@ function updateAllCards(baseData, filteredData) {
     document.getElementById("stockDaysValue").textContent = stock_days > 9999 ? 'มาก' : stock_days;
     document.getElementById("afterStockDaysValue").textContent = after_stock_days > 9999 ? 'มาก' : after_stock_days;
 }
-function getStatusClass(status){
-    if(!status||status.trim()==='')return "status-other";
-    const s=status.toLowerCase();
-    if(s.includes('pending')||s.includes('รอดำเนินการ'))return "status-pending";
-    if(s.includes('approved')||s.includes('อนุมัติ')||s.includes('approve'))return "status-approved";
-    if(s.includes('rejected')||s.includes('ปฏิเสธ')||s.includes('reject'))return "status-rejected";
-    if(s.includes('complete')||s.includes('เสร็จสิ้น')||s.includes('completed'))return "status-approved";
-    if(s.includes('active')||s.includes('ใช้งาน'))return "status-approved";
+function getStatusClass(status) {
+    if (!status || status.trim() === '') return "status-other";
+    const s = status.toLowerCase();
+    if (s.includes('pending') || s.includes('รอดำเนินการ')) return "status-pending";
+    if (s.includes('approved') || s.includes('อนุมัติ') || s.includes('approve')) return "status-approved";
+    if (s.includes('rejected') || s.includes('ปฏิเสธ') || s.includes('reject')) return "status-rejected";
+    if (s.includes('complete') || s.includes('เสร็จสิ้น') || s.includes('completed')) return "status-approved";
+    if (s.includes('active') || s.includes('ใช้งาน')) return "status-approved";
     return "status-other";
 }
-function renderTable(){
-    const container=document.getElementById("dataList");
-    container.innerHTML="";
-    const start=(currentPage-1)*rowsPerPage;
-    const end=start+rowsPerPage;
-    const pageData=filteredData.slice(start,end);
-    if(pageData.length===0){
-        container.innerHTML=`<tr><td colspan="30" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
+function renderTable() {
+    const container = document.getElementById("dataList");
+    container.innerHTML = "";
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const pageData = filteredData.slice(start, end);
+    if (pageData.length === 0) {
+        container.innerHTML = `<tr><td colspan="30" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
         return;
     }
-    pageData.forEach(r=>{
+    pageData.forEach(r => {
         const orderQty = Math.round(r.RecommendedOrder || 0);
-const actual = Math.round(r.ActualOrder || 0);
-let orderClass;
-if (actual < orderQty) {
-    orderClass = "order-less"; // แดง
-} else if (actual > orderQty) {
-    orderClass = "order-more"; // น้ำเงิน
-} else {
-    orderClass = "order-equal"; // เขียว
-}
-        const statusClass=getStatusClass(r.Status);
-        const displayStatus=r.Status&&r.Status.trim()!==''?r.Status:"-";
-        const ownerDisplay=r.OwnerName||(r.OwnerId||"-");
+        const actual = Math.round(r.ActualOrder || 0);
+        let orderClass;
+        if (actual < orderQty) {
+            orderClass = "order-less"; // แดง
+        } else if (actual > orderQty) {
+            orderClass = "order-more"; // น้ำเงิน
+        } else {
+            orderClass = "order-equal"; // เขียว
+        }
+        const statusClass = getStatusClass(r.Status);
+        const displayStatus = r.Status && r.Status.trim() !== '' ? r.Status : "-";
+        const ownerDisplay = r.OwnerName || (r.OwnerId || "-");
         const navClass = (Number(r.Navanakorn || 0) === 0) ? "nava-red" : "nava-orange";
         const navanakornHtml = `<span class="${navClass}">${formatNumber(r.Navanakorn || 0)}</span>`;
         let stockClass = "stock-green";
@@ -1404,7 +1404,7 @@ if (actual < orderQty) {
         const unrestrictedHtml = `
             <span class="${stockClass}">${formatNumber(r.Unrestricted)}</span>
         `;
-        const row=document.createElement("tr");
+        const row = document.createElement("tr");
         row.innerHTML = `
     <td></td>
     <td>${r.Plant}</td>
@@ -1416,12 +1416,12 @@ if (actual < orderQty) {
     <td><span class="value">${formatCurrency(r.Value)}</span></td>
     <td>${formatNumber(r.Qty6Month)}</td>
     <td>${formatNumber(r.Qty4Month)}</td>
-    <td>${r.AvgMonthly.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
+    <td>${r.AvgMonthly.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
     <td>${formatNumber(r.ThirtyDay)}</td>
-    <td>${r.Mean.toLocaleString('th-TH',{minimumFractionDigits:1,maximumFractionDigits:1})}</td>
+    <td>${r.Mean.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
     <td>${formatNumber(r.SafetyStock)}</td>
     <td>${formatNumber(r.ROP)}</td>
-    <td>${r.DOS>9999?'มาก':r.DOS.toFixed(1)}</td>
+    <td>${r.DOS > 9999 ? 'มาก' : r.DOS.toFixed(1)}</td>
    <td>
     <span class="order-span ${orderClass}">
         ${formatNumber(orderQty)}
@@ -1443,35 +1443,35 @@ if (actual < orderQty) {
     <td><span class="moving-${r.Moving.toLowerCase()}">${r.Moving}</span></td>
     <td><span class="return-qty">${formatNumber(r.ReturnQty)}</span></td>
     <td>${r.CumPercent.toFixed(1)}%</td>
-    <td class="col-location">${r.Location||''}</td>
-    <td class="col-shelf">${r.Shelf||''}</td>
+    <td class="col-location">${r.Location || ''}</td>
+    <td class="col-shelf">${r.Shelf || ''}</td>
     <td class="responsible-cell"><span class="responsible-user">${ownerDisplay}</span></td>
     <td><span class="${statusClass}">${displayStatus}</span></td>
 `;
-const actualInput = row.querySelector('input.actual-order-input');
-if (actualInput) {
-    actualInput.addEventListener('input', (e) => {
-        const v = parseFloat(e.target.value);
-        const act = isNaN(v) ? 0 : v;
-        r.ActualOrder = act;
-        r._actualOrderTouched = true; // ★ บอกว่า user เคยแก้แล้ว
-        // ถ้าคุณมี localStorage ตามคำตอบก่อนหน้า
-        if (typeof saveActualOrdersToLocalStorage === 'function') {
-            saveActualOrdersToLocalStorage();
+        const actualInput = row.querySelector('input.actual-order-input');
+        if (actualInput) {
+            actualInput.addEventListener('input', (e) => {
+                const v = parseFloat(e.target.value);
+                const act = isNaN(v) ? 0 : v;
+                r.ActualOrder = act;
+                r._actualOrderTouched = true; // ★ บอกว่า user เคยแก้แล้ว
+                // ถ้าคุณมี localStorage ตามคำตอบก่อนหน้า
+                if (typeof saveActualOrdersToLocalStorage === 'function') {
+                    saveActualOrdersToLocalStorage();
+                }
+                // ★ อัปเดตสีของ "แนะนำสั่ง" ในแถวนี้ทันที
+                const rec = Math.round(r.RecommendedOrder || 0);
+                const span = row.querySelector('.order-span');
+                if (span) {
+                    span.classList.remove('order-less', 'order-more', 'order-equal');
+                    let cls;
+                    if (act < rec) cls = 'order-less';
+                    else if (act > rec) cls = 'order-more';
+                    else cls = 'order-equal';
+                    span.classList.add(cls);
+                }
+            });
         }
-        // ★ อัปเดตสีของ "แนะนำสั่ง" ในแถวนี้ทันที
-        const rec = Math.round(r.RecommendedOrder || 0);
-        const span = row.querySelector('.order-span');
-        if (span) {
-            span.classList.remove('order-less','order-more','order-equal');
-            let cls;
-            if (act < rec) cls = 'order-less';
-            else if (act > rec) cls = 'order-more';
-            else cls = 'order-equal';
-            span.classList.add(cls);
-        }
-    });
-}
         // ★ ปุ่มตะกร้าในคอลัมน์แรก
         const cartCell = row.cells[0];
         const cartBtn = document.createElement('button');
@@ -1489,38 +1489,38 @@ if (actualInput) {
         container.appendChild(row);
     });
 }
-function renderPagination(){
-    const totalPages=Math.max(1,Math.ceil(filteredData.length/rowsPerPage));
-    const p=document.getElementById("pagination");
-    p.innerHTML="";
-    const createBtn=(text,page,disabled=false)=>{
-        const btn=document.createElement("button");
-        btn.className="page-btn";
-        if(page===currentPage)btn.classList.add("active");
-        btn.textContent=text;
-        btn.disabled=disabled;
-        if(!disabled)btn.onclick=()=>{currentPage=page;renderTable();renderPagination();};
+function renderPagination() {
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+    const p = document.getElementById("pagination");
+    p.innerHTML = "";
+    const createBtn = (text, page, disabled = false) => {
+        const btn = document.createElement("button");
+        btn.className = "page-btn";
+        if (page === currentPage) btn.classList.add("active");
+        btn.textContent = text;
+        btn.disabled = disabled;
+        if (!disabled) btn.onclick = () => { currentPage = page; renderTable(); renderPagination(); };
         return btn;
     };
-    p.appendChild(createBtn("<<",1,currentPage===1));
-    p.appendChild(createBtn("<",currentPage-1,currentPage===1));
-    p.appendChild(createBtn(currentPage,currentPage,true));
-    p.appendChild(createBtn(">",currentPage+1,currentPage===totalPages));
-    p.appendChild(createBtn(">>",totalPages,currentPage===totalPages));
+    p.appendChild(createBtn("<<", 1, currentPage === 1));
+    p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
+    p.appendChild(createBtn(currentPage, currentPage, true));
+    p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
+    p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
 }
 function getOrderStorageKey() {
     // ถ้าอยากแยกตาม Plant
     return 'abc_actual_orders_' + (selectedPlant || 'ALL');
 }
 function saveActualOrdersToLocalStorage() {
-  const map = {};
-  allData.forEach(r => {
-    if (r._actualOrderTouched) { // เคยแก้แล้ว
-      const key = `${r.Plant}-${r.Material}`;
-      map[key] = Number(r.ActualOrder || 0);
-    }
-  });
-  localStorage.setItem(getOrderStorageKey(), JSON.stringify(map));
+    const map = {};
+    allData.forEach(r => {
+        if (r._actualOrderTouched) { // เคยแก้แล้ว
+            const key = `${r.Plant}-${r.Material}`;
+            map[key] = Number(r.ActualOrder || 0);
+        }
+    });
+    localStorage.setItem(getOrderStorageKey(), JSON.stringify(map));
 }
 function setActualOrderFromRecommended() {
     if (!Array.isArray(filteredData) || filteredData.length === 0) {
@@ -1594,64 +1594,66 @@ function loadActualOrdersFromLocalStorage() {
         }
     });
 }
-function exportToCSV(){
-    const headers=[
-    "Plant","Material","รายการอะไหล่","Storage bin",
-    "หน่วย","นวนคร","คงเหลือ","มูลค่า","ใช้ 6 เดือน","ใช้ 4 เดือน",
-    "เฉลี่ย/ด.","30Day","Mean","Safety","ROP","DOS","แนะนำสั่งซื้อ",
-    "สั่งจริง", // ★ เพิ่ม
-    "หมายเหตุ","คูณหน่วย","Product","ABC","Moving",
-    "ส่งคืนได้ (ชิ้น)","% สะสม",
-    "Location","Shelf","ผู้รับคืน","Status"
-];
-    let csv="\uFEFF"+headers.join(",")+"\n";
-    filteredData.forEach(r=>{
-        const row=[
-    r.Plant,r.Material,(r.Description||"").replace(/"/g,'""'),r.StorageBin,r.Unit,r.Navanakorn || 0,
-    r.Unrestricted,r.Value,r.Qty6Month,r.Qty4Month,
-    r.AvgDailyUse.toFixed(1),r.ThirtyDay,r.Mean.toFixed(1),Math.round(r.SafetyStock),Math.round(r.ROP),
-    r.DOS>9999?"มาก":r.DOS.toFixed(1),Math.round(r.RecommendedOrder),
-    r.ActualOrder || 0, // ★ คอลัมสั่งจริง
-    r.Note,r.MultiplyUnit,r.Product,r.ABCValue,r.Moving,
-    r.ReturnQty,r.CumPercent.toFixed(2),
-    r.Location||"",r.Shelf||"",r.OwnerName||r.OwnerId||"",r.Status||""
-];
-        csv+=row.map(v=>`"${v}"`).join(",")+"\n";
+function exportToCSV() {
+    const headers = [
+        "Plant", "Material", "รายการอะไหล่", "Storage bin",
+        "หน่วย", "นวนคร", "คงเหลือ", "มูลค่า", "ใช้ 6 เดือน", "ใช้ 4 เดือน",
+        "เฉลี่ย/ด.", "30Day", "Mean", "Safety", "ROP", "DOS", "แนะนำสั่งซื้อ",
+        "สั่งจริง", // ★ เพิ่ม
+        "หมายเหตุ", "คูณหน่วย", "Product", "ABC", "Moving",
+        "ส่งคืนได้ (ชิ้น)", "% สะสม",
+        "Location", "Shelf", "ผู้รับคืน", "Status"
+    ];
+    let csv = "\uFEFF" + headers.join(",") + "\n";
+    filteredData.forEach(r => {
+        const row = [
+            r.Plant, r.Material, (r.Description || "").replace(/"/g, '""'), r.StorageBin, r.Unit, r.Navanakorn || 0,
+            r.Unrestricted, r.Value, r.Qty6Month, r.Qty4Month,
+            r.AvgDailyUse.toFixed(1), r.ThirtyDay, r.Mean.toFixed(1), Math.round(r.SafetyStock), Math.round(r.ROP),
+            r.DOS > 9999 ? "มาก" : r.DOS.toFixed(1), Math.round(r.RecommendedOrder),
+            r.ActualOrder || 0, // ★ คอลัมสั่งจริง
+            r.Note, r.MultiplyUnit, r.Product, r.ABCValue, r.Moving,
+            r.ReturnQty, r.CumPercent.toFixed(2),
+            r.Location || "", r.Shelf || "", r.OwnerName || r.OwnerId || "", r.Status || ""
+        ];
+        csv += row.map(v => `"${v}"`).join(",") + "\n";
     });
-    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.href=url;a.download=`ABC_Analysis_${new Date().toISOString().slice(0,10)}.csv`;
-    a.click();URL.revokeObjectURL(url);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `ABC_Analysis_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(url);
 }
-document.getElementById("cardTotalStock").onclick=()=>{mode="all";abcFilter="";movingFilter="";applyFiltersAndRender();};
-document.getElementById("cardOrderItems").onclick=()=>{mode="onlyOrder";abcFilter="";movingFilter="";applyFiltersAndRender();};
-document.getElementById("cardReturnValue").onclick=()=>{mode="returnable";abcFilter="";movingFilter="";applyFiltersAndRender();};
-document.getElementById("cardShortship").onclick = () => {
-    mode = "shortship";
-    abcFilter = ""; movingFilter = "";
+document.getElementById("cardTotalStock").onclick = () => { mode = "all"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardOrderItems").onclick = () => { mode = "onlyOrder"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardReturnValue").onclick = () => { mode = "returnable"; abcFilter = ""; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardOutOfStock").onclick = () => {
+    mode = "out_of_stock";
+    abcFilter = ""; 
+    movingFilter = "";
     applyFiltersAndRender();
 };
 
-document.getElementById("cardShortshipWait").onclick = () => {
-    mode = "shortship_wait";
-    abcFilter = ""; movingFilter = "";
+document.getElementById("cardOutOfStockWait").onclick = () => {
+    mode = "out_of_stock_wait";
+    abcFilter = ""; 
+    movingFilter = "";
     applyFiltersAndRender();
 };
-document.getElementById("abcA").onclick=()=>{abcFilter="A";movingFilter="";applyFiltersAndRender();};
-document.getElementById("abcB").onclick=()=>{abcFilter="B";movingFilter="";applyFiltersAndRender();};
-document.getElementById("abcC").onclick=()=>{abcFilter="C";movingFilter="";applyFiltersAndRender();};
-document.getElementById("cardFast").onclick=()=>{movingFilter="Fast";abcFilter="";applyFiltersAndRender();};
-document.getElementById("cardMedium").onclick=()=>{movingFilter="Medium";abcFilter="";applyFiltersAndRender();};
-document.getElementById("cardSlow").onclick=()=>{movingFilter="Slow";abcFilter="";applyFiltersAndRender();};
-document.getElementById("cardSlowly").onclick=()=>{movingFilter="Slowly";abcFilter="";applyFiltersAndRender();};
-document.getElementById("cardDead").onclick=()=>{movingFilter="Dead";abcFilter="";applyFiltersAndRender();};
-document.getElementById("plantFilter").addEventListener("change",applyFiltersAndRender);
-document.getElementById("statusFilter").addEventListener("change",applyFiltersAndRender);
-document.getElementById("responsibleFilter").addEventListener("change",applyFiltersAndRender);
-["leadTimeDays","safetyDays","coverDays","searchInput"].forEach(id=>{
-    document.getElementById(id).addEventListener("input",applyFiltersAndRender);
+document.getElementById("abcA").onclick = () => { abcFilter = "A"; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("abcB").onclick = () => { abcFilter = "B"; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("abcC").onclick = () => { abcFilter = "C"; movingFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardFast").onclick = () => { movingFilter = "Fast"; abcFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardMedium").onclick = () => { movingFilter = "Medium"; abcFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardSlow").onclick = () => { movingFilter = "Slow"; abcFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardSlowly").onclick = () => { movingFilter = "Slowly"; abcFilter = ""; applyFiltersAndRender(); };
+document.getElementById("cardDead").onclick = () => { movingFilter = "Dead"; abcFilter = ""; applyFiltersAndRender(); };
+document.getElementById("plantFilter").addEventListener("change", applyFiltersAndRender);
+document.getElementById("statusFilter").addEventListener("change", applyFiltersAndRender);
+document.getElementById("responsibleFilter").addEventListener("change", applyFiltersAndRender);
+["leadTimeDays", "safetyDays", "coverDays", "searchInput"].forEach(id => {
+    document.getElementById(id).addEventListener("input", applyFiltersAndRender);
 });
 document.getElementById("orderDiffFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("setActualBtn").addEventListener("click", setActualOrderFromRecommended);
-document.getElementById("exportBtn").onclick=exportToCSV;
+document.getElementById("exportBtn").onclick = exportToCSV;
