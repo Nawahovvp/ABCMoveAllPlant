@@ -435,30 +435,96 @@
                 </ol>
                 <p><small>ผลลัพธ์: Fast + ABC A จะได้ Mean ที่ตอบสนองต่อแนวโน้มล่าสุดเร็ว<br>Slow + ABC C จะได้ Mean
                         ที่นิ่งและยึดข้อมูลเก่าเป็นหลัก</small></p>
+                <div class="help-note" title="สรุปสำหรับผู้จัดการคลัง">
+                    <b>สรุปสำหรับผู้จัดการคลัง:</b> ระบบจะ “สั่งเมื่อเสี่ยงขาด” (Stock &lt; ROP) และ
+                    “หยุดสั่งของไม่เคลื่อนไหว”
+                    โดยให้ความสำคัญกับกลุ่ม <b>ABC A</b> และกลุ่ม <b>Fast/Medium</b> มากกว่า Slow/Slowly
+                </div>
+                <h3>กฎการสั่งซื้อ (Recommended Order Rules) – เวอร์ชันสมบูรณ์</h3>
 
-                <h3>กฎการแนะนำสั่ง (RecommendedOrder) – ลำดับขั้นตอนจริงในโค้ด</h3>
-                <ol>
-                    <li><b>คำนวณ AvgDailyUse</b> โดยถ่วงน้ำหนักระหว่างข้อมูล 4 เดือน + 30 วัน<br>
-                        <small>(Fast/ABC A จะให้น้ำหนัก 30Day มากกว่า, Slow/C จะให้น้ำหนัก 4M มากกว่า)</small>
-                    </li>
-                    <li><b>ป้องกัน Outlier</b> → ถ้า 30Day พุ่งสูงผิดปกติ จะจำกัดไม่ให้เกิน 4M × 3 เท่า</li>
-                    <li><b>Seasonal Boost</b> → ถ้า 30Day สูงกว่า 4M มาก (ช่วงพีค) จะเพิ่มน้ำหนัก 30Day ชั่วคราว</li>
-                    <li><b>Stockout Protection</b> → ถ้าคงเหลือ = 0 และเป็น Fast/Medium จะเพิ่ม Safety Days ชั่วคราว
-                    </li>
-                    <li><b>คำนวณ ROP</b> = (AvgDailyUse × LeadTime 5 วัน) + SafetyStock</li>
-                    <li><b>ถ้าคงเหลือ < ROP</b> → แนะนำสั่งให้ครอบคลุม CoverDays (40 วัน)<br>
-                                <small>จำนวน = (AvgDailyUse × 40) - คงเหลือ</small></li>
-                    <li><b>ถ้าคงเหลือ ≥ ROP</b> → แนะนำสั่ง = 0</li>
-                    <li><b>ปัดจำนวนสั่ง</b> ตาม MultiplyUnit (ถ้ามี) เพื่อให้สั่งตามแพ็คจริง</li>
-                    <li><b>กฎตัดสั่งพิเศษ (ใช้เฉพาะ Slow / Slowly เท่านั้น)</b>
-                        <ul>
-                            <li>ถ้า Mean = 0 → ไม่สั่ง</li>
-                            <li>ถ้า 30Day = 0 → ไม่สั่ง</li>
-                            <li>ถ้า 30Day ≥ Qty4Month และเป็น Slowly → ไม่สั่ง</li>
-                        </ul>
-                        <small>หมายเหตุ: Fast / Medium / Dead จะยังสั่งตามปกติแม้ 30Day = 0 ถ้า Mean > 0</small>
-                    </li>
-                </ol>
+                <p>
+                    กฎต่อไปนี้คือ <b>ลำดับตรรกะจริงที่ระบบใช้</b> เพื่อคำนวณ “แนะนำสั่ง”
+                    โดยออกแบบให้สมดุลระหว่าง <b>ป้องกันของขาด</b> และ <b>ไม่ให้ของเกิน</b>
+                </p>
+
+                <h4>ขั้นที่ 1: คัดกรองระดับความสำคัญ</h4>
+                <ul>
+                    <li><b>ABC</b> → วัด “ความสำคัญเชิงมูลค่า” (A สำคัญสูงสุด)</li>
+                    <li><b>Moving</b> → วัด “ความเร็วการใช้” จาก AvgMonthly</li>
+                    <li><b>Dead</b> → <span style="color:#e74c3c;font-weight:bold;">ไม่สั่งทันที</span></li>
+                </ul>
+
+                <h4>ขั้นที่ 2: คำนวณฐานการใช้ (Mean / AvgDailyUse)</h4>
+                <ul>
+                    <li>ใช้ข้อมูล <b>Qty4Month (นิ่ง)</b> + <b>30Day (สด)</b> แบบถ่วงน้ำหนัก</li>
+                    <li>Fast / ABC A → ฟัง 30Day มากขึ้น</li>
+                    <li>Slow / ABC C → ฟัง 4Month มากขึ้น</li>
+                    <li>ป้องกัน Outlier: 30Day ไม่เกิน 4M × 3 เท่า</li>
+                </ul>
+
+                <h4>ขั้นที่ 3: คำนวณจุดสั่งซื้อ (ROP)</h4>
+                <ul>
+                    <li><b>AvgDailyUse</b> = Mean ÷ 30</li>
+                    <li><b>ROP</b> = (AvgDailyUse × LeadTime) + SafetyStock</li>
+                    <li>LeadTime มาตรฐาน = 5 วัน (ปรับได้ตาม Plant)</li>
+                </ul>
+
+                <h4>ขั้นที่ 4: เงื่อนไขเข้าโหมด “แนะนำสั่ง”</h4>
+                <ul>
+                    <li>ถ้า <b>Stock &lt; ROP</b> → เข้าสูตรคำนวณสั่ง</li>
+                    <li>ถ้า <b>Stock ≥ ROP</b> → แนะนำสั่ง = 0</li>
+                </ul>
+
+                <h4>ขั้นที่ 5: คำนวณจำนวนสั่งพื้นฐาน</h4>
+                <ul>
+                    <li>CoverDays มาตรฐาน = <b>40 วัน</b></li>
+                    <li>จำนวนสั่งพื้นฐาน = (AvgDailyUse × 40) − Stock</li>
+                    <li>ถ้าคำนวณแล้ว ≤ 0 → ไม่สั่ง</li>
+                </ul>
+
+                <h4>ขั้นที่ 6: ปัดจำนวนสั่งตามแพ็คจริง</h4>
+                <ul>
+                    <li>ใช้ <b>MultiplyUnit</b> ปัดขึ้นให้ตรงแพ็ค</li>
+                    <li>ถ้าไม่มี MultiplyUnit → ใช้จำนวนจริง</li>
+                </ul>
+
+                <h4>ขั้นที่ 7: กฎตัดสั่ง (Brake Rules – ใช้ลดของเกิน)</h4>
+                <p><b>ใช้เฉพาะกลุ่ม Slow / Slowly เท่านั้น</b></p>
+                <ul>
+                    <li>Mean = 0 → ไม่สั่ง</li>
+                    <li>30Day = 0 → ไม่สั่ง</li>
+                    <li>30Day = 1 และ 4Month = 1 → ไม่สั่ง</li>
+                    <li>30Day ≤ 4Month → ไม่สั่ง</li>
+                    <li>Slowly และ 30Day ≥ 4Month → ไม่สั่ง</li>
+                </ul>
+
+                <p style="color:#27ae60;font-weight:bold;">
+                    Fast / Medium จะไม่โดนกฎตัดเหล่านี้ หาก Mean &gt; 0
+                </p>
+
+                <h4>ขั้นที่ 8: กฎป้องกันของขาด (Early Signal)</h4>
+                <ul>
+                    <li>30Day &gt; 0 และ Stock = 0 → <b>สั่งขั้นต่ำ 1 แพ็ค</b></li>
+                    <li>Fast / Medium และ Stock = 0 → เพิ่ม Safety Days ชั่วคราว</li>
+                </ul>
+
+                <h4>ขั้นที่ 9: กฎแนวโน้มกลับมาใช้ (Revival Logic)</h4>
+                <ul>
+                    <li>ถ้า 30Day &gt; 4Month → ถือว่า “เริ่มกลับมาใช้”</li>
+                    <li>ลดความเข้มของ Brake Rules ชั่วคราว</li>
+                </ul>
+
+                <h4>ขั้นที่ 10: สรุปผลลัพธ์</h4>
+                <ul>
+                    <li>ผ่านทุกเงื่อนไข → แสดง <b>แนะนำสั่ง</b></li>
+                    <li>ไม่ผ่านข้อใดข้อหนึ่ง → แนะนำสั่ง = 0</li>
+                    <li>ผู้ใช้สามารถแก้ไขค่า <b>สั่งจริง</b> ได้เอง ระบบจะจดจำค่า</li>
+                </ul>
+
+                <p class="help-footer" title="ข้อมูลเวอร์ชันและแนวคิดระบบ">
+                    อัปเดตตามโค้ดล่าสุด – เน้นความสมดุลระหว่าง “กันของขาด” และ “ไม่ให้ของเกิน”<br>
+                    ปรับแต่งเพิ่มเติมได้ตามความต้องการของ Plant
+                </p>
 
                 <h3>เคล็ดลับการใช้งาน</h3>
                 <ul>
@@ -469,85 +535,87 @@
                     <li>กด <b>Export CSV</b> เพื่อนำข้อมูลไปวิเคราะห์ต่อ</li>
                 </ul>
 
-                <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> คำเตือน: การรีเซ็ตข้อมูล
-                    “สั่งจริง” (ActualOrder)</h3>
-                <p>ข้อมูล “สั่งจริง” ที่คุณกรอกหรือแก้ไขเอง <b>จะถูกบันทึกถาวรในเบราว์เซอร์</b> และ
-                    <b>ไม่ถูกรีเซ็ตอัตโนมัติ</b> ในกรณีปกติ</p>
-                <p>แต่ข้อมูลจะถูก <b>รีเซ็ต (ทับด้วยค่า “แนะนำสั่ง” ใหม่)</b> หากเกิดอย่างใดอย่างหนึ่งต่อไปนี้:</p>
-                <ul style="color:#e67e22; font-weight:bold;">
-                    <li>คุณ <b>รีเฟรชหน้าเว็บ</b> หรือ <b>โหลดข้อมูล Plant ใหม่</b>
-                        <small style="color:#7f8c8d; font-weight:normal;">(เฉพาะรายการที่คุณ <u>ยังไม่เคยแก้
-                                “สั่งจริง”</u> เท่านั้นที่จะถูกรีเซ็ต
-                            รายการที่เคยแก้แล้วจะดึงค่าจากเบราว์เซอร์กลับมา)</small>
-                    </li>
-                    <li>คุณ <b>กดปุ่ม “ตั้งตามแนะนำ”</b>
-                        <small style="color:#7f8c8d; font-weight:normal;">(จะตั้ง “สั่งจริง” = “แนะนำสั่ง”
-                            เฉพาะรายการในหน้าปัจจุบัน และบันทึกค่านี้ถาวร)</small>
-                    </li>
-                    <li>คุณ <b>ล้างข้อมูลเบราว์เซอร์</b> (Clear browsing data / localStorage)
-                        <small style="color:#7f8c8d; font-weight:normal;">(ข้อมูล “สั่งจริง” ทั้งหมดจะหายไป
-                            ระบบจะเริ่มต้นใหม่ตาม “แนะนำสั่ง”)</small>
-                    </li>
-                </ul>
-                <p><b>คำแนะนำ:</b><br>
-                    • ถ้าต้องการให้ค่าที่กรอก “ติดถาวร” → แก้ไขช่อง “สั่งจริง” อย่างน้อย 1 ครั้ง
-                    ระบบจะบันทึกอัตโนมัติ<br>
-                    • หากต้องการรีเซ็ตทั้งหมด → ล้างข้อมูลเบราว์เซอร์ หรือรอข้อมูลสต็อกอัปเดตครั้งใหญ่</p>
+                <div class="help-warn" title="คำเตือนเกี่ยวกับการรีเซ็ตข้อมูลสั่งจริง">
+                    <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;"></i> คำเตือน: การรีเซ็ตข้อมูล
+                        “สั่งจริง” (ActualOrder)</h3>
+                    <p>ข้อมูล “สั่งจริง” ที่คุณกรอกหรือแก้ไขเอง <b>จะถูกบันทึกถาวรในเบราว์เซอร์</b> และ
+                        <b>ไม่ถูกรีเซ็ตอัตโนมัติ</b> ในกรณีปกติ
+                    </p>
+                    <p>แต่ข้อมูลจะถูก <b>รีเซ็ต (ทับด้วยค่า “แนะนำสั่ง” ใหม่)</b> หากเกิดอย่างใดอย่างหนึ่งต่อไปนี้:</p>
+                    <ul style="color:#e67e22; font-weight:bold;">
+                        <li>คุณ <b>รีเฟรชหน้าเว็บ</b> หรือ <b>โหลดข้อมูล Plant ใหม่</b>
+                            <small style="color:#7f8c8d; font-weight:normal;">(เฉพาะรายการที่คุณ <u>ยังไม่เคยแก้
+                                    “สั่งจริง”</u> เท่านั้นที่จะถูกรีเซ็ต
+                                รายการที่เคยแก้แล้วจะดึงค่าจากเบราว์เซอร์กลับมา)</small>
+                        </li>
+                        <li>คุณ <b>กดปุ่ม “ตั้งตามแนะนำ”</b>
+                            <small style="color:#7f8c8d; font-weight:normal;">(จะตั้ง “สั่งจริง” = “แนะนำสั่ง”
+                                เฉพาะรายการในหน้าปัจจุบัน และบันทึกค่านี้ถาวร)</small>
+                        </li>
+                        <li>คุณ <b>ล้างข้อมูลเบราว์เซอร์</b> (Clear browsing data / localStorage)
+                            <small style="color:#7f8c8d; font-weight:normal;">(ข้อมูล “สั่งจริง” ทั้งหมดจะหายไป
+                                ระบบจะเริ่มต้นใหม่ตาม “แนะนำสั่ง”)</small>
+                        </li>
+                    </ul>
+                    <p><b>คำแนะนำ:</b><br>
+                        • ถ้าต้องการให้ค่าที่กรอก “ติดถาวร” → แก้ไขช่อง “สั่งจริง” อย่างน้อย 1 ครั้ง
+                        ระบบจะบันทึกอัตโนมัติ<br>
+                        • หากต้องการรีเซ็ตทั้งหมด → ล้างข้อมูลเบราว์เซอร์ หรือรอข้อมูลสต็อกอัปเดตครั้งใหญ่</p>
 
-                <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin-top:20px;">
-                    อัปเดตตามโค้ดล่าสุด – เน้นความสมดุลระหว่าง “กันของขาด” และ “ไม่ให้ของเกิน”<br>
-                    ปรับแต่งเพิ่มเติมได้ตามความต้องการของ Plant
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ★ Cart Modal -->
-    <div id="cartModal" class="cart-modal">
-        <div class="cart-modal-content" id="cartModalPrintArea">
-            <div class="cart-modal-header">
-                <h2><i class="fas fa-shopping-cart"></i> ตะกร้าอะไหล่</h2>
-                <div class="cart-emp-input">
-                    <label>
-                        รหัสพนักงาน:
-                        <input type="text" id="employeeCode" placeholder="กรอกรหัสพนักงาน">
-                    </label>
-                    <!-- ★ แสดงชื่อและทีมที่ดึงจาก Employee sheet -->
-                    <div class="cart-emp-info">
-                        <span id="employeeNameLabel"></span>
-                        <span id="employeeTeamLabel"></span>
-                    </div>
+                    <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin-top:20px;">
+                        อัปเดตตามโค้ดล่าสุด – เน้นความสมดุลระหว่าง “กันของขาด” และ “ไม่ให้ของเกิน”<br>
+                        ปรับแต่งเพิ่มเติมได้ตามความต้องการของ Plant
+                    </p>
                 </div>
             </div>
+        </div>
 
-            <div class="cart-modal-body">
-                <table class="cart-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Material</th>
-                            <th>รายการอะไหล่</th>
-                            <th>Storage bin</th>
-                            <th>จำนวน</th>
-                            <th>Pack</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cartTableBody">
-                        <!-- เติมด้วย JS -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="cart-modal-footer">
-                <button class="export-btn" id="cartPrintBtn"><i class="fas fa-print"></i> Print</button>
-                <button class="export-btn" id="cartCloseBtn"
-                    style="background:linear-gradient(135deg,#e74c3c,#c0392b);"><i class="fas fa-times"></i>
-                    ปิดหน้าต่าง</button>
+        <!-- ★ Cart Modal -->
+        <div id="cartModal" class="cart-modal">
+            <div class="cart-modal-content" id="cartModalPrintArea">
+                <div class="cart-modal-header">
+                    <h2><i class="fas fa-shopping-cart"></i> ตะกร้าอะไหล่</h2>
+                    <div class="cart-emp-input">
+                        <label>
+                            รหัสพนักงาน:
+                            <input type="text" id="employeeCode" placeholder="กรอกรหัสพนักงาน">
+                        </label>
+                        <!-- ★ แสดงชื่อและทีมที่ดึงจาก Employee sheet -->
+                        <div class="cart-emp-info">
+                            <span id="employeeNameLabel"></span>
+                            <span id="employeeTeamLabel"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-modal-body">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Material</th>
+                                <th>รายการอะไหล่</th>
+                                <th>Storage bin</th>
+                                <th>จำนวน</th>
+                                <th>Pack</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTableBody">
+                            <!-- เติมด้วย JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="cart-modal-footer">
+                    <button class="export-btn" id="cartPrintBtn"><i class="fas fa-print"></i> Print</button>
+                    <button class="export-btn" id="cartCloseBtn"
+                        style="background:linear-gradient(135deg,#e74c3c,#c0392b);"><i class="fas fa-times"></i>
+                        ปิดหน้าต่าง</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- ✨ JS หลักของระบบ (แยกไฟล์แล้ว) -->
-    <script src="app.js"></script>
+        <!-- ✨ JS หลักของระบบ (แยกไฟล์แล้ว) -->
+        <script src="app.js"></script>
 </body>
 
 </html>
