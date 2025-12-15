@@ -92,6 +92,29 @@ const OUT_OF_STOCK_WAIT_MODE = "out_of_stock_wait";
 //
 function toNumber(v) { return parseFloat((v || "0").toString().replace(/,/g, '')) || 0; }
 function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
+function decimalsOf(n) {
+    const s = (n ?? "").toString();
+    return (s.split(".")[1] || "").length;
+}
+function formatQty(n) {
+    const x = Number(n);
+    if (!isFinite(x)) return "0";
+    return x.toLocaleString('th-TH', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+function roundUpToPack(qty, pack) {
+    const q = Number(qty || 0);
+    const p = Number(pack || 1);
+    if (!isFinite(q) || q <= 0) return 0;
+    if (!isFinite(p) || p <= 0) return q;
+
+    const count = Math.ceil(q / p);
+    const raw = count * p;
+    const d = decimalsOf(p);
+    return Number(raw.toFixed(d));
+}
 function formatCurrency(n) { return Number(n).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function formatShortCurrency(n) {
     if (n >= 1e9) return (n / 1e9).toFixed(2) + " พันล้าน";
@@ -484,35 +507,35 @@ function checkLogin() {
 function showLogin() { document.getElementById('loginModal').style.display = 'flex'; }
 function hideLogin() { document.getElementById('loginModal').style.display = 'none'; }
 function login() {
-  const idUser = document.getElementById('idUserInput').value.trim();
-  const password = document.getElementById('passwordInput').value.trim();
-  const remember = document.getElementById('rememberMe').checked;
+    const idUser = document.getElementById('idUserInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
+    const remember = document.getElementById('rememberMe').checked;
 
-  // ใช้ IDRec แทน
-  const user = users.find(u => (u.IDRec || '').toString().trim() === idUser);
+    // ใช้ IDRec แทน
+    const user = users.find(u => (u.IDRec || '').toString().trim() === idUser);
 
-  // password = 4 ตัวท้ายของ IDRec
-  if (user && password === idUser.slice(-4)) {
-    loggedUser = {
-      IDUser: idUser,
-      Name: user.Name || 'ไม่ระบุ',
-      Team: user.Team || '',
-      Position: user.ตำแหน่ง || '-',
-      Department: user.หน่วยงาน || '-'
-    };
+    // password = 4 ตัวท้ายของ IDRec
+    if (user && password === idUser.slice(-4)) {
+        loggedUser = {
+            IDUser: idUser,
+            Name: user.Name || 'ไม่ระบุ',
+            Team: user.Team || '',
+            Position: user.ตำแหน่ง || '-',
+            Department: user.หน่วยงาน || '-'
+        };
 
-    if (remember)
-      localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
-    else
-      sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+        if (remember)
+            localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
+        else
+            sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
 
-    hideLogin();
-    showUserMenu();
-    document.getElementById('plantSelection').style.display = 'block';
-  } else {
-    document.getElementById('loginError').textContent =
-      'User หรือ Password ไม่ถูกต้อง';
-  }
+        hideLogin();
+        showUserMenu();
+        document.getElementById('plantSelection').style.display = 'block';
+    } else {
+        document.getElementById('loginError').textContent =
+            'User หรือ Password ไม่ถูกต้อง';
+    }
 }
 
 function logout() {
@@ -537,7 +560,7 @@ function showUserMenu() {
     document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
     document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
     document.getElementById('userPosition').textContent = `ตำแหน่ง: ${loggedUser.Position}`;
-    document.getElementById('userDepartment').textContent =`หน่วยงาน: ${loggedUser.Department}`;
+    document.getElementById('userDepartment').textContent = `หน่วยงาน: ${loggedUser.Department}`;
 }
 document.getElementById('menuBtn').addEventListener('click', () => {
     const menu = document.getElementById('userMenu');
@@ -998,8 +1021,7 @@ function recalculateStockFields(data, params) {
             if (recommend < 0) recommend = 0;
         }
         // ปัดตามแพ็ค
-        if (mul > 0) recommend = Math.ceil(recommend / mul) * mul;
-        r.RecommendedOrder = Math.round(recommend);
+        r.RecommendedOrder = roundUpToPack(recommend, mul);
         // =========================
         // 11) สั่งจริง (ไม่ทับถ้า user เคยแก้)
         // =========================
@@ -1014,7 +1036,8 @@ function recalculateStockFields(data, params) {
         if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
         if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
         if (qty30d > qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
-        if (r.Moving === "Slowly" && qty30d === 1 && qty4m === 1) {r.RecommendedOrder = 0;
+        if (r.Moving === "Slowly" && qty30d === 1 && qty4m === 1) {
+            r.RecommendedOrder = 0;
 
         }
 
@@ -1170,8 +1193,8 @@ function applyFiltersAndRender() {
     if (diffVal) {
         const matchDiff = (r) => {
             const nav = Number(r.Navanakorn || 0);
-            const rec = Math.round(r.RecommendedOrder || 0);
-            const act = Math.round(r.ActualOrder ?? 0);
+            const orderQty = Number(r.RecommendedOrder || 0);
+            const actual = Number(r.ActualOrder ?? 0);
 
             switch (diffVal) {
                 case "nav0": return nav === 0;
@@ -1408,8 +1431,8 @@ function renderTable() {
         return;
     }
     pageData.forEach(r => {
-        const orderQty = Math.round(r.RecommendedOrder || 0);
-        const actual = Math.round(r.ActualOrder || 0);
+        const orderQty = Number(r.RecommendedOrder || 0);
+        const actual = Number(r.ActualOrder ?? 0);
         let orderClass;
         if (actual < orderQty) {
             orderClass = "order-less"; // แดง
@@ -1450,7 +1473,7 @@ function renderTable() {
     <td>${r.DOS > 9999 ? 'มาก' : r.DOS.toFixed(1)}</td>
    <td>
     <span class="order-span ${orderClass}">
-        ${formatNumber(orderQty)}
+        ${formatQty(orderQty)}
     </span>
 </td>
     <!-- ★ คอลัม “สั่งจริง” -->
@@ -1458,6 +1481,7 @@ function renderTable() {
     <input type="number"
            class="actual-order-input"
            min="0"
+           step="any"
            value="${(r.ActualOrder ?? r.RecommendedOrder) ?? ''}"
            style="width:80px;padding:4px 6px;border-radius:6px;border:1px solid #ccd1ff;text-align:right;">
 </td>
@@ -1486,7 +1510,7 @@ function renderTable() {
                     saveActualOrdersToLocalStorage();
                 }
                 // ★ อัปเดตสีของ "แนะนำสั่ง" ในแถวนี้ทันที
-                const rec = Math.round(r.RecommendedOrder || 0);
+                const rec = Number(r.RecommendedOrder || 0);
                 const span = row.querySelector('.order-span');
                 if (span) {
                     span.classList.remove('order-less', 'order-more', 'order-equal');
@@ -1516,38 +1540,38 @@ function renderTable() {
     });
 }
 function renderPagination() {
-  const p = document.getElementById("pagination");
-  if (!p) return;              // ✅ กันพัง
-  p.style.display = "flex";     // ✅ บังคับให้โชว์
+    const p = document.getElementById("pagination");
+    if (!p) return;              // ✅ กันพัง
+    p.style.display = "flex";     // ✅ บังคับให้โชว์
 
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
-  p.innerHTML = "";
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+    p.innerHTML = "";
 
-  // ✅ ถ้ามีหน้าเดียว จะซ่อนก็ได้ (เลือกใช้)
-  // if (totalPages <= 1) { p.style.display = "none"; return; }
+    // ✅ ถ้ามีหน้าเดียว จะซ่อนก็ได้ (เลือกใช้)
+    // if (totalPages <= 1) { p.style.display = "none"; return; }
 
-  const createBtn = (text, page, disabled = false) => {
-    const btn = document.createElement("button");
-    btn.className = "page-btn";
-    if (page === currentPage) btn.classList.add("active");
-    btn.textContent = text;
-    btn.disabled = disabled;
+    const createBtn = (text, page, disabled = false) => {
+        const btn = document.createElement("button");
+        btn.className = "page-btn";
+        if (page === currentPage) btn.classList.add("active");
+        btn.textContent = text;
+        btn.disabled = disabled;
 
-    if (!disabled) {
-      btn.onclick = () => {
-        currentPage = Math.min(totalPages, Math.max(1, page)); // ✅ กันหลุดช่วง
-        renderTable();
-        renderPagination();
-      };
-    }
-    return btn;
-  };
+        if (!disabled) {
+            btn.onclick = () => {
+                currentPage = Math.min(totalPages, Math.max(1, page)); // ✅ กันหลุดช่วง
+                renderTable();
+                renderPagination();
+            };
+        }
+        return btn;
+    };
 
-  p.appendChild(createBtn("<<", 1, currentPage === 1));
-  p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
-  p.appendChild(createBtn(currentPage, currentPage, true));
-  p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
-  p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
+    p.appendChild(createBtn("<<", 1, currentPage === 1));
+    p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
+    p.appendChild(createBtn(currentPage, currentPage, true));
+    p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
+    p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
 }
 
 function getOrderStorageKey() {
@@ -1566,29 +1590,22 @@ function saveActualOrdersToLocalStorage() {
 }
 function setActualOrderFromRecommended() {
     if (!Array.isArray(filteredData) || filteredData.length === 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "ไม่มีรายการ",
-            text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า",
-        });
+        Swal.fire({ icon: "warning", title: "ไม่มีรายการ", text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า" });
         return;
     }
-    // เฉพาะหน้าปัจจุบัน
+
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const pageData = filteredData.slice(start, end);
+
     if (pageData.length === 0) {
-        Swal.fire({
-            icon: "warning",
-            title: "ไม่มีรายการ",
-            text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า",
-        });
+        Swal.fire({ icon: "warning", title: "ไม่มีรายการ", text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า" });
         return;
     }
-    // 🔔 Popup ยืนยันแบบ SweetAlert2
+
     Swal.fire({
         title: "ยืนยันการตั้งค่า?",
-        text: `ต้องการตั้งค่า "สั่งจริง = แนะนำสั่ง" จำนวน ${pageData.length} รายการในหน้านี้หรือไม่?`,
+        text: `ตั้งค่า "สั่งจริง = แนะนำสั่ง" (ไม่ปัด) จำนวน ${pageData.length} รายการในหน้านี้?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "ยืนยัน",
@@ -1597,27 +1614,28 @@ function setActualOrderFromRecommended() {
         cancelButtonColor: "#c0392b",
     }).then(result => {
         if (!result.isConfirmed) return;
-        // ตั้งค่าจริง
+
         pageData.forEach(r => {
-            r.ActualOrder = Math.round(r.RecommendedOrder || 0);
+            const rec = Number(r.RecommendedOrder);
+            r.ActualOrder = isFinite(rec) ? rec : 0;   // ✅ 697.6 จะอยู่ครบ
             r._actualOrderTouched = true;
         });
+
         saveActualOrdersToLocalStorage();
+
         const pageBefore = currentPage;
         applyFiltersAndRender();
         currentPage = pageBefore;
         renderTable();
         renderPagination();
-        // Popup สำเร็จ
-        Swal.fire({
-            icon: "success",
-            title: "สำเร็จ!",
-            text: "ตั้งค่าตามแนะนำสั่งเรียบร้อยแล้ว",
-            timer: 1500,
-            showConfirmButton: false
-        });
+
+        Swal.fire({ icon: "success", title: "สำเร็จ!", timer: 1200, showConfirmButton: false });
     });
 }
+
+
+
+
 function loadActualOrdersFromLocalStorage() {
     const txt = localStorage.getItem(getOrderStorageKey());
     if (!txt) return;
@@ -1700,17 +1718,17 @@ document.getElementById("orderDiffFilter").addEventListener("change", applyFilte
 document.getElementById("setActualBtn").addEventListener("click", setActualOrderFromRecommended);
 document.getElementById("exportBtn").onclick = exportToCSV;
 document.addEventListener('click', function (e) {
-  const menu = document.getElementById('userMenu');
-  const btn = document.getElementById('menuBtn');
+    const menu = document.getElementById('userMenu');
+    const btn = document.getElementById('menuBtn');
 
-  if (!menu || !btn) return;
+    if (!menu || !btn) return;
 
-  // ถ้าเมนูเปิดอยู่ และคลิกนอกเมนู + ปุ่ม
-  if (
-    menu.style.display === 'block' &&
-    !menu.contains(e.target) &&
-    !btn.contains(e.target)
-  ) {
-    menu.style.display = 'none';
-  }
+    // ถ้าเมนูเปิดอยู่ และคลิกนอกเมนู + ปุ่ม
+    if (
+        menu.style.display === 'block' &&
+        !menu.contains(e.target) &&
+        !btn.contains(e.target)
+    ) {
+        menu.style.display = 'none';
+    }
 });
