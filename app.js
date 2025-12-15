@@ -25,6 +25,7 @@ let employees = [];
 const inventoryUrls = {
     '0301': 'https://opensheet.elk.sh/1x-B1xekpMm4p7fkKucvLjaewtp66uGIp8ZIxJJZAxMk/Sheet1',
     '0304': 'https://opensheet.elk.sh/1miQgObvPdIocjf2Mwn-GZxRvDZy0R5gIl1zhxMWvM-E/Sheet1',
+    '0305': 'https://opensheet.elk.sh/1DszRgfGDXe-n-BUqG3ZLj-_4N0mHu7mvw8EnfUOhvvI/Sheet1',
     '0307': 'https://opensheet.elk.sh/1C9vfwtdIO-XjHrDkmp5cUahjmcJ3vk8pTzhFCgHBg1Q/Sheet1',
     '0309': 'https://opensheet.elk.sh/1ntRtlRIndxgEZ3udnh7Nj8LSQiaUdAeAg5j8qd_z8sA/Sheet1',
     '0311': 'https://opensheet.elk.sh/1OKDdqLY_TOjjfLJ58xFiq-WHIDbMrxMcDho6FO5Rq8o/Sheet1',
@@ -38,7 +39,9 @@ const inventoryUrls = {
 };
 const lastUpdateApiBase = 'https://script.google.com/macros/s/AKfycbxwPojlkzA-QBknRpN6GIiuwxJo5cyBsVGgXQwneGenfsvSz9YuzuoNf2ZsrtxoKypE3Q/exec';
 const lastUpdateApiByPlant = {
+    '0301': `${lastUpdateApiBase}?id=1x-B1xekpMm4p7fkKucvLjaewtp66uGIp8ZIxJJZAxMk`,
     '0304': `${lastUpdateApiBase}?id=1miQgObvPdIocjf2Mwn-GZxRvDZy0R5gIl1zhxMWvM-E`,
+    '0305': `${lastUpdateApiBase}?id=1DszRgfGDXe-n-BUqG3ZLj-_4N0mHu7mvw8EnfUOhvvI`,
     '0307': `${lastUpdateApiBase}?id=1C9vfwtdIO-XjHrDkmp5cUahjmcJ3vk8pTzhFCgHBg1Q`,
     '0309': `${lastUpdateApiBase}?id=1ntRtlRIndxgEZ3udnh7Nj8LSQiaUdAeAg5j8qd_z8sA`,
     '0311': `${lastUpdateApiBase}?id=1OKDdqLY_TOjjfLJ58xFiq-WHIDbMrxMcDho6FO5Rq8o`,
