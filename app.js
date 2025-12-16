@@ -10,7 +10,7 @@ let selectedPlant = "";
 /* ★ ตะกร้า */
 let cartItems = [];
 const userSheetID = '1eqVoLsZxGguEbRCC5rdI4iMVtQ7CK4T3uXRdx8zE3uw';
-const userSheetName = 'EmployeeWeb';
+const userSheetName = 'UserPlant';
 const userUrl = `https://opensheet.elk.sh/${userSheetID}/${userSheetName}`;
 const usageUrl = 'https://opensheet.elk.sh/1P8Frv1zvcuO3qt8seU-zMF0FV0TQHyKXLn9GNHVr6kI/MoveAllsum';
 const mainsapUrl = 'https://opensheet.elk.sh/1CkfOIe2nDYBLs5aPGkPyZhOeqJkyS7UQ6tuMzxy-mfk/mainsap';
@@ -25,7 +25,6 @@ let employees = [];
 const inventoryUrls = {
     '0301': 'https://opensheet.elk.sh/1x-B1xekpMm4p7fkKucvLjaewtp66uGIp8ZIxJJZAxMk/Sheet1',
     '0304': 'https://opensheet.elk.sh/1miQgObvPdIocjf2Mwn-GZxRvDZy0R5gIl1zhxMWvM-E/Sheet1',
-    '0305': 'https://opensheet.elk.sh/1DszRgfGDXe-n-BUqG3ZLj-_4N0mHu7mvw8EnfUOhvvI/Sheet1',
     '0307': 'https://opensheet.elk.sh/1C9vfwtdIO-XjHrDkmp5cUahjmcJ3vk8pTzhFCgHBg1Q/Sheet1',
     '0309': 'https://opensheet.elk.sh/1ntRtlRIndxgEZ3udnh7Nj8LSQiaUdAeAg5j8qd_z8sA/Sheet1',
     '0311': 'https://opensheet.elk.sh/1OKDdqLY_TOjjfLJ58xFiq-WHIDbMrxMcDho6FO5Rq8o/Sheet1',
@@ -39,9 +38,7 @@ const inventoryUrls = {
 };
 const lastUpdateApiBase = 'https://script.google.com/macros/s/AKfycbxwPojlkzA-QBknRpN6GIiuwxJo5cyBsVGgXQwneGenfsvSz9YuzuoNf2ZsrtxoKypE3Q/exec';
 const lastUpdateApiByPlant = {
-    '0301': `${lastUpdateApiBase}?id=1x-B1xekpMm4p7fkKucvLjaewtp66uGIp8ZIxJJZAxMk`,
     '0304': `${lastUpdateApiBase}?id=1miQgObvPdIocjf2Mwn-GZxRvDZy0R5gIl1zhxMWvM-E`,
-    '0305': `${lastUpdateApiBase}?id=1DszRgfGDXe-n-BUqG3ZLj-_4N0mHu7mvw8EnfUOhvvI`,
     '0307': `${lastUpdateApiBase}?id=1C9vfwtdIO-XjHrDkmp5cUahjmcJ3vk8pTzhFCgHBg1Q`,
     '0309': `${lastUpdateApiBase}?id=1ntRtlRIndxgEZ3udnh7Nj8LSQiaUdAeAg5j8qd_z8sA`,
     '0311': `${lastUpdateApiBase}?id=1OKDdqLY_TOjjfLJ58xFiq-WHIDbMrxMcDho6FO5Rq8o`,
@@ -90,31 +87,13 @@ const plantNames = {
 const OUT_OF_STOCK_MODE = "out_of_stock";
 const OUT_OF_STOCK_WAIT_MODE = "out_of_stock_wait";
 //
+function getPlantCalculationOverride(plantCode) {
+    const overrides = (typeof window !== "undefined" && window.plantCalculationOverrides) || {};
+    return overrides[plantCode] || overrides["*"] || null;
+}
+//
 function toNumber(v) { return parseFloat((v || "0").toString().replace(/,/g, '')) || 0; }
 function formatNumber(n) { return Number(n).toLocaleString('th-TH'); }
-function decimalsOf(n) {
-    const s = (n ?? "").toString();
-    return (s.split(".")[1] || "").length;
-}
-function formatQty(n) {
-    const x = Number(n);
-    if (!isFinite(x)) return "0";
-    return x.toLocaleString('th-TH', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
-}
-function roundUpToPack(qty, pack) {
-    const q = Number(qty || 0);
-    const p = Number(pack || 1);
-    if (!isFinite(q) || q <= 0) return 0;
-    if (!isFinite(p) || p <= 0) return q;
-
-    const count = Math.ceil(q / p);
-    const raw = count * p;
-    const d = decimalsOf(p);
-    return Number(raw.toFixed(d));
-}
 function formatCurrency(n) { return Number(n).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function formatShortCurrency(n) {
     if (n >= 1e9) return (n / 1e9).toFixed(2) + " พันล้าน";
@@ -140,7 +119,7 @@ function getOwnerName(userId) {
         default: return userId || '';
     }
 }
-function calculateKeepQty(r) {
+function defaultCalculateKeepQty(r) {
     const avg = r.AvgMonthly;
     if (r.Moving === "Dead" || r.Moving === "Slowly") return 1;
     if (r.Moving === "Slow" && r.ABCValue === "C") return Math.max(1, Math.round(avg * 60));
@@ -153,6 +132,14 @@ function calculateKeepQty(r) {
     if (r.Moving === "Fast" && r.ABCValue === "B") return Math.max(8, Math.round(avg * 90));
     if (r.Moving === "Fast" && r.ABCValue === "A") return Math.max(10, Math.round(avg * 120));
     return Math.max(1, Math.round(avg * 40));
+}
+function calculateKeepQty(r) {
+    const plantCode = (r && r.Plant) ? r.Plant : selectedPlant;
+    const override = getPlantCalculationOverride(plantCode);
+    if (override && typeof override.calculateKeepQty === "function") {
+        return override.calculateKeepQty(r, { defaultCalculateKeepQty });
+    }
+    return defaultCalculateKeepQty(r);
 }
 /* ★ ฟังก์ชันตะกร้า */
 function updateCartCount() {
@@ -510,34 +497,17 @@ function login() {
     const idUser = document.getElementById('idUserInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
     const remember = document.getElementById('rememberMe').checked;
-
-    // ใช้ IDRec แทน
-    const user = users.find(u => (u.IDRec || '').toString().trim() === idUser);
-
-    // password = 4 ตัวท้ายของ IDRec
+    const user = users.find(u => u.IDUser === idUser);
     if (user && password === idUser.slice(-4)) {
-        loggedUser = {
-            IDUser: idUser,
-            Name: user.Name || 'ไม่ระบุ',
-            Team: user.Team || '',
-            Position: user.ตำแหน่ง || '-',
-            Department: user.หน่วยงาน || '-'
-        };
-
-        if (remember)
-            localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
-        else
-            sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
-
-        hideLogin();
-        showUserMenu();
+        loggedUser = { IDUser: user.IDUser, Name: user.Name || 'ไม่ระบุ' };
+        if (remember) localStorage.setItem('rememberedUser', JSON.stringify(loggedUser));
+        else sessionStorage.setItem('loggedUser', JSON.stringify(loggedUser));
+        hideLogin(); showUserMenu();
         document.getElementById('plantSelection').style.display = 'block';
     } else {
-        document.getElementById('loginError').textContent =
-            'User หรือ Password ไม่ถูกต้อง';
+        document.getElementById('loginError').textContent = 'IDUser หรือ Password ไม่ถูกต้อง';
     }
 }
-
 function logout() {
     localStorage.removeItem('rememberedUser');
     sessionStorage.removeItem('loggedUser');
@@ -559,15 +529,16 @@ function showUserMenu() {
     document.getElementById('menuBtn').style.display = 'block';
     document.getElementById('userID').textContent = `รหัส: ${loggedUser.IDUser}`;
     document.getElementById('userName').textContent = `ชื่อ: ${loggedUser.Name}`;
-    document.getElementById('userPosition').textContent = `ตำแหน่ง: ${loggedUser.Position}`;
-    document.getElementById('userDepartment').textContent = `หน่วยงาน: ${loggedUser.Department}`;
 }
 document.getElementById('menuBtn').addEventListener('click', () => {
     const menu = document.getElementById('userMenu');
     menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 });
 document.getElementById('logoutBtn').addEventListener('click', logout);
-document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // ป้องกันการ reload หน้า
+    login();            // เรียกฟังก์ชัน login เดิม
+});
 // =========================
 // ✅ HELP MODAL CONTROL
 // =========================
@@ -756,11 +727,11 @@ async function loadData() {
         });
         allData = [];
         inv.forEach(r => {
-            const plant = (r.Plant || '').toString().trim();
-            const material = (r.Material || '').toString().trim();
-            if (plant !== selectedPlant || !material) return;
-            const key = `${plant}-${material}`;
-            const usageInfo = usageMap.get(key) || { Qty4Month: 0, Qty6Month: 0, ThirtyDay: 0 };
+        const plant = (r.Plant || '').toString().trim();
+        const material = (r.Material || '').toString().trim();
+        if (plant !== selectedPlant || !material) return;
+        const key = `${plant}-${material}`;
+        const usageInfo = usageMap.get(key) || { Qty4Month: 0, Qty6Month: 0, ThirtyDay: 0 };
             const main = mainsapMap.get(material) || { Note: '', MultiplyUnit: 1, Product: '' };
             const status = statusMap.get(key) || '';
             const avgVal = avgValMap.get(material) || 0;
@@ -771,6 +742,13 @@ async function loadData() {
             const originalValue = toNumber(r["Value Unrestricted"] || r["Value unrestricted"] || 0);
             const description = r["Material description"] || '';
             const keys = Object.keys(r);
+            const plannedDelivTime = toNumber(
+                r["Planned Deliv. Time"] ||
+                r["Planned Deliv Time"] ||
+                r["PlannedDelivTime"] ||
+                0
+            );
+            const purchasingGroup = (r["Purchasing Group"] || r["PurchasingGroup"] || r["PurchasingGrp"] || '').toString().trim();
             let storageBin = '';
             const sk =
                 keys.find(k => k.toLowerCase().includes('storage') && k.toLowerCase().includes('bin')) ||
@@ -815,6 +793,8 @@ async function loadData() {
                 Shelf: shelf,
                 OwnerId: ownerId,
                 OwnerName: ownerName,
+                LeadTimeDays: plannedDelivTime,
+                PurchasingGroup: purchasingGroup,
                 ActualOrder: null, // ✅ ให้เป็น null แทน 0
                 _actualOrderTouched: false // ยังไม่เคยแก้
             });
@@ -822,11 +802,16 @@ async function loadData() {
         // หลังจากเติม allData เสร็จ
         loadActualOrdersFromLocalStorage();
         calcABCValue();
+        populatePrgFilter();
         const plantFilter = document.getElementById("plantFilter");
         plantFilter.innerHTML = '';
         const name = plantNames[selectedPlant] || selectedPlant;
         plantFilter.add(new Option(`${selectedPlant} - ${name}`, selectedPlant));
         plantFilter.disabled = true;
+        const dataTable = document.getElementById("dataTable");
+        if (dataTable) {
+            dataTable.classList.toggle("hide-lt", selectedPlant !== "0301");
+        }
         const updateBtn = document.getElementById("updateBtn");
         if (sheetIds[selectedPlant]) {
             updateBtn.style.display = "inline-flex";
@@ -839,15 +824,16 @@ async function loadData() {
             updateBtn.style.display = "none";
         }
         const lastLabel = document.getElementById("lastUpdateLabel");
-        lastLabel.textContent = "";
-        const apiUrl = lastUpdateApiByPlant[selectedPlant];
+        const apiUrl = lastUpdateApiByPlant[selectedPlant] ||
+            (sheetIds[selectedPlant] ? `${lastUpdateApiBase}?id=${sheetIds[selectedPlant]}` : null);
         if (apiUrl) {
             lastLabel.textContent = "กำลังตรวจสอบเวลาอัปเดต...";
             fetch(apiUrl)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.modifiedTime) {
-                        const dt = new Date(data.modifiedTime);
+                    const rawTime = data.modifiedTime || data.modified_time || data.lastModifiedTime || data.lastModified;
+                    if (rawTime) {
+                        const dt = new Date(rawTime);
                         const thTime = dt.toLocaleString('th-TH', {
                             year: 'numeric',
                             month: 'short',
@@ -857,22 +843,22 @@ async function loadData() {
                         });
                         lastLabel.textContent = `อัปเดตล่าสุด: ${thTime}`;
                     } else {
-                        lastLabel.textContent = "";
+                        lastLabel.textContent = "ไม่พบเวลาอัปเดต";
                     }
                 })
                 .catch(err => {
                     console.error('Error fetch modifiedTime', err);
-                    lastLabel.textContent = "";
+                    lastLabel.textContent = "ดึงเวลาอัปเดตไม่สำเร็จ";
                 });
         } else {
-            lastLabel.textContent = "";
+            lastLabel.textContent = "ไม่พบ API เวลาอัปเดต";
         }
         loader.style.display = "none";
         document.getElementById("mainCardsSection").style.display = "flex";
         document.getElementById("summarySection").style.display = "flex";
         document.getElementById("controlsSection").style.display = "flex";
         document.getElementById("tableSection").style.display = "block";
-        document.getElementById("pagination").style.display = "flex";
+        document.getElementById("pagination").style.display = "block";
         setDefaultAndCalculate();
     } catch (e) {
         loader.style.display = "none";
@@ -880,7 +866,7 @@ async function loadData() {
         console.error(e);
     }
 }
-function calcABCValue() {
+function defaultCalcABCValue() {
     const sorted = [...allData].sort((a, b) => b.Value - a.Value);
     const total = sorted.reduce((s, r) => s + r.Value, 0);
     let cum = 0;
@@ -894,7 +880,14 @@ function calcABCValue() {
         }
     });
 }
-function recalculateStockFields(data, params) {
+function calcABCValue() {
+    const override = getPlantCalculationOverride(selectedPlant);
+    if (override && typeof override.calcABCValue === "function") {
+        return override.calcABCValue({ allData, defaultCalcABCValue });
+    }
+    return defaultCalcABCValue();
+}
+function defaultRecalculateStockFields(data, params) {
     data.forEach(r => {
         // =========================
         // 1) ค่าพื้นฐาน + แปลงเป็นตัวเลข
@@ -1021,7 +1014,8 @@ function recalculateStockFields(data, params) {
             if (recommend < 0) recommend = 0;
         }
         // ปัดตามแพ็ค
-        r.RecommendedOrder = roundUpToPack(recommend, mul);
+        if (mul > 0) recommend = Math.ceil(recommend / mul) * mul;
+        r.RecommendedOrder = Math.round(recommend);
         // =========================
         // 11) สั่งจริง (ไม่ทับถ้า user เคยแก้)
         // =========================
@@ -1035,12 +1029,7 @@ function recalculateStockFields(data, params) {
         // =========================
         if (r.Mean === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
         if (qty30d === 0 && (r.Moving === "Slow" || r.Moving === "Slowly")) r.RecommendedOrder = 0;
-        if (qty30d > qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
-        if (r.Moving === "Slowly" && qty30d === 1 && qty4m === 1) {
-            r.RecommendedOrder = 0;
-
-        }
-
+        if (qty30d >= qty4m && r.Moving === "Slowly") r.RecommendedOrder = 0;
         // =========================
         // 13) ReturnQty / ReturnValue (เดิม)
         // =========================
@@ -1050,6 +1039,22 @@ function recalculateStockFields(data, params) {
         r.ReturnQty = Math.round(returnQty);
         r.ReturnValue = returnQty * unitPrice;
     });
+}
+function recalculateStockFields(data, params) {
+    const override = getPlantCalculationOverride(selectedPlant);
+    if (override && typeof override.recalculateStockFields === "function") {
+        return override.recalculateStockFields({
+            data,
+            params,
+            plantCode: selectedPlant,
+            helpers: {
+                defaultRecalculateStockFields,
+                calculateKeepQty,
+                defaultCalculateKeepQty
+            }
+        });
+    }
+    return defaultRecalculateStockFields(data, params);
 }
 function populateOwnerFilter(dataList) {
     const sel = document.getElementById("responsibleFilter");
@@ -1103,12 +1108,33 @@ function populateStatusFilter() {
         statusFilter.value = "";
     }
 }
+function populatePrgFilter() {
+    const sel = document.getElementById("prgFilter");
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = '<option value="">ทุก PRG</option>';
+    const set = new Set();
+    allData.forEach(r => {
+        const prg = (r.PurchasingGroup || "").toString().trim();
+        if (prg) set.add(prg);
+    });
+    Array.from(set).sort().forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        sel.appendChild(opt);
+    });
+    if (current && Array.from(sel.options).some(o => o.value === current)) sel.value = current;
+    else sel.value = "";
+}
 function setDefaultAndCalculate() {
     document.getElementById("statusFilter").value = "";
     document.getElementById("searchInput").value = "";
     document.getElementById("responsibleFilter").value = "";
+    document.getElementById("prgFilter").value = "";
     mode = "all"; abcFilter = ""; movingFilter = "";
     populateStatusFilter();
+    populatePrgFilter();
     applyFiltersAndRender();
 }
 document.getElementById("tableHeader").addEventListener("click", e => {
@@ -1142,6 +1168,11 @@ function applyFiltersAndRender() {
         } else {
             data = data.filter(r => r.Status === statusVal);
         }
+    }
+    // 3.1 กรอง PRG
+    const prgVal = document.getElementById("prgFilter").value;
+    if (prgVal) {
+        data = data.filter(r => (r.PurchasingGroup || "").toString().trim() === prgVal);
     }
 
     // 4. คำนวณ ROP, Safety, RecommendedOrder ใหม่ทุกครั้ง
@@ -1193,8 +1224,8 @@ function applyFiltersAndRender() {
     if (diffVal) {
         const matchDiff = (r) => {
             const nav = Number(r.Navanakorn || 0);
-            const orderQty = Number(r.RecommendedOrder || 0);
-            const actual = Number(r.ActualOrder ?? 0);
+            const rec = Math.round(r.RecommendedOrder || 0);
+            const act = Math.round(r.ActualOrder ?? 0);
 
             switch (diffVal) {
                 case "nav0": return nav === 0;
@@ -1427,12 +1458,12 @@ function renderTable() {
     const end = start + rowsPerPage;
     const pageData = filteredData.slice(start, end);
     if (pageData.length === 0) {
-        container.innerHTML = `<tr><td colspan="30" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
+        container.innerHTML = `<tr><td colspan="32" style="text-align:center;padding:50px;color:#95a5a6;font-size:16px;">ไม่มีข้อมูลตามเงื่อนไข</td></tr>`;
         return;
     }
     pageData.forEach(r => {
-        const orderQty = Number(r.RecommendedOrder || 0);
-        const actual = Number(r.ActualOrder ?? 0);
+        const orderQty = Math.round(r.RecommendedOrder || 0);
+        const actual = Math.round(r.ActualOrder || 0);
         let orderClass;
         if (actual < orderQty) {
             orderClass = "order-less"; // แดง
@@ -1463,6 +1494,7 @@ function renderTable() {
     <td>${navanakornHtml}</td>
     <td>${unrestrictedHtml}</td>
     <td><span class="value">${formatCurrency(r.Value)}</span></td>
+    <td class="lt-col">${(selectedPlant === "0301" && r.LeadTimeDays) ? formatNumber(r.LeadTimeDays) : ''}</td>
     <td>${formatNumber(r.Qty6Month)}</td>
     <td>${formatNumber(r.Qty4Month)}</td>
     <td>${r.AvgMonthly.toLocaleString('th-TH', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</td>
@@ -1473,7 +1505,7 @@ function renderTable() {
     <td>${r.DOS > 9999 ? 'มาก' : r.DOS.toFixed(1)}</td>
    <td>
     <span class="order-span ${orderClass}">
-        ${formatQty(orderQty)}
+        ${formatNumber(orderQty)}
     </span>
 </td>
     <!-- ★ คอลัม “สั่งจริง” -->
@@ -1481,7 +1513,6 @@ function renderTable() {
     <input type="number"
            class="actual-order-input"
            min="0"
-           step="any"
            value="${(r.ActualOrder ?? r.RecommendedOrder) ?? ''}"
            style="width:80px;padding:4px 6px;border-radius:6px;border:1px solid #ccd1ff;text-align:right;">
 </td>
@@ -1496,6 +1527,7 @@ function renderTable() {
     <td class="col-location">${r.Location || ''}</td>
     <td class="col-shelf">${r.Shelf || ''}</td>
     <td class="responsible-cell"><span class="responsible-user">${ownerDisplay}</span></td>
+    <td>${r.PurchasingGroup || ''}</td>
     <td><span class="${statusClass}">${displayStatus}</span></td>
 `;
         const actualInput = row.querySelector('input.actual-order-input');
@@ -1510,7 +1542,7 @@ function renderTable() {
                     saveActualOrdersToLocalStorage();
                 }
                 // ★ อัปเดตสีของ "แนะนำสั่ง" ในแถวนี้ทันที
-                const rec = Number(r.RecommendedOrder || 0);
+                const rec = Math.round(r.RecommendedOrder || 0);
                 const span = row.querySelector('.order-span');
                 if (span) {
                     span.classList.remove('order-less', 'order-more', 'order-equal');
@@ -1540,39 +1572,56 @@ function renderTable() {
     });
 }
 function renderPagination() {
-    const p = document.getElementById("pagination");
-    if (!p) return;              // ✅ กันพัง
-    p.style.display = "flex";     // ✅ บังคับให้โชว์
+  const p = document.getElementById("pagination");
+  if (!p) return;
 
-    const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
+
+  // หน้าเดียวไม่ต้องโชว์
+  if (totalPages <= 1) {
     p.innerHTML = "";
+    p.style.display = "none";
+    return;
+  }
 
-    // ✅ ถ้ามีหน้าเดียว จะซ่อนก็ได้ (เลือกใช้)
-    // if (totalPages <= 1) { p.style.display = "none"; return; }
+  p.style.display = "flex";
+  p.innerHTML = "";
 
-    const createBtn = (text, page, disabled = false) => {
-        const btn = document.createElement("button");
-        btn.className = "page-btn";
-        if (page === currentPage) btn.classList.add("active");
-        btn.textContent = text;
-        btn.disabled = disabled;
+  // clamp กันหลุด
+  currentPage = Math.min(Math.max(1, currentPage), totalPages);
 
-        if (!disabled) {
-            btn.onclick = () => {
-                currentPage = Math.min(totalPages, Math.max(1, page)); // ✅ กันหลุดช่วง
-                renderTable();
-                renderPagination();
-            };
-        }
-        return btn;
-    };
+  const makeBtn = (label, page, disabled = false) => {
+    const btn = document.createElement("button");
+    btn.className = "page-btn";
+    btn.textContent = label;
+    btn.disabled = disabled;
 
-    p.appendChild(createBtn("<<", 1, currentPage === 1));
-    p.appendChild(createBtn("<", currentPage - 1, currentPage === 1));
-    p.appendChild(createBtn(currentPage, currentPage, true));
-    p.appendChild(createBtn(">", currentPage + 1, currentPage === totalPages));
-    p.appendChild(createBtn(">>", totalPages, currentPage === totalPages));
+    if (!disabled) {
+      btn.onclick = () => {
+        currentPage = Math.min(Math.max(1, page), totalPages);
+        renderTable();
+        renderPagination();
+      };
+    }
+    return btn;
+  };
+
+  // << <
+  p.appendChild(makeBtn("<<", 1, currentPage === 1));
+  p.appendChild(makeBtn("<", currentPage - 1, currentPage === 1));
+
+  // ✅ แสดงแค่ “หน้าปัจจุบัน” (เป็นปุ่ม active และกดไม่ได้)
+  const cur = document.createElement("button");
+  cur.className = "page-btn active";
+  cur.textContent = String(currentPage); // เช่น 5
+  cur.disabled = true;
+  p.appendChild(cur);
+
+  // > >>
+  p.appendChild(makeBtn(">", currentPage + 1, currentPage === totalPages));
+  p.appendChild(makeBtn(">>", totalPages, currentPage === totalPages));
 }
+
 
 function getOrderStorageKey() {
     // ถ้าอยากแยกตาม Plant
@@ -1590,22 +1639,29 @@ function saveActualOrdersToLocalStorage() {
 }
 function setActualOrderFromRecommended() {
     if (!Array.isArray(filteredData) || filteredData.length === 0) {
-        Swal.fire({ icon: "warning", title: "ไม่มีรายการ", text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า" });
+        Swal.fire({
+            icon: "warning",
+            title: "ไม่มีรายการ",
+            text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า",
+        });
         return;
     }
-
+    // เฉพาะหน้าปัจจุบัน
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     const pageData = filteredData.slice(start, end);
-
     if (pageData.length === 0) {
-        Swal.fire({ icon: "warning", title: "ไม่มีรายการ", text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า" });
+        Swal.fire({
+            icon: "warning",
+            title: "ไม่มีรายการ",
+            text: "ไม่มีข้อมูลในหน้านี้ให้ตั้งค่า",
+        });
         return;
     }
-
+    // 🔔 Popup ยืนยันแบบ SweetAlert2
     Swal.fire({
         title: "ยืนยันการตั้งค่า?",
-        text: `ตั้งค่า "สั่งจริง = แนะนำสั่ง" (ไม่ปัด) จำนวน ${pageData.length} รายการในหน้านี้?`,
+        text: `ต้องการตั้งค่า "สั่งจริง = แนะนำสั่ง" จำนวน ${pageData.length} รายการในหน้านี้หรือไม่?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "ยืนยัน",
@@ -1614,28 +1670,27 @@ function setActualOrderFromRecommended() {
         cancelButtonColor: "#c0392b",
     }).then(result => {
         if (!result.isConfirmed) return;
-
+        // ตั้งค่าจริง
         pageData.forEach(r => {
-            const rec = Number(r.RecommendedOrder);
-            r.ActualOrder = isFinite(rec) ? rec : 0;   // ✅ 697.6 จะอยู่ครบ
+            r.ActualOrder = Math.round(r.RecommendedOrder || 0);
             r._actualOrderTouched = true;
         });
-
         saveActualOrdersToLocalStorage();
-
         const pageBefore = currentPage;
         applyFiltersAndRender();
         currentPage = pageBefore;
         renderTable();
         renderPagination();
-
-        Swal.fire({ icon: "success", title: "สำเร็จ!", timer: 1200, showConfirmButton: false });
+        // Popup สำเร็จ
+        Swal.fire({
+            icon: "success",
+            title: "สำเร็จ!",
+            text: "ตั้งค่าตามแนะนำสั่งเรียบร้อยแล้ว",
+            timer: 1500,
+            showConfirmButton: false
+        });
     });
 }
-
-
-
-
 function loadActualOrdersFromLocalStorage() {
     const txt = localStorage.getItem(getOrderStorageKey());
     if (!txt) return;
@@ -1662,7 +1717,7 @@ function exportToCSV() {
         "สั่งจริง", // ★ เพิ่ม
         "หมายเหตุ", "คูณหน่วย", "Product", "ABC", "Moving",
         "ส่งคืนได้ (ชิ้น)", "% สะสม",
-        "Location", "Shelf", "ผู้รับคืน", "Status"
+        "Location", "Shelf", "ผู้รับคืน", "L/T", "PRG", "Status"
     ];
     let csv = "\uFEFF" + headers.join(",") + "\n";
     filteredData.forEach(r => {
@@ -1674,7 +1729,7 @@ function exportToCSV() {
             r.ActualOrder || 0, // ★ คอลัมสั่งจริง
             r.Note, r.MultiplyUnit, r.Product, r.ABCValue, r.Moving,
             r.ReturnQty, r.CumPercent.toFixed(2),
-            r.Location || "", r.Shelf || "", r.OwnerName || r.OwnerId || "", r.Status || ""
+            r.Location || "", r.Shelf || "", r.OwnerName || r.OwnerId || "", r.LeadTimeDays || "", r.PurchasingGroup || "", r.Status || ""
         ];
         csv += row.map(v => `"${v}"`).join(",") + "\n";
     });
@@ -1711,24 +1766,10 @@ document.getElementById("cardDead").onclick = () => { movingFilter = "Dead"; abc
 document.getElementById("plantFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("statusFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("responsibleFilter").addEventListener("change", applyFiltersAndRender);
+document.getElementById("prgFilter").addEventListener("change", applyFiltersAndRender);
 ["leadTimeDays", "safetyDays", "coverDays", "searchInput"].forEach(id => {
     document.getElementById(id).addEventListener("input", applyFiltersAndRender);
 });
 document.getElementById("orderDiffFilter").addEventListener("change", applyFiltersAndRender);
 document.getElementById("setActualBtn").addEventListener("click", setActualOrderFromRecommended);
 document.getElementById("exportBtn").onclick = exportToCSV;
-document.addEventListener('click', function (e) {
-    const menu = document.getElementById('userMenu');
-    const btn = document.getElementById('menuBtn');
-
-    if (!menu || !btn) return;
-
-    // ถ้าเมนูเปิดอยู่ และคลิกนอกเมนู + ปุ่ม
-    if (
-        menu.style.display === 'block' &&
-        !menu.contains(e.target) &&
-        !btn.contains(e.target)
-    ) {
-        menu.style.display = 'none';
-    }
-});
