@@ -125,6 +125,12 @@ h1 {
   background: linear-gradient(135deg, #b2bec3, #636e72);
 }
 
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .controls {
   padding: 20px;
   background: #fff;
@@ -132,13 +138,6 @@ h1 {
   flex-direction: column;
   gap: 15px;
   border-bottom: 1px solid #eee;
-}
-
-.filter-row {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .search-row {
@@ -160,12 +159,27 @@ h1 {
   box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
   transition: all 0.3s;
 }
+.control-group.compact-group {
+  padding: 8px 12px;
+  gap: 8px;
+}
+.plant-group select {
+  min-width: 160px;
+}
+.mini-input-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mini-input-row input[type=number] {
+  width: 70px;
+  padding: 8px 10px;
+}
 
 .control-group:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(102, 126, 234, 0.2);
 }
-
 .control-icon {
   font-size: 18px;
   color: #667eea;
@@ -275,29 +289,28 @@ input[type=text]:focus {
 
 /* ให้กล่องตารางเป็น sticky + scroll ข้างในเอง */
 .table-container {
-  /* ❌ ลบ sticky ออก */
-  position: relative;
-  /* หรือเอาออกก็ได้ */
-  top: auto;
-
+  position: sticky;
+  top: 0;
+  /* ติดขอบบน viewport หลังจากเลื่อนมาถึง */
   z-index: 20;
-  max-height: none;
-  /* ❌ ไม่ต้องล็อคสูงเต็มจอ */
+  max-height: calc(100vh - 0px);
+  /* สูงไม่เกินหน้าจอ */
   overflow: auto;
-  /* จะมี scroll ได้ตามพื้นที่ */
-  padding: 0 16px;
+  /* inner scrollbar อยู่ตรงนี้ */
+  padding: 0 8px;
   background: #fff;
+  /* กันโปร่งทะลุ */
 }
-
 
 /* ตาราง */
 table {
   width: 100%;
-  min-width: 1600px;
+  min-width: 1200px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   background: white;
+  table-layout: auto;
 
   /* สำคัญสำหรับ sticky */
   border-collapse: separate;
@@ -322,9 +335,9 @@ th {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: #fff;
 
-  padding: 14px 10px;
+  padding: 8px 6px;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
@@ -344,7 +357,6 @@ th:hover {
 tbody tr {
   transition: background 0.2s;
   border-bottom: 1px solid #eee;
- 
 }
 
 tbody tr:hover {
@@ -356,10 +368,11 @@ tbody tr:nth-child(even) {
 }
 
 td {
-  padding: 12px 10px;
-  font-size: 13px;
+  padding: 6px 4px;
+  font-size: 12px;
   text-align: left;
   white-space: nowrap;
+  line-height: 1.25;
 }
 
 /* badges */
@@ -491,6 +504,15 @@ td {
 .page-btn:hover:not(.active):not(:disabled) {
   background: #e9ecef;
 }
+.page-info {
+  align-self: center;
+  padding: 6px 10px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+.hide-lt .lt-col {
+  display: none;
+}
 
 #loginModal {
   position: fixed;
@@ -546,43 +568,18 @@ td {
 }
 
 #menuBtn {
-  position: fixed;
+  position: absolute;
   top: 20px;
   right: 20px;
-
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-
-  color: #ffffff;
-  font-size: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: rgb(255, 255, 255);
   cursor: pointer;
-
-  display: none; /* คุมด้วย JS */
-  z-index: 9999;
-
-  transition: all 0.25s ease;
 }
-
-#menuBtn:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-}
-
-#menuBtn:active {
-  transform: translateY(0);
-}
-
 
 #userMenu {
-  position: fixed;
+  position: absolute;
   top: 50px;
   right: 20px;
   background: white;
@@ -591,9 +588,6 @@ td {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   display: none;
   text-align: left;
-  margin: 4px 0;
-  font-size: 13px;
-  color: #2c3e50;
 }
 
 #userMenu p {
@@ -652,40 +646,16 @@ td {
 }
 
 #backBtn {
-  position: fixed;
+  position: absolute;
   top: 20px;
   left: 20px;
-
-  width: 40px;          /* 🔹 เท่าปุ่มเมนู */
-  height: 40px;         /* 🔹 เท่าปุ่มเมนู */
-  border-radius: 12px;  /* 🔹 โค้งใกล้เคียง */
-
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-
-  color: #ffffff;
-  font-size: 20px;      /* 🔹 ไอคอนพอดี */
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
   cursor: pointer;
-
   display: none;
-  z-index: 9999;
-
-  transition: all 0.25s ease;
 }
-
-#backBtn:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: translateY(-2px);
-}
-
-#backBtn:active {
-  transform: translateY(0);
-}
-
 
 /* Filter ผู้รับคืน */
 #responsibleFilterContainer {
@@ -761,16 +731,6 @@ th:nth-child(26),
 td:nth-child(26) {
   text-align: center;
   width: 140px;
-}
-
-#controlsSection .filter-row .control-group:first-child {
-  flex: 1 1 280px;
-  min-width: 240px;
-}
-
-#controlsSection .filter-row .control-group:first-child select {
-  width: 100%;
-  min-width: 220px;
 }
 
 /* นวนคร */
@@ -880,29 +840,23 @@ td:nth-child(26) {
 .cart-table th,
 .cart-table td {
   border: 1px solid #ddd;
-  padding: 4px 6px;      /* 🔻 เตี้ยลง */
-  font-size: 12px;       /* 🔻 เล็กลง */
-  line-height: 1;      /* 🔻 ชิดขึ้น */
-  vertical-align: middle;
+  padding: 6px 8px;
+  font-size: 13px;
 }
 
-/* หัวตาราง */
 .cart-table th {
   background: #2980b9;
   color: #ffffff;
   font-weight: 600;
   text-align: center;
-  padding: 6px 6px;      /* 🔻 หัวเตี้ยลง */
 }
 
 .cart-table input[type="number"] {
   width: 80px;
- padding: 2px 6px;
+  padding: 4px 6px;
   border-radius: 6px;
   border: 1px solid #ccd1ff;
   text-align: right;
-   height: 26px;
-   font-size: 12px;
 }
 
 .cart-empty {
@@ -968,15 +922,11 @@ td:nth-child(26) {
   }
 
   .summary-row {
-    position: relative;
-    z-index: 1;
     padding: 10px;
     gap: 8px;
   }
 
   .card {
-    position: relative;
-    z-index: 1;
     max-width: none;
     flex: 1 1 calc(50% - 10px);
   }
@@ -1007,8 +957,7 @@ td:nth-child(26) {
     margin-left: 0;
   }
 
-  .search-row,
-  .filter-row {
+  .search-row {
     gap: 10px;
   }
 
@@ -1201,172 +1150,175 @@ td:nth-child(26) {
 
 /* สีพื้นหลังการ์ด Out of Stock */
 .card.out-of-stock {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
-  color: white;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
 }
 
 .card.out-of-stock-wait {
-  background: linear-gradient(135deg, #f44336, #d32f2f);
-  color: white;
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    color: white;
 }
 
 /* ทำให้มูลค่าด้านล่างตัวเล็กลง (เหมือน Card Order) */
 .card-value.small {
-  font-size: 14px;
-  font-weight: 700;
-  opacity: 0.9;
-  margin-top: -4px;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.9;
+    margin-top: -4px;
 }
 
 /* ปรับให้การ์ดสูงเท่ากันและจัดกึ่งกลางดี */
 .card.out-of-stock,
 .card.out-of-stock-wait {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 8px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    min-height: 100px;
 }
 
 .card.out-of-stock .card-title,
 .card.out-of-stock-wait .card-title {
-  font-size: 13px;
-  margin-bottom: 6px;
-  opacity: 0.95;
+    font-size: 13px;
+    margin-bottom: 6px;
+    opacity: 0.95;
 }
-/* ===== override ทำให้แถวตารางหลักเตี้ยลง (วางท้ายไฟล์) ===== */
-table tbody td{
-  padding: 4px 6px !important;
-  font-size: 12px !important;
-  line-height: 1.0 !important;
-}
-
-table tbody tr{
-  height: 24px !important;   /* เตี้ยลงอีก */
-}
-/* ===== ปุ่มตะกร้าในตารางหลักให้เล็กลง ===== */
-td:first-child .icon-btn,
-td:first-child button,
-td:first-child .cart-btn{
-  width: 26px !important;        /* 🔻 จาก 40 -> 26 */
-  height: 26px !important;
-  border-radius: 10px !important;
-  padding: 0 !important;
-  font-size: 14px !important;    /* ขนาดไอคอน */
-  line-height: 1 !important;
-  display: inline-flex;
+#menuBtn,
+#backBtn {
+  position: absolute;
+  top: 16px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.9);   /* พื้นหลังขาวโปร่ง */
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  font-size: 24px;
+  color: #2c3e50 !important;             /* ไอคอนสีเข้ม */
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
 }
 
-td:first-child .icon-btn i,
-td:first-child button i,
-td:first-child .cart-btn i{
-  font-size: 14px !important;
+#menuBtn {
+  right: 16px;
 }
 
-/* =========================================================
-   HELP MODAL – MANAGER PREMIUM (ADDON)
-   วางท้ายไฟล์ CSS เพื่อ override ของเดิม
-========================================================= */
-
-/* ทำให้ modal ดูลอย หรู และนุ่มขึ้น */
-.help-content{
-  background: linear-gradient(180deg,#ffffff,#f9fbff);
-  border: 1px solid rgba(102,126,234,.18);
+#backBtn {
+  left: 16px;
+  display: none;
 }
 
-/* Header ให้ดูเป็น Executive */
-.help-header{
-  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+#menuBtn:hover,
+#backBtn:hover {
+  background: white;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
 }
-
-.help-header h2{
-  font-weight: 800;
-  letter-spacing: .3px;
+#pagination{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:12px;
 }
-
-/* เส้นแบ่ง Section */
-.help-body h3{
-  padding-bottom: 6px;
-  border-bottom: 2px solid rgba(102,126,234,.15);
+.page-btn{
+  padding:6px 10px;
+  border:1px solid #d0d0d0;
+  background:#fff;
+  border-radius:8px;
+  cursor:pointer;
 }
-
-.help-body h4{
-  padding-left: 8px;
-  border-left: 4px solid #667eea;
-}
-
-/* Card ด้านบนให้ดูเป็น KPI */
-.help-card{
-  background: linear-gradient(180deg,#ffffff,#f1f4ff);
-  box-shadow: 0 6px 18px rgba(102,126,234,.18);
-  transition: transform .25s ease, box-shadow .25s ease;
-}
-
-.help-card:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 10px 26px rgba(102,126,234,.28);
-}
-
-/* pill ดูเป็น tag ผู้บริหาร */
-.help-pill{
-  background: linear-gradient(135deg,#667eea,#764ba2);
+.page-btn.active{
+  background:#2d7ff9;
+  border-color:#2d7ff9;
   color:#fff;
-  border:none;
-  box-shadow: 0 4px 10px rgba(102,126,234,.35);
+}
+.page-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.page-ellipsis{
+  padding:0 6px;
+  color:#888;
+}
+.page-info{
+  margin-left:10px;
+  color:#666;
+  font-size:12px;
+}
+.table-container{
+  padding-bottom: 70px; /* เผื่อที่ให้ pagination ไม่ทับแถวสุดท้าย */
 }
 
-/* list ให้โล่ง อ่านง่าย */
-.help-body ul{
-  padding-left: 18px;
+#pagination{
+  position: sticky;
+  bottom: 0;
+  z-index: 200;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+}
+/* =========================
+   ทำให้แถวข้อมูลในตารางเตี้ยลง
+   ========================= */
+.table-container td{
+  padding: 3px 4px !important;
+  line-height: 1.1 !important;
+  font-size: 11px !important;
+}
+.table-container th{
+  padding: 6px 5px !important;
+  font-size: 11px !important;
 }
 
-.help-body ul li{
-  position: relative;
-  padding-left: 6px;
+/* ลดความหนาของ badge ต่าง ๆ ในตาราง (พวก value/status/moving/stock ฯลฯ) */
+.table-container .value,
+.table-container .return-qty,
+.table-container .order-equal,
+.table-container .order-less,
+.table-container .order-more,
+.table-container .status-pending,
+.table-container .status-approved,
+.table-container .status-rejected,
+.table-container .status-other,
+.table-container .moving-fast,
+.table-container .moving-medium,
+.table-container .moving-slow,
+.table-container .moving-slowly,
+.table-container .moving-dead,
+.table-container .nava-orange,
+.table-container .nava-red,
+.table-container .stock-green,
+.table-container .stock-red,
+.table-container .responsible-user{
+  padding: 2px 6px !important;
+  font-size: 10.5px !important;
+  border-radius: 6px !important;
 }
 
-/* ไฮไลท์คำสำคัญ */
-.help-body b{
-  color:#2f3eb1;
+/* ช่อง input "สั่งจริง" ให้เตี้ยลง */
+.table-container .actual-order-input{
+  width: 68px !important;
+  padding: 2px 6px !important;
+  height: 24px !important;
+  font-size: 11px !important;
 }
 
-/* กล่องสรุป / note สำหรับผู้จัดการ */
-.help-note{
-  background: linear-gradient(135deg,#eef2ff,#f7f9ff);
-  border-left: 6px solid #667eea;
-  font-size: 14px;
+/* =========================
+   ปุ่มตะกร้าในตารางให้เล็กลง
+   (จำกัดเฉพาะใน .table-container)
+   ========================= */
+.table-container .icon-btn{
+  width: 28px !important;
+  height: 28px !important;
 }
-
-/* กล่องคำเตือนให้ดู serious */
-.help-warn{
-  background: linear-gradient(135deg,#fff0f0,#fff7f7);
-  border-left: 6px solid #e74c3c;
-}
-
-/* ทำ footer ให้เหมือน policy note */
-.help-footer{
-  background:#f8fafc;
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-
-/* Scrollbar ใน Help Modal */
-.help-body::-webkit-scrollbar{
-  width: 8px;
-}
-.help-body::-webkit-scrollbar-thumb{
-  background: linear-gradient(180deg,#667eea,#764ba2);
-  border-radius: 999px;
-}
-
-/* Responsive: ผู้จัดการดูบน iPad */
-@media (max-width: 900px){
-  .help-body{
-    font-size: 13px;
-  }
+.table-container .icon-btn i{
+  font-size: 14px !important;
 }
